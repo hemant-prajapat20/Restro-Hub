@@ -20,9 +20,12 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
       ownerPassword, 
       ownerPhone,
       address,
+      state,
+      district,
       plan,
       activeModules,
-      subscriptionExpiryDays = 30
+      subscriptionExpiryDays = 30,
+      subscriptionAmountPaid
     } = req.body;
 
     // 1. Check if user already exists
@@ -60,7 +63,10 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
       contactEmail: ownerEmail,
       contactPhone: ownerPhone,
       address,
+      state,
+      district,
       plan: plan || SubscriptionPlan.BASIC,
+      subscriptionAmountPaid,
       activeModules: activeModules || [BusinessModule.POS],
       subscriptionExpiry: expiryDate,
       status: BusinessStatus.ACTIVE

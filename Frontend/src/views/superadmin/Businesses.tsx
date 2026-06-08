@@ -1,16 +1,132 @@
-import React, { useState } from 'react';
-import { Search, Filter, Plus, MoreVertical, Building2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Plus, MoreVertical, Building2, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
-const MOCK_BUSINESSES = [
-  { id: 1, name: "Spice Symphony", owner: "Rahul Sharma", plan: "Enterprise", status: "Active", outlets: 5 },
-  { id: 2, name: "Cafe Mocha", owner: "Priya Singh", plan: "Pro", status: "Active", outlets: 2 },
-  { id: 3, name: "Burger Point", owner: "Amit Kumar", plan: "Basic", status: "Suspended", outlets: 1 },
-  { id: 4, name: "The Golden Dragon", owner: "Mei Lin", plan: "Enterprise", status: "Active", outlets: 8 },
+const INDIAN_STATES = [
+  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", 
+  "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", 
+  "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", 
+  "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", 
+  "Uttar Pradesh", "Uttarakhand", "West Bengal"
 ];
 
 export const Businesses: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [businesses, setBusinesses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const [formData, setFormData] = useState({
+    businessName: '',
+    ownerFirstName: '',
+    ownerLastName: '',
+    ownerEmail: '',
+    ownerPhone: '',
+    ownerPassword: '',
+    address: '',
+    state: '',
+    district: '',
+    plan: 'BASIC',
+    subscriptionExpiryDays: 30,
+    subscriptionAmountPaid: ''
+  });
+
+  const fetchBusinesses = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/businesses', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        setBusinesses(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch businesses:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinesses();
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    // Phone number validation: allow only digits and max 10 chars
+    if (name === 'ownerPhone') {
+      const formatted = value.replace(/\D/g, '').slice(0, 10);
+      setFormData(prev => ({ ...prev, [name]: formatted }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    // Phone validation
+    if (formData.ownerPhone.length !== 10) {
+      setError("Mobile number must be exactly 10 digits.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/businesses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          subscriptionAmountPaid: formData.subscriptionAmountPaid ? Number(formData.subscriptionAmountPaid) : undefined,
+          activeModules: ['POS'] // Default module
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to register business');
+      }
+
+      setSuccess(`Successfully registered ${formData.businessName}! The Business Admin can now log in.`);
+      fetchBusinesses(); // Refresh table
+      
+      // Reset form after delay and close modal
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setSuccess('');
+        setFormData({
+          businessName: '', ownerFirstName: '', ownerLastName: '', ownerEmail: '', ownerPhone: '', ownerPassword: '',
+          address: '', state: '', district: '', plan: 'BASIC', subscriptionExpiryDays: 30, subscriptionAmountPaid: ''
+        });
+      }, 3000);
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Filter logic
+  const filteredBusinesses = businesses.filter(b => 
+    b.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (b.ownerId?.firstName + " " + b.ownerId?.lastName).toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-8 pb-24">
@@ -19,7 +135,10 @@ export const Businesses: React.FC = () => {
           <h1 className="text-3xl font-semibold text-slate-900 font-display truncate">Business Management</h1>
           <p className="text-slate-500 mt-2 font-medium break-words">Manage all tenant restaurants and franchises.</p>
         </div>
-        <button className="bg-brand-accent hover:bg-brand-accent/90 text-white px-6 py-3 rounded-2xl font-semibold flex items-center gap-2 shadow-lg shadow-brand-accent/30 transition-all active:scale-95">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-brand-accent hover:bg-brand-accent/90 text-white px-6 py-3 rounded-2xl font-semibold flex items-center gap-2 shadow-lg shadow-brand-accent/30 transition-all active:scale-95"
+        >
           <Plus className="w-5 h-5" />
           Register New Business
         </button>
@@ -46,60 +165,192 @@ export const Businesses: React.FC = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse table-fixed">
+          <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Business Name</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Owner</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Plan</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Outlets</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Status</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 text-right">Actions</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Business Name</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Owner</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Plan</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Status</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 text-right w-1/6">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {MOCK_BUSINESSES.map((business, i) => (
-                <motion.tr 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  key={business.id} 
-                  className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-brand-primary/5 text-brand-primary flex items-center justify-center">
-                         <Building2 className="w-5 h-5" />
+              {isLoading ? (
+                <tr><td colSpan={5} className="p-8 text-center text-slate-400 font-semibold">Loading businesses...</td></tr>
+              ) : filteredBusinesses.length === 0 ? (
+                <tr><td colSpan={5} className="p-8 text-center text-slate-400 font-semibold">No businesses found.</td></tr>
+              ) : (
+                filteredBusinesses.map((business, i) => (
+                  <motion.tr 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    key={business._id} 
+                    className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group"
+                  >
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="shrink-0 w-10 h-10 rounded-xl bg-brand-primary/5 text-brand-primary flex items-center justify-center">
+                           <Building2 className="w-5 h-5" />
+                        </div>
+                        <span className="font-semibold text-slate-900 truncate">{business.name}</span>
                       </div>
-                      <span className="font-semibold text-slate-900 truncate">{business.name}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 font-medium text-slate-600">{business.owner}</td>
-                  <td className="p-4">
-                     <span className="font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg text-sm truncate">
-                       {business.plan}
-                     </span>
-                  </td>
-                  <td className="p-4 font-semibold text-slate-900">{business.outlets}</td>
-                  <td className="p-4">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                      business.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${business.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`} />
-                      {business.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right">
-                    <button className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors">
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-slate-900 truncate">{business.ownerId?.firstName} {business.ownerId?.lastName}</span>
+                        <span className="text-xs text-slate-500 truncate">{business.contactEmail}</span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                       <span className="inline-block font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg text-sm truncate">
+                         {business.plan}
+                       </span>
+                    </td>
+                    <td className="p-4">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                        business.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${business.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`} />
+                        {business.status}
+                      </span>
+                    </td>
+                    <td className="p-4 text-right">
+                      <button className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors inline-block">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Registration Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100]"
+              onClick={() => setIsModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl z-[101] p-8"
+            >
+              <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-2xl font-display font-semibold text-slate-900">Register New Business</h2>
+                  <p className="text-sm text-slate-500 mt-1">Provision a new tenant and setup their Business Admin account.</p>
+                </div>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6 text-slate-400" />
+                </button>
+              </div>
+
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl flex items-center gap-3 font-medium">
+                  <AlertCircle className="w-5 h-5" />
+                  {error}
+                </div>
+              )}
+              {success && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-2xl flex items-center gap-3 font-medium">
+                  <CheckCircle2 className="w-5 h-5" />
+                  {success}
+                </div>
+              )}
+
+              <form onSubmit={handleRegister} className="space-y-8">
+                {/* 1. Admin Details */}
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center">1</span>
+                    Admin Credentials
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="ownerFirstName" required placeholder="First Name" value={formData.ownerFirstName} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    <input type="text" name="ownerLastName" required placeholder="Last Name" value={formData.ownerLastName} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    <input type="email" name="ownerEmail" required placeholder="Admin Email" value={formData.ownerEmail} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    <input type="text" name="ownerPhone" required placeholder="Mobile Number (10 Digits)" value={formData.ownerPhone} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    <input type="text" name="ownerPassword" required placeholder="Initial Password" value={formData.ownerPassword} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full md:col-span-2" />
+                  </div>
+                </div>
+
+                <hr className="border-slate-100" />
+
+                {/* 2. Business Details */}
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center">2</span>
+                    Company Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="businessName" required placeholder="Company / Restaurant Name" value={formData.businessName} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full md:col-span-2" />
+                    
+                    <select name="state" required value={formData.state} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full">
+                      <option value="">Select State</option>
+                      {INDIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
+                    <input type="text" name="district" required placeholder="District / City" value={formData.district} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    
+                    <textarea name="address" required placeholder="Full Company & Home Address" value={formData.address} onChange={handleInputChange} rows={3} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full md:col-span-2 resize-none" />
+                  </div>
+                </div>
+
+                <hr className="border-slate-100" />
+
+                {/* 3. Subscription Details */}
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center">3</span>
+                    Subscription Setup
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Plan Tier</label>
+                      <select name="plan" required value={formData.plan} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full">
+                        <option value="BASIC">Basic</option>
+                        <option value="PRO">Pro</option>
+                        <option value="ENTERPRISE">Enterprise</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Duration (Days)</label>
+                      <input type="number" name="subscriptionExpiryDays" required min="1" value={formData.subscriptionExpiryDays} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount Paid (₹)</label>
+                      <input type="number" name="subscriptionAmountPaid" required min="0" placeholder="e.g. 5000" value={formData.subscriptionAmountPaid} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex justify-end gap-4">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-4 font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={isSubmitting} className="bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-50 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-brand-accent/30 transition-all active:scale-95 flex items-center gap-2">
+                    {isSubmitting ? 'Registering...' : 'Complete Registration'}
+                  </button>
+                </div>
+              </form>
+
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

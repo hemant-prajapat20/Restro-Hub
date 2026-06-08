@@ -25,8 +25,11 @@ export interface IBusiness extends Document {
   contactEmail: string;
   contactPhone: string;
   address: string;
+  state: string;
+  district: string;
   logoUrl?: string;
   plan: SubscriptionPlan;
+  subscriptionAmountPaid?: number;
   activeModules: BusinessModule[];
   subscriptionExpiry: Date;
   status: BusinessStatus;
@@ -43,12 +46,15 @@ const businessSchema = new Schema<IBusiness>(
     contactEmail: { type: String, required: true },
     contactPhone: { type: String, required: true },
     address: { type: String, required: true },
+    state: { type: String, required: true },
+    district: { type: String, required: true },
     logoUrl: { type: String },
     plan: {
       type: String,
       enum: Object.values(SubscriptionPlan),
       default: SubscriptionPlan.BASIC
     },
+    subscriptionAmountPaid: { type: Number },
     activeModules: [
       {
         type: String,
