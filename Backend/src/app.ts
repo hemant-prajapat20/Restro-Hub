@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes';
 
 dotenv.config();
 
@@ -20,8 +21,8 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'RestroHub API is running smoothly' });
 });
 
-// Import and mount routes here
-// app.use('/api/auth', authRoutes);
+// Mount routes
+app.use('/api/auth', authRoutes);
 // app.use('/api/businesses', businessRoutes);
 // app.use('/api/orders', orderRoutes);
 
