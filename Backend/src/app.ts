@@ -7,6 +7,8 @@ import authRoutes from './routes/auth.routes';
 import businessRoutes from './routes/business.routes';
 import subscriptionRoutes from './routes/subscription.routes';
 import userRoutes from './routes/user.routes';
+import settingsRoutes from './routes/settings.routes';
+import analyticsRoutes from './routes/analytics.routes';
 
 dotenv.config();
 

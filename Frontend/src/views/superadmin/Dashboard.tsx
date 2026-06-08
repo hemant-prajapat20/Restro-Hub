@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   IndianRupee, 
@@ -8,17 +8,54 @@ import {
   CreditCard,
   AlertCircle
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const SuperAdminDashboard: React.FC = () => {
+  const [metrics, setMetrics] = useState({
+    monthlyRecurringRevenue: 0,
+    activeBusinesses: 0,
+    totalUsers: 0,
+    activeSubscriptions: 0,
+    chartData: [] as any[]
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/analytics/superadmin', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          setMetrics(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch analytics:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(value);
+  };
+
   return (
     <div className="p-8 pb-24">
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
-          { title: "Monthly Recurring Revenue", value: "₹24,50,000", change: "+15%", icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50", gradient: "from-emerald-500 to-green-400" },
-          { title: "Active Businesses", value: "142", change: "+8", icon: Building2, color: "text-indigo-600", bg: "bg-indigo-50", gradient: "from-indigo-500 to-blue-400" },
-          { title: "Total Users", value: "15,489", change: "+12%", icon: Users, color: "text-violet-600", bg: "bg-violet-50", gradient: "from-violet-500 to-purple-400" },
-          { title: "Active Subscriptions", value: "135", change: "+5", icon: CreditCard, color: "text-rose-600", bg: "bg-rose-50", gradient: "from-rose-500 to-pink-400" }
+          { title: "Monthly Recurring Revenue", value: isLoading ? '...' : formatCurrency(metrics.monthlyRecurringRevenue), change: "+15%", icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50", gradient: "from-emerald-500 to-green-400" },
+          { title: "Active Businesses", value: isLoading ? '...' : metrics.activeBusinesses.toString(), change: "+8", icon: Building2, color: "text-indigo-600", bg: "bg-indigo-50", gradient: "from-indigo-500 to-blue-400" },
+          { title: "Total Users", value: isLoading ? '...' : metrics.totalUsers.toString(), change: "+12%", icon: Users, color: "text-violet-600", bg: "bg-violet-50", gradient: "from-violet-500 to-purple-400" },
+          { title: "Active Subscriptions", value: isLoading ? '...' : metrics.activeSubscriptions.toString(), change: "+5", icon: CreditCard, color: "text-rose-600", bg: "bg-rose-50", gradient: "from-rose-500 to-pink-400" }
         ].map((metric, idx) => (
           <motion.div 
             key={idx}
@@ -52,22 +89,42 @@ export const SuperAdminDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          {/* Main Chart Area */}
-         <div className="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+         <div className="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-8">
                <h3 className="text-xl font-semibold text-slate-900 truncate">Revenue Growth</h3>
                <select className="bg-slate-50 border-none outline-none font-semibold text-slate-500 rounded-xl px-4 py-2">
                  <option>Last 6 Months</option>
-                 <option>This Year</option>
                </select>
             </div>
-            <div className="h-64 w-full bg-slate-50 rounded-2xl flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
-               <TrendingUp className="w-12 h-12 mb-4 opacity-20" />
-               <p className="font-semibold uppercase tracking-widest text-sm break-words">Revenue Chart Visualization</p>
-               <p className="text-xs mt-2 break-words">Integrate Recharts here</p>
+            <div className="flex-1 w-full min-h-[300px]">
+               {isLoading ? (
+                 <div className="w-full h-full bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
+                    <p className="font-semibold uppercase tracking-widest text-sm">Loading Chart Data...</p>
+                 </div>
+               ) : (
+                 <ResponsiveContainer width="100%" height="100%">
+                   <AreaChart data={metrics.chartData}>
+                     <defs>
+                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                         <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                       </linearGradient>
+                     </defs>
+                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dx={-10} tickFormatter={(value) => `₹${(value/1000)}k`} />
+                     <Tooltip 
+                       contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                       formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                     />
+                     <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                   </AreaChart>
+                 </ResponsiveContainer>
+               )}
             </div>
          </div>
 
-         {/* Alerts & Activity */}
+         {/* Alerts & Activity (Static Design Preserved) */}
          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col">
             <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2 truncate">
                <AlertCircle className="w-5 h-5 text-orange-500" />

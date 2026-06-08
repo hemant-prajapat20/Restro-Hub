@@ -15,6 +15,8 @@ declare global {
   }
 }
 
+import SystemSettings from '../models/SystemSettings';
+
 export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   let token;
 
@@ -34,6 +36,19 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
       if (!user.isActive) {
         res.status(403).json({ status: 'error', message: 'User account is deactivated' });
         return;
+      }
+
+      // Enforce Maintenance Mode
+      if (user.role !== Role.SUPER_ADMIN) {
+        try {
+          const settings = await SystemSettings.findOne();
+          if (settings && settings.maintenanceMode) {
+             res.status(503).json({ status: 'error', message: 'System is currently under maintenance. Please try again later.' });
+             return;
+          }
+        } catch (e) {
+          console.error("Failed to check maintenance mode", e);
+        }
       }
 
       req.user = user;

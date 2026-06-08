@@ -2,10 +2,23 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User, { Role } from '../models/User';
+import SystemSettings from '../models/SystemSettings';
 
-const generateToken = (id: string): string => {
+const generateToken = async (id: string): Promise<string> => {
+  let expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+  try {
+    const settings = await SystemSettings.findOne();
+    if (settings && settings.jwtExpirationTime) {
+      if (settings.jwtExpirationTime === '24 Hours') expiresIn = '24h';
+      else if (settings.jwtExpirationTime === '7 Days') expiresIn = '7d';
+      else if (settings.jwtExpirationTime === '30 Days') expiresIn = '30d';
+    }
+  } catch (err) {
+    console.error('Could not fetch JWT expiration settings', err);
+  }
+
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
-    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'],
+    expiresIn: expiresIn as jwt.SignOptions['expiresIn'],
   });
 };
 
@@ -38,9 +51,8 @@ export const registerSuperAdmin = async (req: Request, res: Response): Promise<v
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        role: user.role,
-        token: generateToken(user._id.toString()),
-      },
+        token: await generateToken(user._id.toString()),
+      }
     });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });
@@ -76,9 +88,8 @@ export const registerCustomer = async (req: Request, res: Response): Promise<voi
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        role: user.role,
-        token: generateToken(user._id.toString()),
-      },
+        token: await generateToken(user._id.toString()),
+      }
     });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });
@@ -115,9 +126,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         role: user.role,
         businessId: user.businessId,
-        outletId: user.outletId,
-        token: generateToken(user._id.toString()),
-      },
+        token: await generateToken(user._id.toString()),
+      }
     });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });
@@ -217,9 +227,8 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
         phone: user.phone,
         role: user.role,
         businessId: user.businessId,
-        outletId: user.outletId,
-        token: generateToken(user._id.toString()),
-      },
+        token: await generateToken(user._id.toString()),
+      }
     });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });
