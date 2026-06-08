@@ -17,6 +17,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Basic route for testing
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'success', message: 'Welcome to RestroHub Backend API' });
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'RestroHub API is running smoothly' });
 });

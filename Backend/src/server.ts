@@ -16,7 +16,7 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
   console.log(`New client connected: ${socket.id}`);
-  
+
   // Real-time events to be added (e.g., KDS updates, notifications)
   socket.on('disconnect', () => {
     console.log(`Client disconnected: ${socket.id}`);
@@ -29,9 +29,10 @@ const startServer = async () => {
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub';
     await mongoose.connect(mongoUri);
     console.log('Connected to MongoDB successfully.');
-    
+
     server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      console.log(`Backend API Link: http://localhost:${PORT}/`);
     });
   } catch (error) {
     console.error('Failed to start the server:', error);

@@ -6,7 +6,8 @@ export enum Role {
   MANAGER = 'MANAGER',
   CASHIER = 'CASHIER',
   CHEF = 'CHEF',
-  WAITER = 'WAITER'
+  WAITER = 'WAITER',
+  CUSTOMER = 'CUSTOMER'
 }
 
 export interface IUser extends Document {

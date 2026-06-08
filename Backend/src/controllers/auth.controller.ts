@@ -47,6 +47,44 @@ export const registerSuperAdmin = async (req: Request, res: Response): Promise<v
   }
 };
 
+export const registerCustomer = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { firstName, lastName, email, password, phone } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(400).json({ status: 'error', message: 'User already exists' });
+      return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      passwordHash,
+      phone,
+      role: 'CUSTOMER', // Default to Customer
+    });
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id as string),
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
