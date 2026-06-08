@@ -1,10 +1,21 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export enum SubscriptionPlan {
-  RESTAURANT = 'RESTAURANT',
-  BAR = 'BAR',
-  CAFETERIA = 'CAFETERIA',
-  COMBO = 'COMBO'
+  BASIC = 'BASIC',
+  PRO = 'PRO',
+  ENTERPRISE = 'ENTERPRISE'
+}
+
+export enum BusinessModule {
+  POS = 'POS',
+  KDS = 'KDS',
+  DELIVERY = 'DELIVERY',
+  QRMENU = 'QRMENU'
+}
+
+export enum BusinessStatus {
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED'
 }
 
 export interface IBusiness extends Document {
@@ -15,9 +26,11 @@ export interface IBusiness extends Document {
   contactPhone: string;
   address: string;
   logoUrl?: string;
-  activeModules: SubscriptionPlan[];
+  plan: SubscriptionPlan;
+  activeModules: BusinessModule[];
   subscriptionExpiry: Date;
-  isActive: boolean;
+  status: BusinessStatus;
+  isActive: boolean; // Legacy flag, kept for backward compatibility if needed
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,13 +44,23 @@ const businessSchema = new Schema<IBusiness>(
     contactPhone: { type: String, required: true },
     address: { type: String, required: true },
     logoUrl: { type: String },
+    plan: {
+      type: String,
+      enum: Object.values(SubscriptionPlan),
+      default: SubscriptionPlan.BASIC
+    },
     activeModules: [
       {
         type: String,
-        enum: Object.values(SubscriptionPlan)
+        enum: Object.values(BusinessModule)
       }
     ],
     subscriptionExpiry: { type: Date, required: true },
+    status: {
+      type: String,
+      enum: Object.values(BusinessStatus),
+      default: BusinessStatus.ACTIVE
+    },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

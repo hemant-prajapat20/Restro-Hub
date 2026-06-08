@@ -5,7 +5,7 @@ import User, { Role } from '../models/User';
 
 const generateToken = (id: string): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'],
   });
 };
 
@@ -39,7 +39,7 @@ export const registerSuperAdmin = async (req: Request, res: Response): Promise<v
         lastName: user.lastName,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id as string),
+        token: generateToken(user._id.toString()),
       },
     });
   } catch (error: any) {
@@ -77,7 +77,7 @@ export const registerCustomer = async (req: Request, res: Response): Promise<voi
         lastName: user.lastName,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id as string),
+        token: generateToken(user._id.toString()),
       },
     });
   } catch (error: any) {
@@ -116,7 +116,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         businessId: user.businessId,
         outletId: user.outletId,
-        token: generateToken(user._id as string),
+        token: generateToken(user._id.toString()),
       },
     });
   } catch (error: any) {
@@ -218,7 +218,7 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         businessId: user.businessId,
         outletId: user.outletId,
-        token: generateToken(user._id as string),
+        token: generateToken(user._id.toString()),
       },
     });
   } catch (error: any) {

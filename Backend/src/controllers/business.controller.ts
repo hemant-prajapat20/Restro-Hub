@@ -1,0 +1,145 @@
+import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import Business, { SubscriptionPlan, BusinessModule, BusinessStatus } from '../models/Business';
+import User, { Role } from '../models/User';
+import mongoose from 'mongoose';
+
+// @desc    Create a new business and its admin user
+// @route   POST /api/businesses
+// @access  Private/SuperAdmin
+export const createBusiness = async (req: Request, res: Response): Promise<void> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { 
+      businessName, 
+      ownerFirstName, 
+      ownerLastName, 
+      ownerEmail, 
+      ownerPassword, 
+      ownerPhone,
+      address,
+      plan,
+      activeModules,
+      subscriptionExpiryDays = 30
+    } = req.body;
+
+    // 1. Check if user already exists
+    const userExists = await User.findOne({ email: ownerEmail }).session(session);
+    if (userExists) {
+      await session.abortTransaction();
+      session.endSession();
+      res.status(400).json({ status: 'error', message: 'User email already exists' });
+      return;
+    }
+
+    // 2. Hash password
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(ownerPassword, salt);
+
+    // 3. Create Business Admin User
+    const newAdmin = new User({
+      firstName: ownerFirstName,
+      lastName: ownerLastName,
+      email: ownerEmail,
+      passwordHash,
+      phone: ownerPhone,
+      role: Role.BUSINESS_ADMIN,
+    });
+    
+    await newAdmin.save({ session });
+
+    // 4. Create Business
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + subscriptionExpiryDays);
+
+    const newBusiness = new Business({
+      name: businessName,
+      ownerId: newAdmin._id,
+      contactEmail: ownerEmail,
+      contactPhone: ownerPhone,
+      address,
+      plan: plan || SubscriptionPlan.BASIC,
+      activeModules: activeModules || [BusinessModule.POS],
+      subscriptionExpiry: expiryDate,
+      status: BusinessStatus.ACTIVE
+    });
+
+    await newBusiness.save({ session });
+
+    // 5. Update Admin User with Business ID
+    newAdmin.businessId = newBusiness._id as mongoose.Types.ObjectId;
+    await newAdmin.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Business and Admin User created successfully',
+      data: {
+        business: newBusiness,
+        admin: {
+          _id: newAdmin._id,
+          email: newAdmin.email,
+          role: newAdmin.role
+        }
+      }
+    });
+
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// @desc    Get all businesses
+// @route   GET /api/businesses
+// @access  Private/SuperAdmin
+export const getAllBusinesses = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const businesses = await Business.find()
+      .populate('ownerId', 'firstName lastName email phone')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      status: 'success',
+      count: businesses.length,
+      data: businesses
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// @desc    Update business details, plan, modules, or status
+// @route   PUT /api/businesses/:id
+// @access  Private/SuperAdmin
+export const updateBusiness = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { plan, activeModules, status } = req.body;
+
+    const business = await Business.findById(id);
+
+    if (!business) {
+      res.status(404).json({ status: 'error', message: 'Business not found' });
+      return;
+    }
+
+    if (plan) business.plan = plan;
+    if (activeModules) business.activeModules = activeModules;
+    if (status) business.status = status;
+
+    const updatedBusiness = await business.save();
+
+    res.json({
+      status: 'success',
+      data: updatedBusiness
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
