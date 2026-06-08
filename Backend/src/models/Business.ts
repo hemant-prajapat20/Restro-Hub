@@ -1,11 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export enum SubscriptionPlan {
-  BASIC = 'BASIC',
-  PRO = 'PRO',
-  ENTERPRISE = 'ENTERPRISE'
-}
-
 export enum BusinessModule {
   POS = 'POS',
   KDS = 'KDS',
@@ -28,7 +22,7 @@ export interface IBusiness extends Document {
   state: string;
   district: string;
   logoUrl?: string;
-  plan: SubscriptionPlan;
+  platforms: string[];
   subscriptionAmountPaid?: number;
   activeModules: BusinessModule[];
   subscriptionExpiry: Date;
@@ -49,11 +43,7 @@ const businessSchema = new Schema<IBusiness>(
     state: { type: String, required: true },
     district: { type: String, required: true },
     logoUrl: { type: String },
-    plan: {
-      type: String,
-      enum: Object.values(SubscriptionPlan),
-      default: SubscriptionPlan.BASIC
-    },
+    platforms: [{ type: String }],
     subscriptionAmountPaid: { type: Number },
     activeModules: [
       {

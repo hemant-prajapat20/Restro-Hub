@@ -10,6 +10,8 @@ const INDIAN_STATES = [
   "Uttar Pradesh", "Uttarakhand", "West Bengal"
 ];
 
+const AVAILABLE_PLATFORMS = ['Restaurant', 'Cafeteria', 'Bar'];
+
 export const Businesses: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [businesses, setBusinesses] = useState<any[]>([]);
@@ -31,10 +33,13 @@ export const Businesses: React.FC = () => {
     address: '',
     state: '',
     district: '',
-    plan: 'BASIC',
-    subscriptionExpiryDays: 30,
+    subscriptionDurationMonths: 1,
+    subscriptionExpiry: '',
     subscriptionAmountPaid: ''
   });
+  
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['Restaurant']);
+  const [matrix, setMatrix] = useState<any>(null);
 
   const fetchBusinesses = async () => {
     try {
@@ -54,9 +59,56 @@ export const Businesses: React.FC = () => {
     }
   };
 
+  const fetchPricing = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/subscriptions', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        setMatrix(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch pricing config:", error);
+    }
+  };
+
   useEffect(() => {
     fetchBusinesses();
+    fetchPricing();
   }, []);
+
+  // Smart Pricing Engine Auto-calculator
+  useEffect(() => {
+    if (!matrix || selectedPlatforms.length === 0) {
+      if (selectedPlatforms.length === 0) {
+        setFormData(prev => ({ ...prev, subscriptionAmountPaid: '0' }));
+      }
+      return;
+    }
+    
+    const count = selectedPlatforms.length;
+    let tierKey = 'onePlatform';
+    if (count === 2) tierKey = 'twoPlatforms';
+    if (count === 3) tierKey = 'threePlatforms';
+
+    const durKey = `months${formData.subscriptionDurationMonths}`;
+    
+    if (matrix[tierKey] && matrix[tierKey][durKey] !== undefined) {
+      // Also calculate the target expiry date
+      const expiry = new Date();
+      expiry.setMonth(expiry.getMonth() + Number(formData.subscriptionDurationMonths));
+      
+      const tzOffset = expiry.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(expiry.getTime() - tzOffset)).toISOString().slice(0, 16);
+
+      setFormData(prev => ({ 
+        ...prev, 
+        subscriptionAmountPaid: matrix[tierKey][durKey].toString(),
+        subscriptionExpiry: prev.subscriptionExpiry || localISOTime 
+      }));
+    }
+  }, [selectedPlatforms, formData.subscriptionDurationMonths, matrix]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -69,14 +121,26 @@ export const Businesses: React.FC = () => {
     }
   };
 
+  const togglePlatform = (platform: string) => {
+    setSelectedPlatforms(prev => 
+      prev.includes(platform) 
+        ? prev.filter(p => p !== platform)
+        : [...prev, platform]
+    );
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Phone validation
+    // Validations
     if (formData.ownerPhone.length !== 10) {
       setError("Mobile number must be exactly 10 digits.");
+      return;
+    }
+    if (selectedPlatforms.length === 0) {
+      setError("Please select at least one platform (Restaurant, Cafeteria, or Bar).");
       return;
     }
 
@@ -91,8 +155,11 @@ export const Businesses: React.FC = () => {
         },
         body: JSON.stringify({
           ...formData,
-          subscriptionAmountPaid: formData.subscriptionAmountPaid ? Number(formData.subscriptionAmountPaid) : undefined,
-          activeModules: ['POS'] // Default module
+          platforms: selectedPlatforms,
+          subscriptionDurationMonths: Number(formData.subscriptionDurationMonths),
+          subscriptionExpiry: formData.subscriptionExpiry,
+          subscriptionAmountPaid: formData.subscriptionAmountPaid ? Number(formData.subscriptionAmountPaid) : 0,
+          activeModules: ['POS']
         })
       });
 
@@ -111,8 +178,9 @@ export const Businesses: React.FC = () => {
         setSuccess('');
         setFormData({
           businessName: '', ownerFirstName: '', ownerLastName: '', ownerEmail: '', ownerPhone: '', ownerPassword: '',
-          address: '', state: '', district: '', plan: 'BASIC', subscriptionExpiryDays: 30, subscriptionAmountPaid: ''
+          address: '', state: '', district: '', subscriptionDurationMonths: 1, subscriptionExpiry: '', subscriptionAmountPaid: ''
         });
+        setSelectedPlatforms(['Restaurant']);
       }, 3000);
 
     } catch (err: any) {
@@ -122,7 +190,6 @@ export const Businesses: React.FC = () => {
     }
   };
 
-  // Filter logic
   const filteredBusinesses = businesses.filter(b => 
     b.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     (b.ownerId?.firstName + " " + b.ownerId?.lastName).toLowerCase().includes(searchTerm.toLowerCase())
@@ -170,7 +237,7 @@ export const Businesses: React.FC = () => {
               <tr className="bg-slate-50 border-b border-slate-100">
                 <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Business Name</th>
                 <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Owner</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Plan</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Platforms</th>
                 <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Status</th>
                 <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 text-right w-1/6">Actions</th>
               </tr>
@@ -204,9 +271,13 @@ export const Businesses: React.FC = () => {
                       </div>
                     </td>
                     <td className="p-4">
-                       <span className="inline-block font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg text-sm truncate">
-                         {business.plan}
-                       </span>
+                       <div className="flex flex-wrap gap-1">
+                         {business.platforms && business.platforms.map((plat: string) => (
+                           <span key={plat} className="inline-block font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-lg text-xs truncate">
+                             {plat}
+                           </span>
+                         ))}
+                       </div>
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
@@ -317,21 +388,52 @@ export const Businesses: React.FC = () => {
                     <span className="w-6 h-6 rounded-full bg-brand-primary text-white text-xs flex items-center justify-center">3</span>
                     Subscription Setup
                   </h3>
+                  
+                  <div className="mb-6 space-y-3">
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Select Platforms</label>
+                    <div className="flex flex-wrap gap-3">
+                      {AVAILABLE_PLATFORMS.map(plat => (
+                        <button
+                          key={plat}
+                          type="button"
+                          onClick={() => togglePlatform(plat)}
+                          className={`px-4 py-2 rounded-xl font-semibold border-2 transition-colors ${
+                            selectedPlatforms.includes(plat)
+                              ? 'bg-brand-accent/10 border-brand-accent text-brand-accent'
+                              : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                          }`}
+                        >
+                          {plat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Plan Tier</label>
-                      <select name="plan" required value={formData.plan} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full">
-                        <option value="BASIC">Basic</option>
-                        <option value="PRO">Pro</option>
-                        <option value="ENTERPRISE">Enterprise</option>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
+                        <span>Base Duration</span>
+                        <span className="text-brand-accent text-[10px] bg-brand-accent/10 px-2 py-0.5 rounded-full">Calculates Price</span>
+                      </label>
+                      <select name="subscriptionDurationMonths" required value={formData.subscriptionDurationMonths} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full">
+                        <option value={1}>1 Month</option>
+                        <option value={3}>3 Months</option>
+                        <option value={6}>6 Months</option>
+                        <option value={12}>12 Months</option>
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Duration (Days)</label>
-                      <input type="number" name="subscriptionExpiryDays" required min="1" value={formData.subscriptionExpiryDays} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
+                        <span>Exact Expiry Date</span>
+                        <span className="text-brand-accent text-[10px] bg-brand-accent/10 px-2 py-0.5 rounded-full">Editable</span>
+                      </label>
+                      <input type="datetime-local" name="subscriptionExpiry" required value={formData.subscriptionExpiry} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount Paid (₹)</label>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
+                        <span>Final Amount (₹)</span>
+                        <span className="text-brand-accent text-[10px] bg-brand-accent/10 px-2 py-0.5 rounded-full">Editable</span>
+                      </label>
                       <input type="number" name="subscriptionAmountPaid" required min="0" placeholder="e.g. 5000" value={formData.subscriptionAmountPaid} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
                     </div>
                   </div>

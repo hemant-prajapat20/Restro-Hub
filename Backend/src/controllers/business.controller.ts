@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import Business, { SubscriptionPlan, BusinessModule, BusinessStatus } from '../models/Business';
+import Business, { BusinessModule, BusinessStatus } from '../models/Business';
 import User, { Role } from '../models/User';
 import mongoose from 'mongoose';
 
@@ -22,9 +22,9 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
       address,
       state,
       district,
-      plan,
+      platforms,
       activeModules,
-      subscriptionExpiryDays = 30,
+      subscriptionExpiry,
       subscriptionAmountPaid
     } = req.body;
 
@@ -41,7 +41,12 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(ownerPassword, salt);
 
-    // 3. Create Business Admin User
+    // 3. Generate unique businessAdminCode
+    // E.g., BA-XXXXXX where X is uppercase alphanumeric
+    const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const businessAdminCode = `BA-${randomSuffix}`;
+
+    // 4. Create Business Admin User
     const newAdmin = new User({
       firstName: ownerFirstName,
       lastName: ownerLastName,
@@ -49,14 +54,12 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
       passwordHash,
       phone: ownerPhone,
       role: Role.BUSINESS_ADMIN,
+      businessAdminCode
     });
     
     await newAdmin.save({ session });
 
-    // 4. Create Business
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + subscriptionExpiryDays);
-
+    // 5. Create Business
     const newBusiness = new Business({
       name: businessName,
       ownerId: newAdmin._id,
@@ -65,10 +68,10 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
       address,
       state,
       district,
-      plan: plan || SubscriptionPlan.BASIC,
+      platforms: platforms || [],
       subscriptionAmountPaid,
       activeModules: activeModules || [BusinessModule.POS],
-      subscriptionExpiry: expiryDate,
+      subscriptionExpiry: subscriptionExpiry ? new Date(subscriptionExpiry) : new Date(),
       status: BusinessStatus.ACTIVE
     });
 
@@ -126,7 +129,7 @@ export const getAllBusinesses = async (req: Request, res: Response): Promise<voi
 export const updateBusiness = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { plan, activeModules, status } = req.body;
+    const { platforms, activeModules, status } = req.body;
 
     const business = await Business.findById(id);
 
@@ -135,7 +138,7 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    if (plan) business.plan = plan;
+    if (platforms) business.platforms = platforms;
     if (activeModules) business.activeModules = activeModules;
     if (status) business.status = status;
 

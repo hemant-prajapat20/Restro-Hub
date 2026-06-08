@@ -21,6 +21,7 @@ export interface IUser extends Document {
   outletId?: mongoose.Types.ObjectId;   // Null for Business Admin
   otp?: string;
   otpExpires?: Date;
+  businessAdminCode?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +44,7 @@ const userSchema = new Schema<IUser>(
     outletId: { type: Schema.Types.ObjectId, ref: 'Outlet' },
     otp: { type: String },
     otpExpires: { type: Date },
+    businessAdminCode: { type: String, unique: true, sparse: true },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
