@@ -1,0 +1,14 @@
+{
+  "name": "IndiServe Pro",
+  "description": "Industrial-grade enterprise SaaS for restaurant management, POS, and analytics for the Indian market.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "billing",
+    "pos",
+    "inventory",
+    "kitchen-management",
+    "analytics"
+  ]
+}
