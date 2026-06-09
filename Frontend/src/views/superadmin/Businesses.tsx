@@ -520,7 +520,7 @@ export const Businesses: React.FC = () => {
                         <span>Exact Expiry Date</span>
                         <span className="text-brand-accent text-[10px] bg-brand-accent/10 px-2 py-0.5 rounded-full">Editable</span>
                       </label>
-                      <input type="datetime-local" name="subscriptionExpiry" required value={formData.subscriptionExpiry} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
+                      <input type="date" name="subscriptionExpiry" required value={formData.subscriptionExpiry} onChange={handleInputChange} className="px-2 py-4 sm:p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full text-sm sm:text-base" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
