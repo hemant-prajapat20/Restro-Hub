@@ -126,7 +126,7 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
 export const getAllBusinesses = async (req: Request, res: Response): Promise<void> => {
   try {
     const businesses = await Business.find()
-      .populate('ownerId', 'firstName lastName email phone')
+      .populate('ownerId', 'firstName lastName email phone isActive businessAdminCode')
       .sort({ createdAt: -1 });
 
     res.json({

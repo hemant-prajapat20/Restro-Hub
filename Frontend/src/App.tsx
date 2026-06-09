@@ -8,7 +8,6 @@ import { SuperAdminLayout } from './layouts/SuperAdminLayout';
 import { SuperAdminDashboard } from './views/superadmin/Dashboard';
 import { Businesses } from './views/superadmin/Businesses';
 import { Subscriptions } from './views/superadmin/Subscriptions';
-import { Users } from './views/superadmin/Users';
 import { Settings } from './views/superadmin/Settings';
 import { MessageCenter } from './views/superadmin/MessageCenter';
 
@@ -57,7 +56,6 @@ export default function App() {
           <Route path="dashboard" element={<SuperAdminDashboard />} />
           <Route path="businesses" element={<Businesses />} />
           <Route path="subscriptions" element={<Subscriptions />} />
-          <Route path="users" element={<Users />} />
           <Route path="settings" element={<Settings />} />
           <Route path="messages" element={<MessageCenter />} />
         </Route>

@@ -190,6 +190,18 @@ export const Businesses: React.FC = () => {
     }
   };
 
+  const toggleLoginAccess = async (userId: string) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/users/${userId}/status`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (res.ok) fetchBusinesses();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const filteredBusinesses = businesses.filter(b => 
     b.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     (b.ownerId?.firstName + " " + b.ownerId?.lastName).toLowerCase().includes(searchTerm.toLowerCase())
@@ -235,11 +247,12 @@ export const Businesses: React.FC = () => {
           <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Business Name</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Owner</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Platforms</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Status</th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 text-right w-1/6">Actions</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/5">Business Name</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/4">Admin Owner</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/5">Platforms</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Business Status</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 w-1/6">Login Access</th>
+                <th className="p-4 text-xs font-semibold uppercase tracking-widest text-slate-400 text-right w-1/12">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -266,8 +279,11 @@ export const Businesses: React.FC = () => {
                     </td>
                     <td className="p-4">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-slate-900 truncate">{business.ownerId?.firstName} {business.ownerId?.lastName}</span>
-                        <span className="text-xs text-slate-500 truncate">{business.contactEmail}</span>
+                        <span className="font-semibold text-slate-900 truncate">
+                          {business.ownerId?.firstName} {business.ownerId?.lastName}
+                        </span>
+                        <span className="text-xs text-slate-500 truncate">{business.ownerId?.email}</span>
+                        <span className="text-xs text-brand-accent font-semibold mt-0.5">{business.ownerId?.businessAdminCode}</span>
                       </div>
                     </td>
                     <td className="p-4">
@@ -286,6 +302,17 @@ export const Businesses: React.FC = () => {
                         <span className={`w-1.5 h-1.5 rounded-full ${business.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`} />
                         {business.status}
                       </span>
+                    </td>
+                    <td className="p-4">
+                      <button 
+                        onClick={() => toggleLoginAccess(business.ownerId?._id)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider transition-all hover:opacity-80 ${
+                          business.ownerId?.isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${business.ownerId?.isActive ? 'bg-blue-500' : 'bg-slate-400'}`} />
+                        {business.ownerId?.isActive ? 'ENABLED' : 'DISABLED'}
+                      </button>
                     </td>
                     <td className="p-4 text-right">
                       <button className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors inline-block">

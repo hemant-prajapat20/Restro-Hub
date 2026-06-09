@@ -24,7 +24,6 @@ const navItems = [
   { id: 'dashboard', label: 'Platform Analytics', icon: LayoutDashboard },
   { id: 'businesses', label: 'Business Management', icon: Building2 },
   { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
-  { id: 'users', label: 'User Directory', icon: Users },
   { id: 'settings', label: 'System Config', icon: Settings },
   { id: 'messages', label: 'Message Center', icon: Bell },
 ];
