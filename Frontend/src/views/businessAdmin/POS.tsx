@@ -16,9 +16,9 @@ import {
   FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_MENU } from '../mockData';
-import { MenuItem, OrderItem } from '../types';
-import { generateReceiptPDF } from '../utils/pdfGenerator';
+import { MOCK_MENU } from '../../mockData';
+import { MenuItem, OrderItem } from '../../types';
+import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
 export const POS: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');

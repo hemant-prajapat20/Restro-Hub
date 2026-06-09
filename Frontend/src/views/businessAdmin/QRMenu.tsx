@@ -13,8 +13,8 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_MENU } from '../mockData';
-import { MenuItem, OrderItem } from '../types';
+import { MOCK_MENU } from '../../mockData';
+import { MenuItem, OrderItem } from '../../types';
 
 export const QRMenu: React.FC = () => {
   const [cart, setCart] = useState<OrderItem[]>([]);

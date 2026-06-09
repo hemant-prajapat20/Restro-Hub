@@ -12,7 +12,7 @@ import {
   Timer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_ORDERS } from '../mockData';
+import { MOCK_ORDERS } from '../../mockData';
 
 type OrderStatus = 'New' | 'Preparing' | 'Ready' | 'Completed';
 

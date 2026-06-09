@@ -11,7 +11,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { MOCK_MENU } from '../mockData';
+import { MOCK_MENU } from '../../mockData';
 
 export const Delivery: React.FC = () => {
   const [showAddOrder, setShowAddOrder] = React.useState(false);

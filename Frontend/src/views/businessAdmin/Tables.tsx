@@ -26,9 +26,9 @@ import {
   FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_TABLES, MOCK_MENU } from '../mockData';
-import { Table, TableStatus, MenuItem } from '../types';
-import { generateReceiptPDF } from '../utils/pdfGenerator';
+import { MOCK_TABLES, MOCK_MENU } from '../../mockData';
+import { Table, TableStatus, MenuItem } from '../../types';
+import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
 const StatusBadge = ({ status }: { status: TableStatus }) => {
   const styles: Record<TableStatus, string> = {

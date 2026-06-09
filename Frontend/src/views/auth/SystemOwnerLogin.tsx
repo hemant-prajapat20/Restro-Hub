@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { setCredentials } from '../store/slices/authSlice';
+import { RootState } from '../../store';
+import { setCredentials } from '../../store/slices/authSlice';
 import { ShieldAlert, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 

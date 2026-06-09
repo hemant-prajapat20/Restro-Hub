@@ -13,8 +13,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_INVENTORY } from '../mockData';
-import { InventoryItem } from '../types';
+import { MOCK_INVENTORY } from '../../mockData';
+import { InventoryItem } from '../../types';
 
 export const Inventory: React.FC = () => {
   const [inventoryList, setInventoryList] = useState<InventoryItem[]>(MOCK_INVENTORY);

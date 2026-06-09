@@ -25,7 +25,7 @@ import {
   FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { generateReceiptPDF } from '../utils/pdfGenerator';
+import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
 interface SignatureItem {
   id: string;

@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Login } from './views/Login';
-import { Register } from './views/Register';
-import { SystemOwnerLogin } from './views/SystemOwnerLogin';
+import { Login } from './views/auth/Login';
+import { Register } from './views/auth/Register';
+import { SystemOwnerLogin } from './views/auth/SystemOwnerLogin';
 import { BusinessAdminLayout } from './layouts/BusinessAdminLayout';
 import { SuperAdminLayout } from './layouts/SuperAdminLayout';
 
@@ -13,19 +13,20 @@ import { Settings } from './views/superadmin/Settings';
 import { MessageCenter } from './views/superadmin/MessageCenter';
 
 // Business Admin Views
-import { Dashboard } from './views/Dashboard';
-import { POS } from './views/POS';
-import { RestroSignature } from './views/RestroSignature';
-import { BarLounge } from './views/BarLounge';
-import { CafeBakery } from './views/CafeBakery';
-import { MenuManagement } from './views/MenuManagement';
-import { Tables } from './views/Tables';
-import { KDS } from './views/KDS';
-import { Delivery } from './views/Delivery';
-import { QRMenu } from './views/QRMenu';
-import { Inventory } from './views/Inventory';
-import { StaffManagement } from './views/StaffManagement';
-import { Reports } from './views/Reports';
+import { Dashboard } from './views/businessAdmin/Dashboard';
+import { POS } from './views/businessAdmin/POS';
+import { RestroSignature } from './views/businessAdmin/RestroSignature';
+import { BarLounge } from './views/businessAdmin/BarLounge';
+import { CafeBakery } from './views/businessAdmin/CafeBakery';
+import { MenuManagement } from './views/businessAdmin/MenuManagement';
+import { Tables } from './views/businessAdmin/Tables';
+import { KDS } from './views/businessAdmin/KDS';
+import { Delivery } from './views/businessAdmin/Delivery';
+import { QRMenu } from './views/businessAdmin/QRMenu';
+import { Inventory } from './views/businessAdmin/Inventory';
+import { StaffManagement } from './views/businessAdmin/StaffManagement';
+import { Reports } from './views/businessAdmin/Reports';
+import { Settings as BusinessSettings } from './views/businessAdmin/Settings';
 
 const CustomersPlaceholder = () => (
   <div className="p-8 text-center">
@@ -36,9 +37,10 @@ const CustomersPlaceholder = () => (
 
 
 const CustomerPlaceholder = () => (
-  <div className="p-8 text-center mt-20">
-    <h2 className="text-4xl font-bold">Customer Panel</h2>
-    <p>View Menus, Place Orders, and Track Loyalty Points</p>
+  <div className="min-h-[112vh] bg-[#F8FAFC] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+    <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
+    <h2 className="text-4xl font-bold text-slate-900 mb-4 z-10">Customer Panel</h2>
+    <p className="text-slate-500 z-10">View Menus, Place Orders, and Track Loyalty Points</p>
   </div>
 );
 
@@ -81,6 +83,7 @@ export default function App() {
           <Route path="inventory" element={<Inventory />} />
           <Route path="staff" element={<StaffManagement />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<BusinessSettings />} />
           <Route path="customers" element={<CustomersPlaceholder />} />
         </Route>
 

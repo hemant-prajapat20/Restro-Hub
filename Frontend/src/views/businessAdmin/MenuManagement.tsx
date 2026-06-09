@@ -14,8 +14,8 @@ import {
   Layers
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { MOCK_MENU } from '../mockData';
-import { MenuItem } from '../types';
+import { MOCK_MENU } from '../../mockData';
+import { MenuItem } from '../../types';
 
 export const MenuManagement: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
