@@ -50,7 +50,7 @@ export const MenuManagement: React.FC = () => {
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-soft flex flex-col lg:flex-row items-center gap-4">
+      <div className="bg-white p-6 lg:p-8 rounded-[32px] border border-stone-200/80 shadow-soft flex flex-col lg:flex-row items-center gap-4">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input 
@@ -84,7 +84,7 @@ export const MenuManagement: React.FC = () => {
           <motion.div 
             layout
             key={item.id} 
-            className="bg-white rounded-[32px] border border-slate-200 shadow-soft overflow-hidden group hover:border-brand-accent transition-all"
+            className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent transition-all flex flex-col h-full"
           >
              <div className="relative h-48">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />

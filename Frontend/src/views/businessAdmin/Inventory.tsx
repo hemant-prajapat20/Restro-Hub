@@ -93,10 +93,10 @@ export const Inventory: React.FC = () => {
   const lowStockCount = inventoryList.filter(item => item.currentStock <= item.minStock).length;
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-150 flex items-center justify-between hover:border-brand-accent transition-all group">
+        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
               <p className="text-stone-400 text-xs font-black uppercase tracking-wider mb-2 font-display">Total Cellar SKU Valuation</p>
               <h4 className="text-3xl font-black text-stone-900">₹{(totalSkuValue / 100000).toFixed(2)}L</h4>
@@ -110,7 +110,7 @@ export const Inventory: React.FC = () => {
            </div>
         </div>
 
-        <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-150 flex items-center justify-between hover:border-brand-accent transition-all group">
+        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
               <p className="text-stone-400 text-xs font-black uppercase tracking-wider mb-2 font-display">Depleted ingredients alerts</p>
               <h4 className="text-3xl font-black text-rose-800">{lowStockCount} Items</h4>
@@ -124,7 +124,7 @@ export const Inventory: React.FC = () => {
            </div>
         </div>
 
-        <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-150 flex items-center justify-between hover:border-brand-accent transition-all group">
+        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
               <p className="text-stone-400 text-xs font-black uppercase tracking-wider mb-2 font-display">Active Merchant Consignments</p>
               <h4 className="text-3xl font-black text-stone-900">03 Cargo</h4>

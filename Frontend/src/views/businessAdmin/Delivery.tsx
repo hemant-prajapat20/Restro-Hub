@@ -99,12 +99,13 @@ export const Delivery: React.FC = () => {
        )}
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-             <h4 className="text-xl font-black font-display flex items-center gap-2 text-slate-900">
-                <ShoppingBag className="text-brand-accent" />
-                Live Feed
-             </h4>
-             <div className="space-y-4">
+          <div className="lg:col-span-2">
+             <div className="bg-white border border-stone-200/80 rounded-[32px] p-8 lg:p-10 shadow-soft h-full flex flex-col">
+                 <h4 className="text-xl font-black font-display flex items-center gap-2 text-slate-900 mb-6">
+                    <ShoppingBag className="text-brand-accent" />
+                    Live Feed
+                 </h4>
+                 <div className="space-y-4">
                 {[
                   { id: 'DEL-284', source: 'Zomato', items: '2x Biryani, 1x Coke', total: '₹750', time: '4m ago', status: 'In Kitchen' },
                   { id: 'DEL-285', source: 'Swiggy', items: '1x Pasta Carbonara', total: '₹540', time: '12m ago', status: 'Ready' },
@@ -114,7 +115,7 @@ export const Delivery: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     key={order.id} 
-                    className="bg-white p-5 rounded-3xl border border-slate-200 shadow-soft flex items-center gap-6"
+                    className="bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100 flex items-center gap-6 hover:bg-slate-100/50 transition-colors"
                   >
                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black ${
                        order.source === 'Zomato' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'
@@ -142,10 +143,11 @@ export const Delivery: React.FC = () => {
                   </motion.div>
                 ))}
              </div>
+             </div>
           </div>
 
-          <div className="space-y-8">
-             <div className="bg-brand-primary p-8 rounded-[40px] text-white space-y-8 overflow-hidden relative shadow-2xl">
+          <div className="lg:col-span-1">
+             <div className="bg-brand-primary p-8 rounded-[32px] text-white space-y-8 overflow-hidden relative shadow-2xl h-full flex flex-col justify-between">
                 <div className="relative z-10 space-y-8">
                    <div>
                       <h4 className="text-2xl font-black font-display">Daily Delivery Heatmap</h4>

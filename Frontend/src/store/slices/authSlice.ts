@@ -8,6 +8,8 @@ export interface User {
   role: string;
   businessId?: string;
   outletId?: string;
+  phone?: string;
+  businessData?: any;
 }
 
 export interface AuthState {

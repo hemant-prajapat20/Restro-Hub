@@ -15,7 +15,7 @@ import { motion } from 'motion/react';
 
 export const Reports: React.FC = () => {
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
              <h3 className="text-2xl font-black font-display text-slate-900">Financial Audit & GST</h3>
@@ -40,7 +40,7 @@ export const Reports: React.FC = () => {
             { label: 'Operating Cost', value: '₹14.2L', trend: -4.2, icon: ArrowDownRight, color: 'orange' },
             { label: 'Net Profit', value: '₹9.36L', trend: 22.4, icon: ArrowUpRight, color: 'brand-accent' },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white p-6 rounded-3xl shadow-soft border border-slate-100 flex flex-col gap-4">
+            <div key={stat.label} className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex flex-col gap-4 h-full justify-between">
                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-${stat.color}-50 text-${stat.color}-600`}>
                   <stat.icon size={24} />
                </div>
@@ -57,7 +57,7 @@ export const Reports: React.FC = () => {
        </div>
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-soft overflow-hidden">
+          <div className="lg:col-span-2 bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden h-full flex flex-col">
              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                 <h5 className="font-black font-display text-slate-900">Recent Invoices</h5>
                 <div className="relative">
@@ -106,7 +106,7 @@ export const Reports: React.FC = () => {
           </div>
 
           <div className="space-y-8">
-             <div className="bg-brand-primary p-8 rounded-[40px] text-white relative overflow-hidden">
+             <div className="bg-brand-primary p-8 rounded-[32px] text-white relative overflow-hidden h-full flex flex-col">
                 <div className="relative z-10 flex flex-col h-full gap-8">
                    <div className="flex items-center gap-3">
                       <Lock className="text-brand-accent fill-brand-accent" size={20} />

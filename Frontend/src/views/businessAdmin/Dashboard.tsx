@@ -45,7 +45,7 @@ const categoryData = [
 ];
 
 const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => (
-  <div className="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 flex items-start justify-between">
+  <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-start justify-between h-full">
     <div>
       <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
       <h3 className="text-2xl font-bold font-display text-slate-900">{value}</h3>
@@ -106,7 +106,7 @@ export const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+        <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h4 className="text-lg font-bold font-display">Revenue Velocity</h4>
@@ -157,7 +157,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* AI Insights & Alerts */}
-        <div className="bg-brand-sidebar p-6 rounded-3xl shadow-soft text-white relative overflow-hidden">
+        <div className="bg-brand-sidebar p-8 rounded-[32px] shadow-soft text-white relative overflow-hidden h-full flex flex-col">
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-6">
               <Zap className="text-brand-accent fill-brand-accent" size={20} />
@@ -185,7 +185,7 @@ export const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Category Breakdown */}
-        <div className="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-bold font-display mb-6">Sales Mix by Category</h4>
            <div className="flex items-center gap-8 h-[250px]">
              <div className="w-1/2 h-full">
@@ -221,7 +221,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Top Selling Items */}
-        <div className="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-bold font-display mb-6">Top Performing Items</h4>
            <div className="space-y-4">
               {[

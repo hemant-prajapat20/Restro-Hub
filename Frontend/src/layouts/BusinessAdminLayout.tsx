@@ -4,7 +4,7 @@ import { Sidebar, Header } from '../components/Navigation';
 
 export const BusinessAdminLayout: React.FC = () => {
   return (
-    <div className="flex h-screen bg-brand-bg select-none">
+    <div className="flex h-screen bg-brand-bg select-none font-sans font-semibold">
       <Sidebar />
       <div className="flex-1 min-w-0">
         <Header />

@@ -47,7 +47,9 @@ export const Login: React.FC = () => {
           email: data.data.email,
           role: data.data.role,
           businessId: data.data.businessId,
-          outletId: data.data.outletId
+          outletId: data.data.outletId,
+          phone: data.data.phone,
+          businessData: data.data.businessData
         },
         token: data.data.token
       }));

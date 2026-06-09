@@ -12,7 +12,10 @@ import {
   Coffee, 
   Utensils, 
   Store, 
-  CalendarCheck 
+  CalendarCheck,
+  Phone,
+  CreditCard,
+  Calendar
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -63,7 +66,7 @@ export const Settings: React.FC = () => {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8 font-[Inter]">
+    <div className="p-8 max-w-[1600px] mx-auto space-y-8 font-[Inter] h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Business Settings</h1>
@@ -74,8 +77,8 @@ export const Settings: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Profile Card */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <div className="lg:col-span-1">
+          <div className="bg-white border border-stone-200/80 rounded-[32px] p-8 lg:p-10 shadow-soft h-full flex flex-col">
             <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
               <div className="w-24 h-24 bg-brand-accent/10 rounded-full flex items-center justify-center text-brand-accent text-3xl font-bold mb-4 border-4 border-white shadow-lg">
                 {user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'G'}
@@ -87,41 +90,76 @@ export const Settings: React.FC = () => {
               </span>
             </div>
 
-            <div className="pt-6 space-y-4">
-              <div className="flex items-center gap-3 text-sm">
-                <Mail className="w-5 h-5 text-slate-400" />
+            <div className="pt-6 space-y-5">
+              <div className="flex items-start gap-3 text-sm">
+                <Building2 className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-slate-500 font-medium">Email Address</p>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Business Name</p>
+                  <p className="font-semibold text-slate-900">{user?.businessData?.name || 'IndiServe Prime'}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 text-sm">
+                <Mail className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Owner Email</p>
                   <p className="font-semibold text-slate-900">{user?.email || 'admin@indiserve.com'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Building2 className="w-5 h-5 text-slate-400" />
+
+              <div className="flex items-start gap-3 text-sm">
+                <Phone className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-slate-500 font-medium">Business ID</p>
-                  <p className="font-semibold text-slate-900">{user?.businessId || 'N/A'}</p>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Contact Phone</p>
+                  <p className="font-semibold text-slate-900">{user?.phone || user?.businessData?.contactPhone || 'N/A'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <MapPin className="w-5 h-5 text-slate-400" />
+
+              <div className="flex items-start gap-3 text-sm">
+                <MapPin className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-slate-500 font-medium">Branch Location</p>
-                  <p className="font-semibold text-slate-900">Connaught Place</p>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Registered Address</p>
+                  <p className="font-semibold text-slate-900">{user?.businessData?.address || 'N/A'}</p>
+                  <p className="text-slate-600 font-medium">
+                    {[user?.businessData?.district, user?.businessData?.state].filter(Boolean).join(', ') || 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-100 w-full my-4" />
+
+              <div className="flex items-start gap-3 text-sm">
+                <CreditCard className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Subscription Paid</p>
+                  <p className="font-semibold text-brand-success">
+                    {user?.businessData?.subscriptionAmountPaid 
+                      ? `₹ ${user.businessData.subscriptionAmountPaid.toLocaleString()}` 
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 text-sm">
+                <Calendar className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Plan Expiry</p>
+                  <p className="font-semibold text-slate-900">
+                    {user?.businessData?.subscriptionExpiry 
+                      ? new Date(user.businessData.subscriptionExpiry).toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' })
+                      : 'N/A'}
+                  </p>
                 </div>
               </div>
             </div>
             
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <button className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold transition-colors">
-                Edit Profile
-              </button>
-            </div>
+
           </div>
         </div>
 
         {/* Feature Toggles */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <div className="lg:col-span-2">
+          <div className="bg-white border border-stone-200/80 rounded-[32px] p-8 lg:p-10 shadow-soft h-full flex flex-col">
             <div className="mb-6">
               <h3 className="text-xl font-bold text-slate-900">Active Modules & Features</h3>
               <p className="text-slate-500 font-medium mt-1">Enable or disable specific features for your business based on your current plan.</p>
@@ -179,7 +217,7 @@ export const Settings: React.FC = () => {
               />
             </div>
             
-            <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
+            <div className="mt-auto pt-6 border-t border-slate-100 flex justify-end">
                <button className="py-3 px-6 bg-brand-accent hover:bg-yellow-500 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-brand-accent/20">
                  Save Configuration
                </button>

@@ -140,7 +140,7 @@ export const StaffManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
       {/* Golden Staff Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
@@ -226,7 +226,7 @@ export const StaffManagement: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-[32px] p-6 border border-stone-200/80 shadow-soft hover:border-brand-accent group transition-all flex flex-col justify-between"
+                  className="bg-white rounded-[32px] p-8 border border-stone-200/80 shadow-soft hover:border-brand-accent group transition-all flex flex-col justify-between h-full"
                >
                   <div>
                      <div className="flex items-start justify-between mb-6">

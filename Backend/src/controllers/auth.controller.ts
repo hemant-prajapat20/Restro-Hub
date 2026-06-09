@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User, { Role } from '../models/User';
 import SystemSettings from '../models/SystemSettings';
+import Business from '../models/Business';
 
 const generateToken = async (id: string): Promise<string> => {
   let expiresIn = process.env.JWT_EXPIRES_IN || '7d';
@@ -131,6 +132,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    let businessData = null;
+    if (user.businessId) {
+      businessData = await Business.findById(user.businessId);
+    }
+
     res.json({
       status: 'success',
       data: {
@@ -138,8 +144,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
         role: user.role,
         businessId: user.businessId,
+        businessData,
         token: await generateToken(user._id.toString()),
       }
     });
