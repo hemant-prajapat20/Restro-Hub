@@ -118,7 +118,7 @@ export const SuperAdminDashboard: React.FC = () => {
                  )}
                </div>
             </div>
-            <div className="flex-1 w-full min-h-[300px]">
+            <div className="w-full h-[300px] sm:h-[350px]">
                {isLoading ? (
                  <div className="w-full h-full bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
                     <p className="font-semibold uppercase tracking-widest text-sm">Loading Chart Data...</p>
