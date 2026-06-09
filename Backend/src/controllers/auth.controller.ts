@@ -248,3 +248,60 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
+export const secretLogin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { secretKey } = req.body;
+
+    if (!secretKey) {
+      res.status(400).json({ status: 'error', message: 'Secret key is required' });
+      return;
+    }
+
+    // 1. Fetch System Settings from Database
+    let settings = await SystemSettings.findOne();
+    
+    // If no settings exist yet in the database, auto-create them to set the default master key
+    if (!settings) {
+      settings = await SystemSettings.create({});
+    }
+
+    // 2. Validate against Database Secret Key
+    if (secretKey !== settings.masterSecretKey) {
+      res.status(401).json({ status: 'error', message: 'Invalid secret key' });
+      return;
+    }
+
+    // Find the first SUPER_ADMIN user
+    let user = await User.findOne({ role: Role.SUPER_ADMIN });
+    
+    // If no Super Admin exists, auto-create the Owner account since they possess the Master Key
+    if (!user) {
+      const hashedPassword = await bcrypt.hash(secretKey, 10);
+      user = await User.create({
+        firstName: 'System',
+        lastName: 'Owner',
+        email: 'owner@restrohub.com',
+        passwordHash: hashedPassword,
+        phone: '0000000000',
+        role: Role.SUPER_ADMIN,
+        isActive: true,
+      });
+    }
+
+    res.json({
+      status: 'success',
+      data: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        businessId: user.businessId,
+        token: await generateToken(user._id.toString()),
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};

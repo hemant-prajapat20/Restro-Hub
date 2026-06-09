@@ -72,22 +72,22 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+    <div className="h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Decorative Elements matching Login.tsx */}
       <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-brand-success/5 rounded-full blur-3xl pointer-events-none" />
       
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-center relative z-10 h-full max-h-[800px]">
         {/* Hero Section */}
-        <div className="hidden lg:block space-y-8">
-           <div className="w-20 h-20 bg-brand-accent rounded-[32px] flex items-center justify-center shadow-2xl shadow-brand-accent/40 rotate-3">
-              <UtensilsCrossed className="text-white w-10 h-10" />
+        <div className="hidden lg:block space-y-6">
+           <div className="w-12 h-12 bg-brand-accent rounded-[16px] flex items-center justify-center shadow-xl shadow-brand-accent/40 rotate-3 mb-6">
+              <UtensilsCrossed className="text-white w-6 h-6" />
            </div>
-           <div className="space-y-4">
-              <h1 className="text-6xl font-black text-slate-900 leading-[1.1] tracking-tighter">
+           <div className="space-y-2">
+              <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
                  Your Favorite Food. <br/><span className="text-brand-accent">Delivered Faster.</span>
               </h1>
-              <p className="text-xl text-slate-500 font-medium max-w-md">
+              <p className="text-sm text-slate-500 font-medium max-w-sm">
                  Join thousands of food lovers. Experience seamless ordering, exclusive loyalty rewards, and live tracking.
               </p>
            </div>
@@ -106,9 +106,9 @@ export const Register: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-[480px] mx-auto lg:mx-0 justify-self-center lg:justify-self-end bg-white rounded-[24px] sm:rounded-[40px] shadow-soft border border-slate-200 overflow-hidden"
+          className="w-full max-w-[380px] mx-auto lg:mx-0 justify-self-center lg:justify-self-end bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
         >
-          <div className="p-6 sm:p-8 md:p-12">
+          <div className="p-5 sm:p-6">
             <div className="lg:hidden flex items-center gap-3 mb-10">
               <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center">
                 <UtensilsCrossed className="text-white w-6 h-6" />
@@ -119,11 +119,11 @@ export const Register: React.FC = () => {
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-8"
+              className="space-y-4"
             >
               <div>
-                <h2 className="text-3xl font-black text-slate-900 leading-tight">Create Account</h2>
-                <p className="text-slate-500 mt-2 font-medium">Register as a customer to start ordering.</p>
+                <h2 className="text-xl font-black text-slate-900 leading-tight">Create Account</h2>
+                <p className="text-xs text-slate-500 mt-1 font-medium">Register as a customer to start ordering.</p>
               </div>
 
               {error && (
@@ -132,68 +132,63 @@ export const Register: React.FC = () => {
                 </div>
               )}
 
-              <form onSubmit={handleRegister} className="space-y-4">
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                   <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+              <form onSubmit={handleRegister} className="space-y-3">
+                 <div className="grid grid-cols-2 gap-3">
+                   <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
                       <input 
                         type="text" 
                         name="firstName"
                         required
                         placeholder="First Name" 
-                        className="bg-transparent w-full outline-none text-lg font-bold text-slate-900 placeholder:text-slate-400"
+                        className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
                         value={formData.firstName}
                         onChange={handleChange}
                       />
                    </div>
-    <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-       <input 
-          type="text" 
-          name="lastName"
-           required
-             placeholder="Last Name" 
-             className="bg-transparent w-full outline-none text-lg font-bold text-slate-900 placeholder:text-slate-400"
-                 value={formData.lastName}
-                  onChange={handleChange}
-               />
-        </div>
-     </div>
-
-                 <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl group focus-within:border-brand-accent focus-within:bg-white transition-all">
-                    <div className="flex items-center gap-2 pr-4 border-r-2 border-slate-200/50">
-                       <img src="https://flagcdn.com/in.svg" className="w-6 h-4 rounded-sm shadow-sm" alt="India" />
-                       <span className="text-slate-800 font-black">+91</span>
-                    </div>
-                    <input 
-                      type="tel" 
-                      name="phone"
-                      maxLength={10}
-                      required
-                      placeholder="Phone Number" 
-                      className="bg-transparent border-none outline-none flex-1 text-lg font-bold text-slate-900 placeholder:text-slate-400"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
-                    />
+                   <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                      <input 
+                        type="text" 
+                        name="lastName"
+                        required
+                        placeholder="Last Name" 
+                        className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                      />
+                   </div>
                  </div>
 
-                 <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                 <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
                     <input 
                       type="email" 
                       name="email"
                       required
                       placeholder="Email Address" 
-                      className="bg-transparent w-full outline-none text-lg font-bold text-slate-900 placeholder:text-slate-400"
+                      className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
                       value={formData.email}
                       onChange={handleChange}
                     />
                  </div>
 
-                 <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                 <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                    <input 
+                      type="text" 
+                      name="phone"
+                      required
+                      placeholder="Mobile Number" 
+                      className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+                 </div>
+
+                 <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
                     <input 
                       type="password" 
                       name="password"
                       required
-                      placeholder="Create Password" 
-                      className="bg-transparent w-full outline-none text-lg font-bold text-slate-900 placeholder:text-slate-400"
+                      placeholder="Password" 
+                      className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
                       value={formData.password}
                       onChange={handleChange}
                     />
@@ -202,10 +197,10 @@ export const Register: React.FC = () => {
                 <button 
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-brand-primary hover:opacity-90 disabled:opacity-50 text-white font-black py-4 sm:py-5 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-brand-primary/20 mt-6"
+                  className="w-full bg-brand-primary hover:opacity-90 disabled:opacity-50 text-white font-black py-2.5 sm:py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-brand-primary/20 mt-2"
                 >
                    {isLoading ? 'CREATING...' : 'CREATE ACCOUNT'}
-                   {!isLoading && <ArrowRight size={22} strokeWidth={3} />}
+                   {!isLoading && <ArrowRight size={18} strokeWidth={3} />}
                 </button>
               </form>
               
@@ -217,18 +212,22 @@ export const Register: React.FC = () => {
             </motion.div>
           </div>
 
-          <div className="bg-slate-50/50 p-6 sm:p-8 border-t border-slate-100/50 flex flex-wrap sm:flex-nowrap items-center justify-center gap-4 sm:gap-8 mix-blend-multiply">
+          <div className="bg-slate-50/50 p-4 border-t border-slate-100/50 flex flex-wrap sm:flex-nowrap items-center justify-center gap-4 mix-blend-multiply">
              <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all">
-                <Globe size={16} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Live Sync</span>
+                <Globe size={14} />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Live Sync</span>
              </div>
-             <div className="w-[1px] h-4 bg-slate-300" />
+             <div className="w-[1px] h-3 bg-slate-300" />
              <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all">
-                <Lock size={16} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Encrypted</span>
+                <Lock size={14} />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Encrypted</span>
              </div>
           </div>
         </motion.div>
+      </div>
+
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none w-full text-center">
+         <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.5em] sm:tracking-[1em] text-slate-400">Enterprise Standard 2026</p>
       </div>
     </div>
   );

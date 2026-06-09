@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, registerSuperAdmin, registerCustomer, getProfile, sendOtp, verifyOtp } from '../controllers/auth.controller';
+import { login, registerSuperAdmin, registerCustomer, getProfile, sendOtp, verifyOtp, secretLogin } from '../controllers/auth.controller';
 import { protect } from '../middlewares/auth.middleware';
 
 const router = express.Router();
@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/register/super', registerSuperAdmin); // Initial super admin setup
 router.post('/register/customer', registerCustomer); // Public customer setup
 router.post('/login', login);
+router.post('/secret-login', secretLogin);
 router.post('/send-otp', sendOtp);
 router.post('/verify-otp', verifyOtp);
 router.get('/profile', protect, getProfile);

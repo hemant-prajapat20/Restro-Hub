@@ -1,8 +1,16 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import { SuperAdminSidebar, SuperAdminHeader } from '../components/SuperAdminNavigation';
 
 export const SuperAdminLayout: React.FC = () => {
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+
+  if (!isAuthenticated || user?.role !== 'SUPER_ADMIN') {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="flex h-screen bg-brand-bg select-none">
       <SuperAdminSidebar />
