@@ -16,7 +16,7 @@ import {
 import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,6 +32,13 @@ const navItems = [
 
 export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({ isOpen = false, onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
   const currentPath = location.pathname.split('/').pop();
 
   return (
@@ -89,7 +96,7 @@ export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => voi
 
       <div className="p-4 border-t border-slate-800 space-y-1">
 
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm">
+        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm">
           <LogOut className="w-5 h-5" />
           <span className="font-medium truncate">Logout</span>
         </button>

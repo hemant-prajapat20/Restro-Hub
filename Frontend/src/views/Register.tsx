@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { 
+import {
   ArrowRight,
   Globe,
   Lock,
@@ -13,7 +13,7 @@ import { setCredentials } from '../store/slices/authSlice';
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -28,16 +28,16 @@ export const Register: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
+
     try {
       const response = await fetch('http://localhost:5000/api/auth/register/customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to register');
       }
@@ -72,38 +72,56 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[112vh] bg-[#F8FAFC] flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Decorative Elements matching Login.tsx */}
       <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-brand-success/5 rounded-full blur-3xl pointer-events-none" />
-      
+
       <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-center relative z-10 h-full max-h-[800px]">
         {/* Hero Section */}
         <div className="hidden lg:block space-y-6">
-           <div className="w-12 h-12 bg-brand-accent rounded-[16px] flex items-center justify-center shadow-xl shadow-brand-accent/40 rotate-3 mb-6">
-              <UtensilsCrossed className="text-white w-6 h-6" />
-           </div>
-           <div className="space-y-2">
-              <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
-                 Your Favorite Food. <br/><span className="text-brand-accent">Delivered Faster.</span>
-              </h1>
-              <p className="text-sm text-slate-500 font-medium max-w-sm">
-                 Join thousands of food lovers. Experience seamless ordering, exclusive loyalty rewards, and live tracking.
-              </p>
-           </div>
-           <div className="flex items-center gap-6 pt-4">
-              <div className="flex -space-x-3">
-                 {[1,2,3,4].map(i => (
-                   <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+20}`} className="w-12 h-12 rounded-full border-4 border-white" alt="User" />
-                 ))}
-                 <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">+10k</div>
+          <div className="w-12 h-12 bg-brand-accent rounded-[16px] flex items-center justify-center shadow-xl shadow-brand-accent/40 rotate-3 mb-6">
+            <UtensilsCrossed className="text-white w-6 h-6" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
+              Your Favorite Food. <br /><span className="text-brand-accent">Delivered Faster.</span>
+            </h1>
+            <p className="text-sm text-slate-500 font-medium max-w-sm">
+              Join thousands of food lovers. Experience seamless ordering, exclusive loyalty rewards, and live tracking.
+            </p>
+          </div>
+          <div className="flex items-center gap-6 pt-4">
+            <div className="flex -space-x-3">
+              {[1, 2, 3, 4].map(i => (
+                <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 20}`} className="w-12 h-12 rounded-full border-4 border-white" alt="User" />
+              ))}
+              <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">+10k</div>
+            </div>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Happy Customers</p>
+          </div>
+
+          <div className="pt-8 grid grid-cols-1 gap-5 max-w-sm">
+            {[
+              { title: "Live Order Tracking", desc: "Watch your food arrive in real-time on our interactive map." },
+              { title: "Exclusive Rewards", desc: "Earn loyalty points on every order and unlock special discounts." },
+              { title: "Instant Support", desc: "24/7 customer support ready to help you with any issues." }
+            ].map((feature, idx) => (
+              <div key={idx} className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-brand-accent" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">{feature.title}</h3>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
+                </div>
               </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Happy Customers</p>
-           </div>
+            ))}
+          </div>
         </div>
 
         {/* Register Card */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-[380px] mx-auto lg:mx-0 justify-self-center lg:justify-self-end bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
@@ -116,7 +134,7 @@ export const Register: React.FC = () => {
               <h1 className="text-xl font-black font-display tracking-tight text-brand-primary">IndiServe</h1>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-4"
@@ -132,78 +150,83 @@ export const Register: React.FC = () => {
                 </div>
               )}
 
-              <form onSubmit={handleRegister} className="space-y-3">
-                 <div className="grid grid-cols-2 gap-3">
-                   <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-                      <input 
-                        type="text" 
-                        name="firstName"
-                        required
-                        placeholder="First Name" 
-                        className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                      />
-                   </div>
-                   <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-                      <input 
-                        type="text" 
-                        name="lastName"
-                        required
-                        placeholder="Last Name" 
-                        className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                      />
-                   </div>
-                 </div>
-
-                 <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-                    <input 
-                      type="email" 
-                      name="email"
+              <form onSubmit={handleRegister} className="space-y-3" autoComplete="off">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                    <input
+                      type="text"
+                      name="firstName"
                       required
-                      placeholder="Email Address" 
+                      autoComplete="off"
+                      placeholder="First Name"
                       className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
-                      value={formData.email}
+                      value={formData.firstName}
                       onChange={handleChange}
                     />
-                 </div>
-
-                 <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-                    <input 
-                      type="text" 
-                      name="phone"
+                  </div>
+                  <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                    <input
+                      type="text"
+                      name="lastName"
                       required
-                      placeholder="Mobile Number" 
+                      autoComplete="off"
+                      placeholder="Last Name"
                       className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
-                      value={formData.phone}
+                      value={formData.lastName}
                       onChange={handleChange}
                     />
-                 </div>
+                  </div>
+                </div>
 
-                 <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-                    <input 
-                      type="password" 
-                      name="password"
-                      required
-                      placeholder="Password" 
-                      className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
-                      value={formData.password}
-                      onChange={handleChange}
-                    />
-                 </div>
+                <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    autoComplete="off"
+                    placeholder="Email Address"
+                    className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                <button 
+                <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                  <input
+                    type="tel"
+                    name="phone"
+                    required
+                    autoComplete="off"
+                    placeholder="Mobile Number"
+                    className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="p-2 sm:p-2.5 bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+                  <input
+                    type="password"
+                    name="password"
+                    required
+                    autoComplete="new-password"
+                    placeholder="Password"
+                    className="bg-transparent w-full outline-none text-sm font-bold text-slate-900 placeholder:text-slate-400"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <button
                   type="submit"
                   disabled={isLoading}
                   className="w-full bg-brand-primary hover:opacity-90 disabled:opacity-50 text-white font-black py-2.5 sm:py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-brand-primary/20 mt-2"
                 >
-                   {isLoading ? 'CREATING...' : 'CREATE ACCOUNT'}
-                   {!isLoading && <ArrowRight size={18} strokeWidth={3} />}
+                  {isLoading ? 'CREATING...' : 'CREATE ACCOUNT'}
+                  {!isLoading && <ArrowRight size={18} strokeWidth={3} />}
                 </button>
               </form>
-              
+
               <div className="text-center mt-6">
                 <Link to="/login" className="text-brand-accent font-bold hover:underline">
                   Already have an account? Login here
@@ -213,21 +236,21 @@ export const Register: React.FC = () => {
           </div>
 
           <div className="bg-slate-50/50 p-4 border-t border-slate-100/50 flex flex-wrap sm:flex-nowrap items-center justify-center gap-4 mix-blend-multiply">
-             <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all">
-                <Globe size={14} />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Live Sync</span>
-             </div>
-             <div className="w-[1px] h-3 bg-slate-300" />
-             <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all">
-                <Lock size={14} />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Encrypted</span>
-             </div>
+            <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all">
+              <Globe size={14} />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Live Sync</span>
+            </div>
+            <div className="w-[1px] h-3 bg-slate-300" />
+            <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all">
+              <Lock size={14} />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Encrypted</span>
+            </div>
           </div>
         </motion.div>
       </div>
 
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none w-full text-center">
-         <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.5em] sm:tracking-[1em] text-slate-400">Enterprise Standard 2026</p>
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-40 pointer-events-none w-full text-center">
+        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.5em] sm:tracking-[1em] text-slate-400">Enterprise Standard 2026</p>
       </div>
     </div>
   );
