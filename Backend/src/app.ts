@@ -9,6 +9,7 @@ import subscriptionRoutes from './routes/subscription.routes';
 import userRoutes from './routes/user.routes';
 import settingsRoutes from './routes/settings.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import activityRoutes from './routes/activity.routes';
 
 dotenv.config();
 

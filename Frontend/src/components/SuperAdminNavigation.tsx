@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Building2, 
@@ -25,6 +25,8 @@ const navItems = [
   { id: 'businesses', label: 'Business Management', icon: Building2 },
   { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
   { id: 'users', label: 'User Directory', icon: Users },
+  { id: 'settings', label: 'System Config', icon: Settings },
+  { id: 'messages', label: 'Message Center', icon: Bell },
 ];
 
 export const SuperAdminSidebar: React.FC = () => {
@@ -72,18 +74,7 @@ export const SuperAdminSidebar: React.FC = () => {
       </nav>
 
       <div className="p-4 border-t border-slate-800 space-y-1">
-        <Link 
-          to="/super-admin/settings"
-          className={cn(
-            "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm",
-            currentPath === 'settings'
-              ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
-              : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
-          )}
-        >
-          <Settings className="w-5 h-5" />
-          <span className="font-medium truncate">System Config</span>
-        </Link>
+
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm">
           <LogOut className="w-5 h-5" />
           <span className="font-medium truncate">Logout</span>
@@ -94,6 +85,44 @@ export const SuperAdminSidebar: React.FC = () => {
 };
 
 export const SuperAdminHeader: React.FC = () => {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:5000/api/activity', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          setNotifications(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to load notifications", err);
+      }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000); // refresh every 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const markAllRead = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await fetch('http://localhost:5000/api/activity/read', {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 lg:ml-64 sticky top-0 z-40 glass">
       <div className="flex flex-col">
@@ -107,10 +136,45 @@ export const SuperAdminHeader: React.FC = () => {
           Network Status: Optimal
         </div>
         
-        <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all">
-          <Bell className="w-6 h-6" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white truncate" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all"
+          >
+            <Bell className="w-6 h-6" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {showDropdown && (
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50">
+              <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <span className="font-semibold text-sm">Notifications</span>
+                {unreadCount > 0 && (
+                  <button onClick={markAllRead} className="text-xs text-brand-accent hover:underline font-medium">Mark all read</button>
+                )}
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-slate-500">No new notifications</div>
+                ) : (
+                  notifications.map((notif, i) => (
+                    <div key={i} className={cn("p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors", notif.isRead ? "opacity-60" : "")}>
+                      <p className="text-xs font-medium text-slate-900 mb-1">{notif.message}</p>
+                      <span className="text-[10px] text-slate-400">{new Date(notif.createdAt).toLocaleString()}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+              <Link to="/super-admin/messages" onClick={() => setShowDropdown(false)} className="block p-3 text-center text-xs text-brand-accent font-semibold hover:bg-slate-50 transition-colors border-t border-slate-100">
+                View Message Center
+              </Link>
+            </div>
+          )}
+        </div>
 
         <div className="h-10 w-[1px] bg-slate-200 mx-2" />
 

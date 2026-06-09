@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import SystemSettings from '../models/SystemSettings';
+import ActivityLog from '../models/ActivityLog';
 
 // @desc    Get global system settings
 // @route   GET /api/settings
@@ -37,6 +38,13 @@ export const updateSettings = async (req: Request, res: Response): Promise<void>
     if (jwtExpirationTime !== undefined) settings.jwtExpirationTime = jwtExpirationTime;
 
     const updatedSettings = await settings.save();
+
+    // Log Activity
+    await ActivityLog.create({
+      action: 'SETTINGS_UPDATED',
+      message: 'System configuration was updated',
+      type: 'info'
+    });
 
     res.json({
       status: 'success',

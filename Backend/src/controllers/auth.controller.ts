@@ -26,9 +26,16 @@ export const registerSuperAdmin = async (req: Request, res: Response): Promise<v
   try {
     const { firstName, lastName, email, password, phone } = req.body;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ 
+      $or: [{ email }, { phone }] 
+    });
+    
     if (userExists) {
-      res.status(400).json({ status: 'error', message: 'User already exists' });
+      if (userExists.email === email) {
+        res.status(400).json({ status: 'error', message: 'User email already exists' });
+      } else {
+        res.status(400).json({ status: 'error', message: 'User phone number already exists' });
+      }
       return;
     }
 
@@ -63,9 +70,16 @@ export const registerCustomer = async (req: Request, res: Response): Promise<voi
   try {
     const { firstName, lastName, email, password, phone } = req.body;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ 
+      $or: [{ email }, { phone }] 
+    });
+    
     if (userExists) {
-      res.status(400).json({ status: 'error', message: 'User already exists' });
+      if (userExists.email === email) {
+        res.status(400).json({ status: 'error', message: 'User email already exists' });
+      } else {
+        res.status(400).json({ status: 'error', message: 'User phone number already exists' });
+      }
       return;
     }
 

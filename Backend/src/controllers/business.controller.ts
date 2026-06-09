@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import Business, { BusinessModule, BusinessStatus } from '../models/Business';
 import User, { Role } from '../models/User';
+import ActivityLog from '../models/ActivityLog';
 import mongoose from 'mongoose';
 
 // @desc    Create a new business and its admin user
@@ -29,11 +30,18 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
     } = req.body;
 
     // 1. Check if user already exists
-    const userExists = await User.findOne({ email: ownerEmail }).session(session);
+    const userExists = await User.findOne({ 
+      $or: [{ email: ownerEmail }, { phone: ownerPhone }] 
+    }).session(session);
+    
     if (userExists) {
       await session.abortTransaction();
       session.endSession();
-      res.status(400).json({ status: 'error', message: 'User email already exists' });
+      if (userExists.email === ownerEmail) {
+        res.status(400).json({ status: 'error', message: 'User email already exists' });
+      } else {
+        res.status(400).json({ status: 'error', message: 'User phone number already exists' });
+      }
       return;
     }
 
@@ -80,6 +88,14 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
     // 5. Update Admin User with Business ID
     newAdmin.businessId = newBusiness._id as mongoose.Types.ObjectId;
     await newAdmin.save({ session });
+
+    // 6. Log Activity
+    const log = new ActivityLog({
+      action: 'BUSINESS_REGISTERED',
+      message: `New Business Admin registered: ${ownerFirstName} ${ownerLastName} for platform(s) ${platforms.join(', ')}`,
+      type: 'success'
+    });
+    await log.save({ session });
 
     await session.commitTransaction();
     session.endSession();
