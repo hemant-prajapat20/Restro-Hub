@@ -19,6 +19,8 @@ export const Businesses: React.FC = () => {
   const filterOptions = ['All', 'Active', 'Inactive'];
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
+  const [showDurationDropdown, setShowDurationDropdown] = useState(false);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -423,10 +425,30 @@ export const Businesses: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" name="businessName" required placeholder="Company / Restaurant Name" value={formData.businessName} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full md:col-span-2" />
                     
-                    <select name="state" required value={formData.state} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full">
-                      <option value="">Select State</option>
-                      {INDIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
-                    </select>
+                    <div className="relative w-full">
+                      <button
+                        type="button"
+                        onClick={() => { setShowStateDropdown(!showStateDropdown); setShowDurationDropdown(false); }}
+                        className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full flex justify-between items-center text-slate-700"
+                      >
+                        <span className="truncate">{formData.state || "Select State"}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" className="w-5 h-5 text-slate-400 shrink-0"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 7l5 5 5-5"/></svg>
+                      </button>
+                      {showStateDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-[110] max-h-60 overflow-y-auto">
+                          {INDIAN_STATES.map(st => (
+                            <button
+                              key={st}
+                              type="button"
+                              onClick={() => { setFormData({...formData, state: st}); setShowStateDropdown(false); }}
+                              className="w-full text-left px-4 py-3 text-sm font-semibold hover:bg-slate-50 transition-colors text-slate-700"
+                            >
+                              {st}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <input type="text" name="district" required placeholder="District / City" value={formData.district} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full" />
                     
                     <textarea name="address" required placeholder="Full Company & Home Address" value={formData.address} onChange={handleInputChange} rows={3} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full md:col-span-2 resize-none" />
@@ -468,12 +490,30 @@ export const Businesses: React.FC = () => {
                         <span>Base Duration</span>
                         <span className="text-brand-accent text-[10px] bg-brand-accent/10 px-2 py-0.5 rounded-full">Calculates Price</span>
                       </label>
-                      <select name="subscriptionDurationMonths" required value={formData.subscriptionDurationMonths} onChange={handleInputChange} className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full">
-                        <option value={1}>1 Month</option>
-                        <option value={3}>3 Months</option>
-                        <option value={6}>6 Months</option>
-                        <option value={12}>12 Months</option>
-                      </select>
+                      <div className="relative w-full">
+                        <button
+                          type="button"
+                          onClick={() => { setShowDurationDropdown(!showDurationDropdown); setShowStateDropdown(false); }}
+                          className="p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full flex justify-between items-center text-slate-700"
+                        >
+                          <span className="truncate">{formData.subscriptionDurationMonths} Month{Number(formData.subscriptionDurationMonths) > 1 ? 's' : ''}</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" className="w-5 h-5 text-slate-400 shrink-0"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 7l5 5 5-5"/></svg>
+                        </button>
+                        {showDurationDropdown && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-[110]">
+                            {[1, 3, 6, 12].map(m => (
+                              <button
+                                key={m}
+                                type="button"
+                                onClick={() => { setFormData({...formData, subscriptionDurationMonths: m}); setShowDurationDropdown(false); }}
+                                className="w-full text-left px-4 py-3 text-sm font-semibold hover:bg-slate-50 transition-colors text-slate-700"
+                              >
+                                {m} Month{m > 1 ? 's' : ''}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">

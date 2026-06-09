@@ -36,7 +36,7 @@ export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => voi
 
   return (
     <aside className={cn(
-      "w-64 h-screen bg-brand-sidebar text-white flex-col fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0",
+      "w-64 h-screen bg-brand-sidebar text-white flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0",
       isOpen ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="p-6 flex items-center justify-between gap-3">
@@ -174,7 +174,7 @@ export const SuperAdminHeader: React.FC<{ onOpenSidebar?: () => void }> = ({ onO
           </button>
 
           {showDropdown && (
-            <div className="absolute right-[-1rem] sm:right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50">
+            <div className="fixed left-4 right-4 top-20 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-80 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50">
               <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <span className="font-semibold text-sm">Notifications</span>
                 {unreadCount > 0 && (
