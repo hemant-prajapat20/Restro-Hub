@@ -145,18 +145,18 @@ export const Register: React.FC = () => {
                         onChange={handleChange}
                       />
                    </div>
-                   <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl focus-within:border-brand-accent focus-within:bg-white transition-all">
-                      <input 
-                        type="text" 
-                        name="lastName"
-                        required
-                        placeholder="Last Name" 
-                        className="bg-transparent w-full outline-none text-lg font-bold text-slate-900 placeholder:text-slate-400"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                      />
-                   </div>
-                 </div>
+    <div className="p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl focus-within:border-brand-accent focus-within:bg-white transition-all">
+       <input 
+          type="text" 
+          name="lastName"
+           required
+             placeholder="Last Name" 
+             className="bg-transparent w-full outline-none text-lg font-bold text-slate-900 placeholder:text-slate-400"
+                 value={formData.lastName}
+                  onChange={handleChange}
+               />
+        </div>
+     </div>
 
                  <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl sm:rounded-3xl group focus-within:border-brand-accent focus-within:bg-white transition-all">
                     <div className="flex items-center gap-2 pr-4 border-r-2 border-slate-200/50">
