@@ -25,6 +25,7 @@ export const Businesses: React.FC = () => {
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -176,18 +177,20 @@ export const Businesses: React.FC = () => {
       }
 
       setSuccess(`Successfully registered ${formData.businessName}! The Business Admin can now log in.`);
-      fetchBusinesses(); // Refresh table
       
-      // Reset form after delay and close modal
-      setTimeout(() => {
-        setIsModalOpen(false);
-        setSuccess('');
-        setFormData({
-          businessName: '', ownerFirstName: '', ownerLastName: '', ownerEmail: '', ownerPhone: '', ownerPassword: '',
-          address: '', state: '', district: '', subscriptionDurationMonths: 1, subscriptionExpiry: '', subscriptionAmountPaid: ''
-        });
-        setSelectedPlatforms(['Restaurant']);
-      }, 3000);
+      // Close form and open success popup immediately
+      setIsModalOpen(false);
+      setShowSuccessModal(true);
+      
+      // Still refresh table to show new record in SuperAdmin panel
+      fetchBusinesses(); 
+
+      // Reset form silently
+      setFormData({
+        businessName: '', ownerFirstName: '', ownerLastName: '', ownerEmail: '', ownerPhone: '', ownerPassword: '',
+        address: '', state: '', district: '', subscriptionDurationMonths: 1, subscriptionExpiry: '', subscriptionAmountPaid: ''
+      });
+      setSelectedPlatforms(['Restaurant']);
 
     } catch (err: any) {
       setError(err.message);
@@ -547,6 +550,36 @@ export const Businesses: React.FC = () => {
                 </div>
               </form>
 
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Success Popup Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl z-[201] p-8 text-center"
+            >
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+              </div>
+              <h2 className="text-2xl font-display font-bold text-slate-900 mb-2">Registration Successful!</h2>
+              <p className="text-slate-500 text-sm mb-8">{success}</p>
+              <button 
+                onClick={() => { setShowSuccessModal(false); setSuccess(''); }}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl transition-colors shadow-lg shadow-emerald-500/30"
+              >
+                Done
+              </button>
             </motion.div>
           </>
         )}

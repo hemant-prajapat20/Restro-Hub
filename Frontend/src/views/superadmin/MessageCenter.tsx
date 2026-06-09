@@ -24,6 +24,29 @@ export const MessageCenter: React.FC = () => {
     }
   };
 
+  const handleDoubleClick = async (logId: string, isRead: boolean) => {
+    if (isRead) return; // Already read
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/activity/read', {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ logId })
+      });
+      
+      if (res.ok) {
+        // Optimistically update the UI
+        setLogs(prev => prev.map(log => log._id === logId ? { ...log, isRead: true } : log));
+      }
+    } catch (error) {
+      console.error('Error marking message as read', error);
+    }
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'success': return <CheckCircle className="w-5 h-5 text-emerald-500" />;
@@ -71,18 +94,32 @@ export const MessageCenter: React.FC = () => {
         ) : (
           <div className="divide-y divide-slate-100">
             {filteredLogs.map((log) => (
-              <div key={log._id} className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors">
-                <div className="mt-1">
+              <div 
+                key={log._id} 
+                onDoubleClick={() => handleDoubleClick(log._id, log.isRead)}
+                className={`p-6 flex items-start gap-4 transition-colors select-none cursor-pointer border-l-4 ${
+                  log.isRead ? 'bg-white border-transparent hover:bg-slate-50' : 'bg-brand-accent/5 border-brand-accent hover:bg-brand-accent/10'
+                }`}
+                title="Double-click to mark as seen"
+              >
+                <div className="mt-1 relative">
+                  {!log.isRead && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-accent rounded-full border-2 border-white"></span>
+                  )}
                   {getIcon(log.type)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2">
-                    <h3 className="font-semibold text-slate-900 break-words">{log.action.replace(/_/g, ' ')}</h3>
+                    <h3 className={`font-semibold break-words ${log.isRead ? 'text-slate-800' : 'text-slate-900'}`}>
+                      {log.action.replace(/_/g, ' ')}
+                    </h3>
                     <span className="text-[10px] sm:text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-full shrink-0">
                       {new Date(log.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600 break-words">{log.message}</p>
+                  <p className={`text-sm break-words ${log.isRead ? 'text-slate-500' : 'text-slate-700 font-medium'}`}>
+                    {log.message}
+                  </p>
                 </div>
               </div>
             ))}
