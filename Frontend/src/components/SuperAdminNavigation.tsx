@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   Building2, 
@@ -26,8 +26,8 @@ const navItems = [
   { id: 'dashboard', label: 'Platform Analytics', icon: LayoutDashboard },
   { id: 'businesses', label: 'Business Management', icon: Building2 },
   { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
-  { id: 'settings', label: 'System Config', icon: Settings },
   { id: 'messages', label: 'Message Center', icon: Bell },
+  { id: 'settings', label: 'System Config', icon: Settings },
 ];
 
 export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({ isOpen = false, onClose }) => {
@@ -36,7 +36,7 @@ export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => voi
 
   return (
     <aside className={cn(
-      "w-64 h-screen bg-brand-sidebar text-white flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0",
+      "w-64 bg-brand-sidebar text-white flex flex-col fixed left-0 top-0 bottom-0 z-50 transition-transform duration-300 lg:translate-x-0",
       isOpen ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="p-6 flex items-center justify-between gap-3">
@@ -101,6 +101,29 @@ export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => voi
 export const SuperAdminHeader: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleGlobalEvent(event: Event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        // If clicking the bell icon itself, let the onClick handler deal with it to avoid double toggling
+        const target = event.target as Element;
+        if (target.closest('button[aria-label="Notifications"]')) return;
+        
+        setShowDropdown(false);
+      }
+    }
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleGlobalEvent);
+      document.addEventListener('scroll', handleGlobalEvent, true);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleGlobalEvent);
+      document.removeEventListener('scroll', handleGlobalEvent, true);
+    };
+  }, [showDropdown]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -160,8 +183,9 @@ export const SuperAdminHeader: React.FC<{ onOpenSidebar?: () => void }> = ({ onO
           Network Status: Optimal
         </div>
         
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button 
+            aria-label="Notifications"
             onClick={() => setShowDropdown(!showDropdown)}
             className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all"
           >

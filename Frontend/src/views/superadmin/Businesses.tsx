@@ -26,6 +26,9 @@ export const Businesses: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
+  const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -42,7 +45,8 @@ export const Businesses: React.FC = () => {
     district: '',
     subscriptionDurationMonths: 1,
     subscriptionExpiry: '',
-    subscriptionAmountPaid: ''
+    subscriptionAmountPaid: '',
+    businessStatus: ''
   });
   
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['Restaurant']);
@@ -199,6 +203,84 @@ export const Businesses: React.FC = () => {
     }
   };
 
+  const handleToggleBusinessStatus = async (businessId: string, currentStatus: string) => {
+    try {
+      const newStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+      const res = await fetch(`http://localhost:5000/api/businesses/${businessId}`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        fetchBusinesses();
+        setActionMenuOpen(null);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditClick = (business: any) => {
+    setEditingBusinessId(business._id);
+    setFormData({
+      ...formData,
+      businessName: business.name,
+      ownerEmail: business.contactEmail,
+      ownerPhone: business.contactPhone || '',
+      address: business.address,
+      state: business.state,
+      district: business.district,
+      subscriptionAmountPaid: business.subscriptionAmountPaid?.toString() || '',
+      subscriptionExpiry: business.subscriptionExpiry ? new Date(business.subscriptionExpiry).toISOString().split('T')[0] : '',
+      businessStatus: business.status || 'ACTIVE'
+    });
+    setSelectedPlatforms(business.platforms || []);
+    setIsEditModalOpen(true);
+    setActionMenuOpen(null);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBusinessId) return;
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/businesses/${editingBusinessId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          name: formData.businessName,
+          contactEmail: formData.ownerEmail,
+          address: formData.address,
+          state: formData.state,
+          district: formData.district,
+          subscriptionExpiry: formData.subscriptionExpiry,
+          subscriptionAmountPaid: formData.subscriptionAmountPaid ? Number(formData.subscriptionAmountPaid) : 0,
+          platforms: selectedPlatforms,
+          status: formData.businessStatus
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to update business');
+      }
+
+      setIsEditModalOpen(false);
+      fetchBusinesses();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const toggleLoginAccess = async (userId: string) => {
     try {
       const res = await fetch(`http://localhost:5000/api/users/${userId}/status`, {
@@ -275,7 +357,7 @@ export const Businesses: React.FC = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto w-full">
+        <div className="overflow-x-auto lg:overflow-visible w-full">
           <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
@@ -347,7 +429,11 @@ export const Businesses: React.FC = () => {
                       </button>
                     </td>
                     <td className="p-4 text-right">
-                      <button className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors inline-block">
+                      <button 
+                        onClick={() => handleEditClick(business)}
+                        title="Edit Details"
+                        className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors inline-block"
+                      >
                         <MoreVertical className="w-5 h-5" />
                       </button>
                     </td>
@@ -584,6 +670,149 @@ export const Businesses: React.FC = () => {
           </>
         )}
       </AnimatePresence>
+      {/* Edit Business Modal */}
+      <AnimatePresence>
+        {isEditModalOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50"
+              onClick={() => !isSubmitting && setIsEditModalOpen(false)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, x: '100%' }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: '100%' }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 right-0 w-full sm:w-[600px] bg-white shadow-2xl z-50 flex flex-col"
+            >
+              <div className="flex items-center justify-between p-6 sm:p-8 border-b border-slate-100 bg-white/50 backdrop-blur-xl">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-900 font-display">Edit Business</h2>
+                  <p className="text-sm text-slate-500 mt-1">Modify details for this tenant.</p>
+                </div>
+                <button onClick={() => !isSubmitting && setIsEditModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                  <X className="w-6 h-6 text-slate-400" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEditSubmit} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8 custom-scrollbar">
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <p>{error}</p>
+                  </div>
+                )}
+
+                {/* Basic Info */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-brand-accent" />
+                    Basic Details
+                  </h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Business Name</label>
+                      <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contact Email</label>
+                      <input type="email" name="ownerEmail" value={formData.ownerEmail} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Info */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-brand-accent" />
+                    Location
+                  </h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Address</label>
+                      <input type="text" name="address" value={formData.address} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">State</label>
+                        <input type="text" name="state" value={formData.state} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">District</label>
+                        <input type="text" name="district" value={formData.district} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Toggle */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-brand-accent" />
+                    Business Status
+                  </h3>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                    <button 
+                      type="button"
+                      onClick={() => setFormData({ ...formData, businessStatus: 'ACTIVE' })}
+                      className={`flex-1 py-4 px-6 rounded-xl font-semibold border-2 transition-all flex items-center justify-center gap-2 ${
+                        formData.businessStatus === 'ACTIVE' 
+                          ? 'bg-green-50 border-green-500 text-green-700 shadow-sm' 
+                          : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className={`w-2.5 h-2.5 rounded-full ${formData.businessStatus === 'ACTIVE' ? 'bg-green-500' : 'bg-slate-300'}`} />
+                      Active / Enabled
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setFormData({ ...formData, businessStatus: 'SUSPENDED' })}
+                      className={`flex-1 py-4 px-6 rounded-xl font-semibold border-2 transition-all flex items-center justify-center gap-2 ${
+                        formData.businessStatus === 'SUSPENDED' 
+                          ? 'bg-red-50 border-red-500 text-red-700 shadow-sm' 
+                          : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className={`w-2.5 h-2.5 rounded-full ${formData.businessStatus === 'SUSPENDED' ? 'bg-red-500' : 'bg-slate-300'}`} />
+                      Suspended / Deactivated
+                    </button>
+                  </div>
+                </div>
+
+                {/* Subscription Info */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-brand-accent" />
+                    Subscription (Time / Month)
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Exact Expiry Date</label>
+                      <CustomDatePicker 
+                        value={formData.subscriptionExpiry}
+                        onChange={(val) => setFormData(p => ({ ...p, subscriptionExpiry: val }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Amount Paid (₹)</label>
+                      <input type="number" name="subscriptionAmountPaid" value={formData.subscriptionAmountPaid} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex flex-col sm:flex-row justify-end gap-4">
+                  <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-6 py-4 font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors order-2 sm:order-1">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={isSubmitting} className="bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-50 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-brand-accent/30 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2">
+                    {isSubmitting ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };

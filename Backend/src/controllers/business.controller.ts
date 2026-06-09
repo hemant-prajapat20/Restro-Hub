@@ -145,7 +145,18 @@ export const getAllBusinesses = async (req: Request, res: Response): Promise<voi
 export const updateBusiness = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { platforms, activeModules, status } = req.body;
+    const { 
+      platforms, 
+      activeModules, 
+      status,
+      name,
+      contactEmail,
+      address,
+      state,
+      district,
+      subscriptionExpiry,
+      subscriptionAmountPaid
+    } = req.body;
 
     const business = await Business.findById(id);
 
@@ -157,6 +168,13 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
     if (platforms) business.platforms = platforms;
     if (activeModules) business.activeModules = activeModules;
     if (status) business.status = status;
+    if (name) business.name = name;
+    if (contactEmail) business.contactEmail = contactEmail;
+    if (address) business.address = address;
+    if (state) business.state = state;
+    if (district) business.district = district;
+    if (subscriptionExpiry) business.subscriptionExpiry = new Date(subscriptionExpiry);
+    if (subscriptionAmountPaid !== undefined) business.subscriptionAmountPaid = subscriptionAmountPaid;
 
     const updatedBusiness = await business.save();
 

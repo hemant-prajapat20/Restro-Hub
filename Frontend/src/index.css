@@ -15,6 +15,9 @@
 }
 
 @layer base {
+  html {
+    zoom: 90%;
+  }
   body {
     @apply font-sans bg-brand-bg text-brand-primary antialiased;
   }

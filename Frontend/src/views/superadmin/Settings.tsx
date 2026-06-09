@@ -69,7 +69,7 @@ export const Settings: React.FC = () => {
   if (isLoading) return <div className="p-8 text-slate-500 font-semibold">Loading Configuration...</div>;
 
   return (
-    <div className="p-4 sm:p-8 pb-24 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-8 pb-24 w-full">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-slate-900 font-display truncate">System Configuration</h1>
         <p className="text-slate-500 mt-2 font-medium break-words">Global settings for the RestroHub Platform.</p>
