@@ -79,7 +79,7 @@ export const POS: React.FC = () => {
   const total = subTotal + sgst + cgst;
 
   return (
-    <div className="flex h-[calc(100vh-80px)] overflow-hidden">
+    <div className="flex h-[calc(100vh-80px)] overflow-hidden font-[Inter] font-semibold">
       {/* Menu Area */}
       <div className="flex-1 flex flex-col bg-slate-50">
         {/* Top Controls */}
@@ -106,7 +106,7 @@ export const POS: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
+                className={`flex-shrink-0 px-6 py-2.5 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all ${
                   activeCategory === cat 
                     ? 'bg-brand-accent text-white shadow-xl shadow-brand-accent/30' 
                     : 'bg-white text-slate-500 border border-slate-200 hover:border-brand-accent hover:text-brand-accent'
@@ -130,16 +130,16 @@ export const POS: React.FC = () => {
             >
               <div className="relative h-32 rounded-xl overflow-hidden mb-3">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
                   item.isVeg ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                 }`}>
                   {item.isVeg ? 'Veg' : 'Non-Veg'}
                 </div>
               </div>
-              <h5 className="font-bold text-slate-900 group-hover:text-brand-accent transition-colors truncate">{item.name}</h5>
+              <h5 className="font-semibold text-slate-900 group-hover:text-brand-accent transition-colors truncate">{item.name}</h5>
               <p className="text-xs text-slate-500 line-clamp-1 mb-2">{item.description}</p>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-black text-brand-primary">₹{item.price}</span>
+                <span className="text-lg font-semibold text-brand-primary">₹{item.price}</span>
                 <div className="p-1.5 bg-slate-100 rounded-lg text-slate-400 group-hover:bg-brand-accent group-hover:text-white transition-all">
                   <Plus size={16} strokeWidth={3} />
                 </div>
@@ -153,8 +153,8 @@ export const POS: React.FC = () => {
       <div className="w-[400px] bg-white border-l border-slate-200 flex flex-col">
         <div className="p-6 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h4 className="font-black text-lg font-display uppercase tracking-tight text-slate-800">Current Order</h4>
-            <span className="bg-brand-accent text-white px-2.5 py-1 rounded-lg text-xs font-black shadow-sm">{cart.length}</span>
+            <h4 className="font-semibold text-lg font-display uppercase tracking-tight text-slate-800">Current Order</h4>
+            <span className="bg-brand-accent text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">{cart.length}</span>
           </div>
           <button 
              onClick={() => setCart([])}
@@ -182,7 +182,7 @@ export const POS: React.FC = () => {
                 className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100"
               >
                 <div className="flex-1">
-                  <h6 className="font-bold text-sm text-slate-900 leading-tight">{item.name}</h6>
+                  <h6 className="font-semibold text-sm text-slate-900 leading-tight">{item.name}</h6>
                   <p className="text-xs text-slate-500 mt-0.5">₹{item.price} each</p>
                 </div>
                 <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-1">
@@ -192,7 +192,7 @@ export const POS: React.FC = () => {
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                  <span className="text-xs font-semibold w-4 text-center">{item.quantity}</span>
                   <button 
                     onClick={() => addToCart(MOCK_MENU.find(m => m.id === item.itemId)!)}
                     className="p-1 hover:bg-slate-100 rounded text-slate-500"
@@ -201,7 +201,7 @@ export const POS: React.FC = () => {
                   </button>
                 </div>
                 <div className="text-right ml-2">
-                  <p className="text-sm font-bold text-slate-900">₹{item.price * item.quantity}</p>
+                  <p className="text-sm font-semibold text-slate-900">₹{item.price * item.quantity}</p>
                 </div>
               </motion.div>
             ))
@@ -214,7 +214,7 @@ export const POS: React.FC = () => {
               <span>Subtotal</span>
               <span>₹{subTotal}</span>
             </div>
-            <div className="flex justify-between text-sm text-brand-primary font-bold">
+            <div className="flex justify-between text-sm text-brand-primary font-semibold">
                <div className="flex items-center gap-1">
                   <CheckCircle2 size={14} />
                   <span>KDS Sync Fee</span>
@@ -223,15 +223,15 @@ export const POS: React.FC = () => {
             </div>
           </div>
           <div className="flex justify-between items-center py-2 border-t border-slate-200">
-            <span className="text-lg font-bold text-slate-900">Total Due</span>
-            <span className="text-2xl font-black text-brand-primary">₹{total.toFixed(2)}</span>
+            <span className="text-lg font-semibold text-slate-900">Total Due</span>
+            <span className="text-2xl font-semibold text-brand-primary">₹{total.toFixed(2)}</span>
           </div>
 
           <div className="flex gap-3">
              <button
                disabled={cart.length === 0 || orderState !== 'idle'}
                onClick={handleSendToKitchen}
-               className={`flex-1 group py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-2 border-2 ${
+               className={`flex-1 group py-5 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 border-2 ${
                   orderState === 'idle' 
                     ? 'border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white' 
                     : 'bg-slate-100 border-slate-100 text-slate-400 cursor-not-allowed'
@@ -249,7 +249,7 @@ export const POS: React.FC = () => {
              <button
                disabled={cart.length === 0}
                onClick={() => setShowCheckout(true)}
-               className="flex-[2] bg-brand-accent hover:bg-brand-accent/90 disabled:bg-slate-300 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-brand-accent/30 transition-all active:scale-95 text-lg"
+               className="flex-[2] bg-brand-accent hover:bg-brand-accent/90 disabled:bg-slate-300 text-white font-semibold py-5 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-brand-accent/30 transition-all active:scale-95 text-lg"
              >
                PAY BILL
                <ChevronRight size={22} strokeWidth={3} />
@@ -274,11 +274,11 @@ export const POS: React.FC = () => {
                 >
                    <CheckCircle2 size={48} strokeWidth={3} />
                 </motion.div>
-                <h3 className="text-2xl font-black text-slate-900 mb-2 uppercase">Ticket Sent!</h3>
+                <h3 className="text-2xl font-semibold text-slate-900 mb-2 uppercase">Ticket Sent!</h3>
                 <p className="text-slate-500 font-medium mb-8">Order #0912 has been successfully synchronized with the Kitchen KDS.</p>
                 <button 
                   onClick={handleResetOrder}
-                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all"
+                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-semibold uppercase tracking-widest hover:bg-slate-800 transition-all"
                 >
                    Close & Next Order
                 </button>
@@ -305,7 +305,7 @@ export const POS: React.FC = () => {
               className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
             >
               <div className="p-8">
-                <h3 className="text-2xl font-bold font-display mb-6">Complete Payment</h3>
+                <h3 className="text-2xl font-semibold font-display mb-6">Complete Payment</h3>
                 
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {[
@@ -327,7 +327,7 @@ export const POS: React.FC = () => {
                         }`}
                       >
                         <Icon size={32} className="mb-2" />
-                        <span className="font-bold">{method.label}</span>
+                        <span className="font-semibold">{method.label}</span>
                       </button>
                     );
                   })}
@@ -336,19 +336,19 @@ export const POS: React.FC = () => {
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-slate-500 font-medium">Grand Total</span>
-                    <span className="text-3xl font-black text-brand-primary">₹{total.toFixed(2)}</span>
+                    <span className="text-3xl font-semibold text-brand-primary">₹{total.toFixed(2)}</span>
                   </div>
                   <div className="h-[1px] bg-slate-200 my-4" />
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Order Reference</span>
-                    <span className="text-xs font-mono font-bold text-slate-500">IND-8842-109</span>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Order Reference</span>
+                    <span className="text-xs font-mono font-semibold text-slate-500">IND-8842-109</span>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
                   <button 
                     onClick={() => setShowCheckout(false)}
-                    className="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all"
+                    className="flex-1 py-4 font-semibold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all"
                   >
                     BACK
                   </button>
@@ -384,7 +384,7 @@ export const POS: React.FC = () => {
                       setPaymentMethod(null);
                     }}
                     disabled={!paymentMethod}
-                    className="flex-[2] bg-brand-success hover:bg-brand-success/90 disabled:bg-slate-300 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-success/20 transition-all"
+                    className="flex-[2] bg-brand-success hover:bg-brand-success/90 disabled:bg-slate-300 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-success/20 transition-all"
                   >
                     COMPLETE & DOWNLOAD PDF
                     <FileText size={18} />

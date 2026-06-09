@@ -140,15 +140,15 @@ export const StaffManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">
       {/* Golden Staff Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-brand-accent font-black text-xs uppercase tracking-[0.25em]">
+          <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <Sparkles size={12} className="text-amber-500 animate-ping" />
             Vanguard Employee roster
           </div>
-          <h3 className="text-3xl font-black font-display text-white tracking-tight">Staff & Shift Directory</h3>
+          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Staff & Shift Directory</h3>
           <p className="text-sm text-stone-400 max-w-xl">
              Supervise active brigade attendance, adjust sommelier allocations, configure clock-ins, and recruit certified hospitality personnel.
           </p>
@@ -159,8 +159,8 @@ export const StaffManagement: React.FC = () => {
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
              <Clock className="text-amber-500" size={24} />
              <div>
-                <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest font-sans">Active On-Duty Brigade</p>
-                <p className="text-lg font-black text-white font-mono">
+                <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Active On-Duty Brigade</p>
+                <p className="text-lg font-semibold text-white font-mono">
                    {crew.filter(m => m.status === 'Clocked In').length} / {crew.length} Crew
                 </p>
              </div>
@@ -168,8 +168,8 @@ export const StaffManagement: React.FC = () => {
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
              <TrendingUp className="text-amber-500" size={24} />
              <div>
-                <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest font-sans">Monthly Payroll projection</p>
-                <p className="text-lg font-black text-white font-mono">
+                <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Monthly Payroll projection</p>
+                <p className="text-lg font-semibold text-white font-mono">
                    ₹{(crew.reduce((acc, current) => acc + current.salary, 0) / 1000).toFixed(0)}K
                 </p>
              </div>
@@ -196,7 +196,7 @@ export const StaffManagement: React.FC = () => {
             <button
               key={role}
               onClick={() => setSelectedRoleFilter(role)}
-              className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+              className={`px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
                 selectedRoleFilter === role 
                   ? 'bg-brand-primary text-brand-accent shadow-lg shadow-brand-primary/10' 
                   : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
@@ -208,7 +208,7 @@ export const StaffManagement: React.FC = () => {
           <div className="h-6 w-[1px] bg-stone-200 mx-2 hidden xl:block" />
           <button 
             onClick={() => setShowAddModal(true)}
-            className="px-6 py-3 bg-brand-accent text-stone-950 font-black rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
+            className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
           >
             <Plus size={16} strokeWidth={3} />
             Recruit Member
@@ -234,21 +234,21 @@ export const StaffManagement: React.FC = () => {
                            <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex flex-col items-end">
-                           <span className={`px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                           <span className={`px-2.5 py-1 rounded-full text-[8px] font-semibold uppercase tracking-wider ${
                               member.status === 'Clocked In' ? 'bg-green-50 text-green-700 border border-green-200/40' : 
                               member.status === 'On Break' ? 'bg-amber-50 text-amber-700 border border-amber-200/40' : 'bg-stone-100 text-stone-500 border border-stone-200/40'
                            } border`}>
                               {member.status}
                            </span>
-                           <span className="text-[10px] font-mono text-amber-500 font-bold tracking-tight mt-1 flex items-center gap-1">
+                           <span className="text-[10px] font-mono text-amber-500 font-semibold tracking-tight mt-1 flex items-center gap-1">
                               <Smile size={10} />
                               CS {member.score} / 5.0
                            </span>
                         </div>
                      </div>
 
-                     <h5 className="text-lg font-black text-stone-900 group-hover:text-brand-accent transition-colors block">{member.name}</h5>
-                     <p className="text-[10.5px] font-bold text-stone-400 uppercase tracking-widest mt-1 block">ID: MAISON-{member.id}</p>
+                     <h5 className="text-lg font-semibold text-stone-900 group-hover:text-brand-accent transition-colors block">{member.name}</h5>
+                     <p className="text-[10.5px] font-semibold text-stone-400 uppercase tracking-widest mt-1 block">ID: MAISON-{member.id}</p>
                      
                      <div className="mt-4 py-3 border-y border-stone-50 space-y-2">
                         <div className="flex items-center gap-2 text-stone-500 font-medium text-xs">
@@ -275,14 +275,14 @@ export const StaffManagement: React.FC = () => {
 
                   <div className="mt-6 pt-4 border-t border-stone-50 flex items-center justify-between">
                      <div>
-                        <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest">Base Salary</p>
-                        <p className="text-sm font-black text-stone-800">₹{member.salary.toLocaleString()} / mo</p>
+                        <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Base Salary</p>
+                        <p className="text-sm font-semibold text-stone-800">₹{member.salary.toLocaleString()} / mo</p>
                      </div>
                      <div className="flex gap-1">
                         {member.status !== 'Clocked In' && (
                            <button 
                              onClick={() => handleUpdateStatus(member.id, 'Clocked In')}
-                             className="p-2 bg-green-50 border border-green-200 text-green-700 rounded-xl hover:bg-green-100 transition-all text-[10px] font-black"
+                             className="p-2 bg-green-50 border border-green-200 text-green-700 rounded-xl hover:bg-green-100 transition-all text-[10px] font-semibold"
                            >
                              CLOCK IN
                            </button>
@@ -290,7 +290,7 @@ export const StaffManagement: React.FC = () => {
                         {member.status === 'Clocked In' && (
                            <button 
                              onClick={() => handleUpdateStatus(member.id, 'On Break')}
-                             className="p-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl hover:bg-amber-100 transition-all text-[10px] font-black"
+                             className="p-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl hover:bg-amber-100 transition-all text-[10px] font-semibold"
                            >
                              BREAK
                            </button>
@@ -298,7 +298,7 @@ export const StaffManagement: React.FC = () => {
                         {member.status !== 'Off-Duty' && (
                            <button 
                              onClick={() => handleUpdateStatus(member.id, 'Off-Duty')}
-                             className="p-2 bg-stone-50 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-100 transition-all text-[10px] font-black"
+                             className="p-2 bg-stone-50 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-100 transition-all text-[10px] font-semibold"
                            >
                              EXIT
                            </button>
@@ -327,29 +327,29 @@ export const StaffManagement: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-black text-stone-900 mb-2 font-display">Recruit Team Member</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-black mb-6">Onboard certified luxury hospitality brigade personnel</p>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Recruit Team Member</h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Onboard certified luxury hospitality brigade personnel</p>
 
               <form onSubmit={handleOnboardStaff} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Master Sommelier Dev" 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
                     <select 
                       value={newRole} 
                       onChange={(e) => setNewRole(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm text-stone-600"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="Executive Chef">Executive Chef</option>
                       <option value="Head Sommelier">Head Sommelier</option>
@@ -360,11 +360,11 @@ export const StaffManagement: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Assigned Shift</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Assigned Shift</label>
                     <select 
                       value={newShift} 
                       onChange={(e) => setNewShift(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm text-stone-600"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="General (10 AM - 7 PM)">General (10 AM - 7 PM)</option>
                       <option value="Morning (6 AM - 2 PM)">Morning (6 AM - 2 PM)</option>
@@ -376,41 +376,41 @@ export const StaffManagement: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Monthly Base Salary (₹)</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Monthly Base Salary (₹)</label>
                     <input 
                       type="number" 
                       required
                       placeholder="e.g. 85000" 
                       value={newSalary}
                       onChange={(e) => setNewSalary(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Performance Score</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Performance Score</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 4.9" 
                       value={newScore}
                       onChange={(e) => setNewScore(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Secretariat Email</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Secretariat Email</label>
                     <input 
                       type="email" 
                       placeholder="e.g. dev@indiserve.pro" 
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Premium Call Contact</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Premium Call Contact</label>
                     <input 
                       type="text" 
                       required
@@ -423,8 +423,8 @@ export const StaffManagement: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-black text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">INDIVIEW COMMISSION</button>
+                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
+                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">INDIVIEW COMMISSION</button>
                 </div>
               </form>
             </motion.div>

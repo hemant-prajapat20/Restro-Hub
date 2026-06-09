@@ -15,18 +15,18 @@ import { motion } from 'motion/react';
 
 export const Reports: React.FC = () => {
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
-             <h3 className="text-2xl font-black font-display text-slate-900">Financial Audit & GST</h3>
+             <h3 className="text-2xl font-semibold font-display text-slate-900">Financial Audit & GST</h3>
              <p className="text-slate-500 font-medium">Enterprise compliance and detailed profit analysis</p>
           </div>
           <div className="flex items-center gap-3">
-             <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
+             <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">
                 <Calendar size={18} />
                 April 2026
              </button>
-             <button className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-sm font-black hover:opacity-90 transition-all shadow-lg shadow-brand-primary/10">
+             <button className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-sm font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-primary/10">
                 <Download size={18} />
                 Export Tally/Excel
              </button>
@@ -45,9 +45,9 @@ export const Reports: React.FC = () => {
                   <stat.icon size={24} />
                </div>
                <div>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">{stat.label}</p>
-                  <h4 className="text-2xl font-black text-slate-900">{stat.value}</h4>
-                  <div className={`flex items-center gap-1 mt-2 text-xs font-bold ${stat.trend > 0 ? 'text-brand-success' : 'text-brand-danger'}`}>
+                  <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">{stat.label}</p>
+                  <h4 className="text-2xl font-semibold text-slate-900">{stat.value}</h4>
+                  <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${stat.trend > 0 ? 'text-brand-success' : 'text-brand-danger'}`}>
                      {stat.trend > 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                      {Math.abs(stat.trend)}% vs last month
                   </div>
@@ -59,7 +59,7 @@ export const Reports: React.FC = () => {
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden h-full flex flex-col">
              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                <h5 className="font-black font-display text-slate-900">Recent Invoices</h5>
+                <h5 className="font-semibold font-display text-slate-900">Recent Invoices</h5>
                 <div className="relative">
                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                    <input 
@@ -73,27 +73,27 @@ export const Reports: React.FC = () => {
                 <table className="w-full text-left">
                    <thead className="bg-slate-50">
                       <tr>
-                         <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Bill ID</th>
-                         <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</th>
-                         <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Amount</th>
-                         <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">GST Paid</th>
-                         <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
+                         <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID</th>
+                         <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Type</th>
+                         <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Amount</th>
+                         <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">GST Paid</th>
+                         <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Status</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-100">
                       {[1,2,3,4,5].map((i) => (
                         <tr key={i} className="hover:bg-slate-50/50 transition-all group">
                            <td className="px-6 py-4">
-                              <p className="text-sm font-bold text-brand-primary">#INV-8842-10{i}</p>
-                              <p className="text-[10px] font-bold text-slate-400 mt-0.5">09 May 2026, 12:4{i} PM</p>
+                              <p className="text-sm font-semibold text-brand-primary">#INV-8842-10{i}</p>
+                              <p className="text-[10px] font-semibold text-slate-400 mt-0.5">09 May 2026, 12:4{i} PM</p>
                            </td>
                            <td className="px-6 py-4">
-                              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black uppercase tracking-widest">Dine-In</span>
+                              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-semibold uppercase tracking-widest">Dine-In</span>
                            </td>
-                           <td className="px-6 py-4 text-center font-bold text-sm text-slate-900">₹{1200 + i*150}</td>
-                           <td className="px-6 py-4 text-center font-bold text-sm text-brand-success">₹64.50</td>
+                           <td className="px-6 py-4 text-center font-semibold text-sm text-slate-900">₹{1200 + i*150}</td>
+                           <td className="px-6 py-4 text-center font-semibold text-sm text-brand-success">₹64.50</td>
                            <td className="px-6 py-4 text-right">
-                              <span className="px-2 py-0.5 bg-brand-success/10 text-brand-success rounded text-[10px] font-black uppercase tracking-widest">Settled</span>
+                              <span className="px-2 py-0.5 bg-brand-success/10 text-brand-success rounded text-[10px] font-semibold uppercase tracking-widest">Settled</span>
                            </td>
                         </tr>
                       ))}
@@ -101,7 +101,7 @@ export const Reports: React.FC = () => {
                 </table>
              </div>
              <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
-                <button className="text-xs font-black text-slate-400 hover:text-brand-primary uppercase tracking-widest transition-all">View full audit trail</button>
+                <button className="text-xs font-semibold text-slate-400 hover:text-brand-primary uppercase tracking-widest transition-all">View full audit trail</button>
              </div>
           </div>
 
@@ -110,19 +110,19 @@ export const Reports: React.FC = () => {
                 <div className="relative z-10 flex flex-col h-full gap-8">
                    <div className="flex items-center gap-3">
                       <Lock className="text-brand-accent fill-brand-accent" size={20} />
-                      <h4 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Security Vault</h4>
+                      <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Security Vault</h4>
                    </div>
                    <div>
                       <p className="text-slate-400 text-sm font-medium">All financial reports are signed with enterprise-grade SHA-256 encryption.</p>
                    </div>
                    <div className="space-y-3">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">QUICK ACTIONS</p>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">QUICK ACTIONS</p>
                       <button className="w-full text-left p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                         <p className="text-sm font-bold">Generate P&L Statement</p>
+                         <p className="text-sm font-semibold">Generate P&L Statement</p>
                          <p className="text-[10px] text-slate-500 uppercase">Q1 2026 Analysis</p>
                       </button>
                       <button className="w-full text-left p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                         <p className="text-sm font-bold">Staff Salary Report</p>
+                         <p className="text-sm font-semibold">Staff Salary Report</p>
                          <p className="text-[10px] text-slate-500 uppercase">Performance bonuses included</p>
                       </button>
                    </div>

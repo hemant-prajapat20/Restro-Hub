@@ -93,14 +93,14 @@ export const Inventory: React.FC = () => {
   const lowStockCount = inventoryList.filter(item => item.currentStock <= item.minStock).length;
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
-              <p className="text-stone-400 text-xs font-black uppercase tracking-wider mb-2 font-display">Total Cellar SKU Valuation</p>
-              <h4 className="text-3xl font-black text-stone-900">₹{(totalSkuValue / 100000).toFixed(2)}L</h4>
-              <p className="text-xs text-brand-success font-bold mt-2 flex items-center gap-1">
+              <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-2 font-display">Total Cellar SKU Valuation</p>
+              <h4 className="text-3xl font-semibold text-stone-900">₹{(totalSkuValue / 100000).toFixed(2)}L</h4>
+              <p className="text-xs text-brand-success font-semibold mt-2 flex items-center gap-1">
                  <ClipboardCheck size={14} />
                  Ledger synced: Just now
               </p>
@@ -112,9 +112,9 @@ export const Inventory: React.FC = () => {
 
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
-              <p className="text-stone-400 text-xs font-black uppercase tracking-wider mb-2 font-display">Depleted ingredients alerts</p>
-              <h4 className="text-3xl font-black text-rose-800">{lowStockCount} Items</h4>
-              <p className="text-xs text-brand-danger font-black mt-2 flex items-center gap-1 uppercase tracking-widest font-mono">
+              <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-2 font-display">Depleted ingredients alerts</p>
+              <h4 className="text-3xl font-semibold text-rose-800">{lowStockCount} Items</h4>
+              <p className="text-xs text-brand-danger font-semibold mt-2 flex items-center gap-1 uppercase tracking-widest font-mono">
                  <AlertCircle size={14} className="animate-pulse" />
                  REORDER PROTOCOL REQ.
               </p>
@@ -126,9 +126,9 @@ export const Inventory: React.FC = () => {
 
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
-              <p className="text-stone-400 text-xs font-black uppercase tracking-wider mb-2 font-display">Active Merchant Consignments</p>
-              <h4 className="text-3xl font-black text-stone-900">03 Cargo</h4>
-              <p className="text-xs text-stone-500 font-bold mt-2 flex items-center gap-1">
+              <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-2 font-display">Active Merchant Consignments</p>
+              <h4 className="text-3xl font-semibold text-stone-900">03 Cargo</h4>
+              <p className="text-xs text-stone-500 font-semibold mt-2 flex items-center gap-1">
                  <Truck size={14} className="text-brand-accent" />
                  Verified luxury importers
               </p>
@@ -156,7 +156,7 @@ export const Inventory: React.FC = () => {
               <button 
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                className={`px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-widest transition-all ${
                   selectedCategory === cat 
                     ? 'bg-brand-primary text-brand-accent shadow-md shadow-brand-primary/10' 
                     : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
@@ -168,7 +168,7 @@ export const Inventory: React.FC = () => {
            <div className="h-6 w-[1px] bg-stone-200 mx-1 hidden xl:block" />
            <button 
              onClick={() => setShowAddModal(true)}
-             className="px-6 py-3 bg-brand-accent text-stone-950 font-black rounded-2xl text-xs uppercase tracking-widest hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/20"
+             className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/20"
            >
               <Plus size={16} strokeWidth={3} />
               Catalog Ingredient
@@ -181,12 +181,12 @@ export const Inventory: React.FC = () => {
         <table className="w-full text-left border-collapse">
             <thead className="bg-stone-50 border-b border-stone-200">
                <tr>
-                  <th className="px-6 py-4 text-[10px] font-black text-stone-400 uppercase tracking-widest">Item / Spec Details</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-stone-400 uppercase tracking-widest">Cellar Category</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-stone-400 uppercase tracking-widest text-center">Batch Status</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-stone-400 uppercase tracking-widest text-center">In Stock Ledger</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-stone-400 uppercase tracking-widest text-center">Safety Limit</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-stone-400 uppercase tracking-widest text-right">Ledger Calibration</th>
+                  <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">Item / Spec Details</th>
+                  <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">Cellar Category</th>
+                  <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest text-center">Batch Status</th>
+                  <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest text-center">In Stock Ledger</th>
+                  <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest text-center">Safety Limit</th>
+                  <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest text-right">Ledger Calibration</th>
                </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
@@ -200,41 +200,41 @@ export const Inventory: React.FC = () => {
                                <Package size={18} />
                             </div>
                             <div>
-                               <p className="text-sm font-black text-stone-900">{item.name}</p>
-                               <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest font-mono">SKU: MAISON-ING-{item.id}</p>
+                               <p className="text-sm font-semibold text-stone-900">{item.name}</p>
+                               <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest font-mono">SKU: MAISON-ING-{item.id}</p>
                             </div>
                          </div>
                       </td>
                       <td className="px-6 py-5">
-                         <span className="px-3 py-1 bg-stone-50 border border-stone-200/50 text-stone-600 rounded-xl text-[9px] font-black uppercase tracking-wider">
+                         <span className="px-3 py-1 bg-stone-50 border border-stone-200/50 text-stone-600 rounded-xl text-[9px] font-semibold uppercase tracking-wider">
                             {item.category}
                          </span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                         <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+                         <span className={`px-3 py-1 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
                             isLow ? 'bg-red-50 text-red-700 border-red-200/40' : 'bg-green-50 text-green-700 border-green-200/40'
                          }`}>
                             {isLow ? 'Critical Limit' : 'Stocked'}
                          </span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                         <span className={`text-sm font-black ${isLow ? 'text-rose-700 animate-pulse' : 'text-stone-950'}`}>{item.currentStock} {item.unit}</span>
+                         <span className={`text-sm font-semibold ${isLow ? 'text-rose-700 animate-pulse' : 'text-stone-950'}`}>{item.currentStock} {item.unit}</span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                         <span className="text-sm font-bold text-stone-400 font-mono">{item.minStock} {item.unit}</span>
+                         <span className="text-sm font-semibold text-stone-400 font-mono">{item.minStock} {item.unit}</span>
                       </td>
                       <td className="px-6 py-5">
                          <div className="flex items-center justify-end gap-1.5">
                             <button 
                               onClick={() => handleQuickAddStock(item.id)}
-                              className="px-3 py-1.5 bg-stone-50 border border-stone-200 hover:bg-stone-900 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                              className="px-3 py-1.5 bg-stone-50 border border-stone-200 hover:bg-stone-900 hover:text-white rounded-lg text-[9px] font-semibold uppercase tracking-widest transition-all"
                             >
                                Receive +10
                             </button>
                             <button 
                               onClick={() => handleQuickDispatch(item.id)}
                               disabled={item.currentStock <= 0}
-                              className="px-3 py-1.5 bg-amber-50 border border-amber-200 hover:bg-amber-150 text-stone-700 disabled:opacity-40 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                              className="px-3 py-1.5 bg-amber-50 border border-amber-200 hover:bg-amber-150 text-stone-700 disabled:opacity-40 rounded-lg text-[9px] font-semibold uppercase tracking-widest transition-all"
                             >
                                Dispatch -5
                             </button>
@@ -259,16 +259,16 @@ export const Inventory: React.FC = () => {
         className="bg-brand-primary rounded-[40px] p-8 text-white flex flex-col md:flex-row items-center gap-8 relative overflow-hidden shadow-xl"
       >
         <div className="relative z-10 flex-1">
-           <h4 className="text-xl font-black font-display mb-1 flex items-center gap-2 text-brand-accent uppercase tracking-wide">
+           <h4 className="text-xl font-semibold font-display mb-1 flex items-center gap-2 text-brand-accent uppercase tracking-wide">
               <Sparkles className="text-brand-accent" />
               Pre-reordering intelligence predictions
            </h4>
            <p className="text-stone-400 text-sm max-w-2xl leading-relaxed">
-              Automated supply forecasts predict exhaustion spikes in <span className="text-brand-accent font-bold"> Basmati Rice</span> and <span className="text-brand-accent font-bold"> Paneer</span> due to high booking loads in PDR cabins. Approve automatic bulk purchase order directly to primary certified suppliers.
+              Automated supply forecasts predict exhaustion spikes in <span className="text-brand-accent font-semibold"> Basmati Rice</span> and <span className="text-brand-accent font-semibold"> Paneer</span> due to high booking loads in PDR cabins. Approve automatic bulk purchase order directly to primary certified suppliers.
            </p>
         </div>
         <div className="relative z-10 flex-shrink-0">
-           <button className="px-8 py-4 bg-brand-accent text-stone-950 font-black uppercase tracking-wider rounded-2xl text-xs hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/25">
+           <button className="px-8 py-4 bg-brand-accent text-stone-950 font-semibold uppercase tracking-wider rounded-2xl text-xs hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/25">
               Approve import dispatch
            </button>
         </div>
@@ -292,29 +292,29 @@ export const Inventory: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-black text-stone-900 mb-2 font-display">Catalog Raw Ingredient</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-black mb-6">Incorporate prime raw supplies into warehouse ledgers</p>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Catalog Raw Ingredient</h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Incorporate prime raw supplies into warehouse ledgers</p>
 
               <form onSubmit={handleCreateInventoryItem} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Raw Ingredient Name</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Raw Ingredient Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Saffron Pistils (Organic Grade)" 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Stock Category</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock Category</label>
                     <select 
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm text-stone-600"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="Essentials">Essentials</option>
                       <option value="Grains">Grains & Legumes</option>
@@ -324,11 +324,11 @@ export const Inventory: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Measuring Unit</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Measuring Unit</label>
                     <select 
                       value={newUnit} 
                       onChange={(e) => setNewUnit(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm text-stone-600"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="kg">kilograms (kg)</option>
                       <option value="Ltr">Litres (Ltr)</option>
@@ -341,32 +341,32 @@ export const Inventory: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Starting Stock</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Starting Stock</label>
                     <input 
                       type="number" 
                       required
                       placeholder="e.g. 100" 
                       value={newStock}
                       onChange={(e) => setNewStock(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Minimum Reorder Limit</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Minimum Reorder Limit</label>
                     <input 
                       type="number" 
                       required
                       placeholder="e.g. 15" 
                       value={newMinStock}
                       onChange={(e) => setNewMinStock(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-black text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20 font-sans">SET ITEM SECURE</button>
+                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
+                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20 font-sans">SET ITEM SECURE</button>
                 </div>
               </form>
             </motion.div>

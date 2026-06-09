@@ -30,19 +30,19 @@ export const MenuManagement: React.FC = () => {
   });
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <h3 className="text-2xl font-black font-display text-slate-900">Menu Catalog</h3>
+          <h3 className="text-2xl font-semibold font-display text-slate-900">Menu Catalog</h3>
           <p className="text-slate-500 font-medium font-sans">Manage dishes, pricing, and availability across all digital platforms.</p>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
+          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">
             <Layers size={18} />
             Categories
           </button>
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-brand-accent text-white rounded-2xl text-sm font-black shadow-xl shadow-brand-accent/25 hover:scale-105 active:scale-95 transition-all">
+          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-brand-accent text-white rounded-2xl text-sm font-semibold shadow-xl shadow-brand-accent/25 hover:scale-105 active:scale-95 transition-all">
             <Plus size={18} strokeWidth={3} />
             ADD NEW DISH
           </button>
@@ -66,7 +66,7 @@ export const MenuManagement: React.FC = () => {
              <button
                key={cat}
                onClick={() => setSelectedCategory(cat)}
-               className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+               className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                  selectedCategory === cat 
                    ? 'bg-brand-primary text-white shadow-md' 
                    : 'text-slate-500 hover:bg-slate-100'
@@ -89,17 +89,17 @@ export const MenuManagement: React.FC = () => {
              <div className="relative h-48">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                   <button className="bg-white text-brand-primary p-2 rounded-xl flex items-center gap-2 text-xs font-bold shadow-xl">
+                   <button className="bg-white text-brand-primary p-2 rounded-xl flex items-center gap-2 text-xs font-semibold shadow-xl">
                       <ImageIcon size={14} />
                       UPDATE PHOTO
                    </button>
                 </div>
                 <div className="absolute top-4 left-4 flex gap-2">
-                   <div className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest text-white shadow-lg ${item.isVeg ? 'bg-brand-success' : 'bg-brand-danger'}`}>
+                   <div className={`px-2 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg ${item.isVeg ? 'bg-brand-success' : 'bg-brand-danger'}`}>
                       {item.isVeg ? 'Veg' : 'Non-Veg'}
                    </div>
                    {item.price > 350 && (
-                      <div className="px-2 py-1 bg-brand-primary text-white rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg">
+                      <div className="px-2 py-1 bg-brand-primary text-white rounded-lg text-[10px] font-semibold uppercase tracking-widest shadow-lg">
                         Premium
                       </div>
                    )}
@@ -112,14 +112,14 @@ export const MenuManagement: React.FC = () => {
              <div className="p-6 space-y-4">
                 <div className="flex items-start justify-between">
                    <div className="flex-1">
-                      <h4 className="text-xl font-black text-brand-primary leading-tight hover:text-brand-accent transition-colors cursor-pointer">{item.name}</h4>
-                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{item.category}</p>
+                      <h4 className="text-xl font-semibold text-brand-primary leading-tight hover:text-brand-accent transition-colors cursor-pointer">{item.name}</h4>
+                      <p className="text-xs text-slate-400 font-semibold uppercase tracking-widest mt-1">{item.category}</p>
                    </div>
                    <div className="text-right">
-                      <p className="text-2xl font-black text-brand-primary flex items-center justify-end">
+                      <p className="text-2xl font-semibold text-brand-primary flex items-center justify-end">
                          <span className="text-xs mr-0.5 mt-1">₹</span>{item.price}
                       </p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">incl. tax</p>
+                      <p className="text-[10px] text-slate-400 font-semibold uppercase mt-1">incl. tax</p>
                    </div>
                 </div>
 
@@ -129,9 +129,9 @@ export const MenuManagement: React.FC = () => {
 
                 <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
                    <div className="flex -space-x-2">
-                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400" title="KDS Tracking Available">K</div>
-                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400" title="QR Ordering Ready">Q</div>
-                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400" title="Delivery Active">D</div>
+                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-semibold text-slate-400" title="KDS Tracking Available">K</div>
+                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-semibold text-slate-400" title="QR Ordering Ready">Q</div>
+                      <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-semibold text-slate-400" title="Delivery Active">D</div>
                    </div>
                    <div className="flex items-center gap-2">
                       <button className="p-2.5 text-slate-400 hover:text-brand-primary hover:bg-slate-50 rounded-xl transition-all">
@@ -151,8 +151,8 @@ export const MenuManagement: React.FC = () => {
            <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
               <Plus className="text-slate-300 group-hover:text-brand-accent" size={32} />
            </div>
-           <p className="font-bold text-slate-400 group-hover:text-brand-primary transition-colors">Add New Catalog Item</p>
-           <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-1">Industrial Menu System</p>
+           <p className="font-semibold text-slate-400 group-hover:text-brand-primary transition-colors">Add New Catalog Item</p>
+           <p className="text-[10px] text-slate-300 font-semibold uppercase tracking-widest mt-1">Industrial Menu System</p>
         </div>
       </div>
     </div>

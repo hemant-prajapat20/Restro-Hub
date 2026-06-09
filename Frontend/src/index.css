@@ -3,7 +3,7 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Poppins", sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
   
   --color-brand-primary: #1C1917;
   --color-brand-accent: #C5A059;

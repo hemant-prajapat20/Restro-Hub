@@ -241,15 +241,15 @@ export const RestroSignature: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Luxurious Restro Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-brand-accent font-black text-xs uppercase tracking-[0.25em]">
+          <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <Crown size={12} className="animate-pulse" />
             Michelin-Inspired Fine Dining Terminal
           </div>
-          <h3 className="text-3xl font-black font-display text-white tracking-tight">Restro Signature & Suites</h3>
+          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Restro Signature & Suites</h3>
           <p className="text-sm text-stone-400 max-w-xl">
             Settle royal VIP rooms, manage custom multi-course chef tasting menus, and showcase curated signature preparations.
           </p>
@@ -260,14 +260,14 @@ export const RestroSignature: React.FC = () => {
           <button 
             type="button"
             onClick={() => setActiveTab('display')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === 'display' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
+            className={`px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${activeTab === 'display' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
           >
              Suites & Signatures
           </button>
           <button 
             type="button"
             onClick={() => setActiveTab('billing')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === 'billing' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
+            className={`px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${activeTab === 'billing' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
           >
              Royal POS Counter
           </button>
@@ -278,15 +278,15 @@ export const RestroSignature: React.FC = () => {
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
             <Users className="text-amber-500" size={24} />
             <div>
-              <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Active Executive Covers</p>
-              <p className="text-lg font-black text-white font-mono">18 / 26 VIPs</p>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Active Executive Covers</p>
+              <p className="text-lg font-semibold text-white font-mono">18 / 26 VIPs</p>
             </div>
           </div>
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
             <Sparkles className="text-amber-500 animate-spin-slow" size={24} />
             <div>
-              <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Master Tasting Sessions</p>
-              <p className="text-lg font-black text-white font-mono">02 Live</p>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Master Tasting Sessions</p>
+              <p className="text-lg font-semibold text-white font-mono">02 Live</p>
             </div>
           </div>
         </div>
@@ -309,11 +309,11 @@ export const RestroSignature: React.FC = () => {
               {/* Private Dining Rooms */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-2">
-                  <h4 className="text-lg font-black uppercase text-stone-800 tracking-tight flex items-center gap-2">
+                  <h4 className="text-lg font-semibold uppercase text-stone-800 tracking-tight flex items-center gap-2">
                     <Crown size={18} className="text-brand-accent" />
                     Royal suites & private dining cabins
                   </h4>
-                  <span className="text-stone-400 font-bold text-xs uppercase">Ground Floor West Wing</span>
+                  <span className="text-stone-400 font-semibold text-xs uppercase">Ground Floor West Wing</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -327,7 +327,7 @@ export const RestroSignature: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-start justify-between mb-4">
-                        <div className="px-3 py-1 bg-stone-50 rounded-xl text-[9px] font-black uppercase text-stone-400 tracking-widest">
+                        <div className="px-3 py-1 bg-stone-50 rounded-xl text-[9px] font-semibold uppercase text-stone-400 tracking-widest">
                           Cap: {room.capacity} VIPs
                         </div>
                         <span className={`w-3 h-3 rounded-full ${
@@ -336,19 +336,19 @@ export const RestroSignature: React.FC = () => {
                         }`} />
                       </div>
 
-                      <h5 className="text-base font-black text-stone-900 group-hover:text-brand-accent transition-colors">{room.name}</h5>
-                      <p className="text-[10px] text-stone-400 font-bold uppercase mt-1 tracking-widest leading-relaxed">
+                      <h5 className="text-base font-semibold text-stone-900 group-hover:text-brand-accent transition-colors">{room.name}</h5>
+                      <p className="text-[10px] text-stone-400 font-semibold uppercase mt-1 tracking-widest leading-relaxed">
                          {room.notes}
                       </p>
 
                       <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-stone-100">
                          <div>
-                            <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest">Min. Spend</p>
-                            <p className="text-sm font-black text-brand-primary">₹{room.minSpend.toLocaleString()}</p>
+                            <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Min. Spend</p>
+                            <p className="text-sm font-semibold text-brand-primary">₹{room.minSpend.toLocaleString()}</p>
                          </div>
                          <div>
-                            <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest">Active bill</p>
-                            <p className="text-sm font-black text-brand-success">
+                            <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Active bill</p>
+                            <p className="text-sm font-semibold text-brand-success">
                               {room.activeBill > 0 ? `₹${room.activeBill.toLocaleString()}` : 'No Active Bill'}
                             </p>
                          </div>
@@ -361,13 +361,13 @@ export const RestroSignature: React.FC = () => {
               {/* Chef Curated Signatures List */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-2 pt-4">
-                  <h4 className="text-lg font-black uppercase text-stone-800 tracking-tight flex items-center gap-2">
+                  <h4 className="text-lg font-semibold uppercase text-stone-800 tracking-tight flex items-center gap-2">
                     <UtensCrossedIcon size={18} className="text-brand-accent" />
                     Featured chef specifications
                   </h4>
                   <button 
                     onClick={() => setShowAddDishModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-brand-accent rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-md shadow-brand-primary/10"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-brand-accent rounded-xl text-xs font-semibold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-md shadow-brand-primary/10"
                   >
                     <Plus size={14} strokeWidth={3} />
                     Propose Dish 
@@ -383,26 +383,26 @@ export const RestroSignature: React.FC = () => {
                       <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                         <div>
                           <div className="flex items-center justify-between">
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-semibold uppercase tracking-widest border ${
                               dish.isVeg ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
                             }`}>
                               {dish.isVeg ? 'Veg' : 'Non-Veg'} • {dish.course}
                             </span>
-                            <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1">
+                            <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-widest flex items-center gap-1">
                               <Crown size={10} />
                               By {dish.chefName}
                             </p>
                           </div>
-                          <h5 className="text-base font-black text-stone-900 mt-2 block">{dish.name}</h5>
+                          <h5 className="text-base font-semibold text-stone-900 mt-2 block">{dish.name}</h5>
                           <p className="text-xs text-stone-400 font-medium leading-relaxed mt-1">{dish.description}</p>
                         </div>
 
                         <div className="flex items-center justify-between pt-3 border-t border-stone-100">
                           <div>
-                            <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest">Base Price</p>
-                            <p className="text-lg font-black text-brand-primary">₹{dish.price.toLocaleString()}</p>
+                            <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Base Price</p>
+                            <p className="text-lg font-semibold text-brand-primary">₹{dish.price.toLocaleString()}</p>
                           </div>
-                          <span className="text-[10px] font-black uppercase text-brand-accent bg-amber-500/10 px-3 py-1 rounded-xl">Chef Special</span>
+                          <span className="text-[10px] font-semibold uppercase text-brand-accent bg-amber-500/10 px-3 py-1 rounded-xl">Chef Special</span>
                         </div>
                       </div>
                     </div>
@@ -415,24 +415,24 @@ export const RestroSignature: React.FC = () => {
             {/* Right Hand Sidebar: Master Chef Active Tasting session */}
             <div className="space-y-6">
               <div className="bg-stone-950 p-8 rounded-[40px] border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
-                <h5 className="text-[10px] font-black text-brand-accent uppercase tracking-[0.25em] mb-4">Chef Tasting Session Log</h5>
+                <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Chef Tasting Session Log</h5>
                 
                 <div className="space-y-4">
                    <div className="bg-stone-900/60 p-5 rounded-3xl border border-stone-800">
-                      <span className="text-[9px] font-black text-brand-accent uppercase tracking-widest block mb-2">Live Session #05</span>
-                      <h6 className="text-sm font-black text-white uppercase tracking-tight">Royals Tasting Plate</h6>
+                      <span className="text-[9px] font-semibold text-brand-accent uppercase tracking-widest block mb-2">Live Session #05</span>
+                      <h6 className="text-sm font-semibold text-white uppercase tracking-tight">Royals Tasting Plate</h6>
                       <p className="text-xs text-stone-400 font-medium leading-relaxed mt-1">
                          6 premium courses curated dynamically by Chef Head Sommelier Ranveer for the Agarwal delegation.
                       </p>
                       <div className="flex items-center justify-between mt-4 text-[10px] font-mono">
-                         <span className="text-stone-500 font-bold uppercase">Status</span>
-                         <span className="text-amber-500 font-black uppercase tracking-wider animate-pulse">Session active</span>
+                         <span className="text-stone-500 font-semibold uppercase">Status</span>
+                         <span className="text-amber-500 font-semibold uppercase tracking-wider animate-pulse">Session active</span>
                       </div>
                    </div>
                    
                    <div className="bg-stone-900/60 p-5 rounded-3xl border border-stone-800">
-                      <span className="text-[9px] font-black text-stone-500 uppercase tracking-widest block mb-2">Upcoming - 8:30 PM</span>
-                      <h6 className="text-sm font-black text-stone-400 uppercase tracking-tight">Ambassador Gala Plate</h6>
+                      <span className="text-[9px] font-semibold text-stone-500 uppercase tracking-widest block mb-2">Upcoming - 8:30 PM</span>
+                      <h6 className="text-sm font-semibold text-stone-400 uppercase tracking-tight">Ambassador Gala Plate</h6>
                       <p className="text-xs text-stone-500 font-medium leading-relaxed mt-1">
                          8 courses featuring authentic copper oven baked starters.
                       </p>
@@ -440,14 +440,14 @@ export const RestroSignature: React.FC = () => {
                 </div>
 
                 <div className="pt-6 border-t border-stone-900 text-center">
-                   <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest leading-none mb-1">Weekly Booking Revenue</p>
-                   <p className="text-4xl font-display font-black text-brand-accent">₹248,500</p>
+                   <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest leading-none mb-1">Weekly Booking Revenue</p>
+                   <p className="text-4xl font-display font-semibold text-brand-accent">₹248,500</p>
                    <p className="text-[8px] text-stone-500 mt-2 uppercase font-mono tracking-wider">Generated from 14 PDR groups</p>
                 </div>
               </div>
 
               <div className="bg-white p-8 rounded-[40px] border border-stone-200/60 shadow-soft space-y-6">
-                <h5 className="text-xs font-black text-stone-400 uppercase tracking-[0.25em]">Signature Kitchen Protocols</h5>
+                <h5 className="text-xs font-semibold text-stone-400 uppercase tracking-[0.25em]">Signature Kitchen Protocols</h5>
                 <div className="p-5 bg-amber-50 rounded-3xl border border-amber-100">
                   <p className="text-[11px] text-stone-500 leading-relaxed font-semibold">
                     Gold elements are kept under high security lockbox key #03. Heavy tandoori prawns are strictly organic supply from Kochi docks.
@@ -467,8 +467,8 @@ export const RestroSignature: React.FC = () => {
             {/* Left Column: Menu Selector for POS (7 columns) */}
             <div className="xl:col-span-7 space-y-6">
               <div className="flex items-center justify-between p-4 bg-white rounded-3xl border border-stone-200/80">
-                <span className="text-xs font-black text-stone-500 uppercase tracking-widest">Imperial Menu Offerings</span>
-                <span className="text-xs font-black text-brand-primary uppercase tracking-wider">{signatures.length} chef creations</span>
+                <span className="text-xs font-semibold text-stone-500 uppercase tracking-widest">Imperial Menu Offerings</span>
+                <span className="text-xs font-semibold text-brand-primary uppercase tracking-wider">{signatures.length} chef creations</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -483,18 +483,18 @@ export const RestroSignature: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center gap-1.5">
-                        <span className={`px-2 py-0.5 rounded text-[7px] font-bold uppercase tracking-widest border ${
+                        <span className={`px-2 py-0.5 rounded text-[7px] font-semibold uppercase tracking-widest border ${
                           dish.isVeg ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
                         }`}>
                           {dish.course}
                         </span>
                       </div>
-                      <h5 className="text-sm font-black text-stone-900 group-hover:text-brand-primary transition-colors truncate">{dish.name}</h5>
+                      <h5 className="text-sm font-semibold text-stone-900 group-hover:text-brand-primary transition-colors truncate">{dish.name}</h5>
                       <p className="text-[10px] text-stone-400 font-medium truncate">Prepared under {dish.chefName}</p>
                       
                       <div className="flex items-center justify-between pt-2">
-                        <span className="text-sm font-black text-stone-950 font-mono">₹{dish.price.toLocaleString()}</span>
-                        <span className="text-[9px] font-black text-brand-accent uppercase tracking-wider group-hover:underline">Add to Order +</span>
+                        <span className="text-sm font-semibold text-stone-950 font-mono">₹{dish.price.toLocaleString()}</span>
+                        <span className="text-[9px] font-semibold text-brand-accent uppercase tracking-wider group-hover:underline">Add to Order +</span>
                       </div>
                     </div>
                   </button>
@@ -508,12 +508,12 @@ export const RestroSignature: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-stone-100 pb-4">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="text-brand-accent" size={18} />
-                    <h4 className="text-sm font-black text-stone-900 uppercase tracking-wider">Royal Order Ticket</h4>
+                    <h4 className="text-sm font-semibold text-stone-900 uppercase tracking-wider">Royal Order Ticket</h4>
                   </div>
                   <button 
                     onClick={() => setCart([])}
                     disabled={cart.length === 0}
-                    className="text-[10px] font-black text-stone-400 hover:text-stone-950 uppercase tracking-widest disabled:opacity-40"
+                    className="text-[10px] font-semibold text-stone-400 hover:text-stone-950 uppercase tracking-widest disabled:opacity-40"
                   >
                     Clear Cart
                   </button>
@@ -524,7 +524,7 @@ export const RestroSignature: React.FC = () => {
                   <div className="py-12 text-center rounded-3xl bg-stone-50/50 border border-dashed border-stone-150 p-6 flex flex-col items-center gap-3">
                     <UtensilsCrossed className="text-stone-300 animate-pulse" size={40} />
                     <div>
-                      <p className="text-xs font-black text-stone-400 uppercase tracking-widest">Docket is empty</p>
+                      <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest">Docket is empty</p>
                       <p className="text-[11px] text-stone-400 mt-1 max-w-[240px]">Select any Michelin signature dish above to initiate the royal suite transaction.</p>
                     </div>
                   </div>
@@ -534,21 +534,21 @@ export const RestroSignature: React.FC = () => {
                       <div key={cartItem.dish.id} className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-3">
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs font-black text-stone-900 truncate">{cartItem.dish.name}</p>
+                            <p className="text-xs font-semibold text-stone-900 truncate">{cartItem.dish.name}</p>
                             <p className="text-[10px] text-stone-400 font-mono">₹{cartItem.dish.price} each</p>
                           </div>
                           
                           <div className="flex items-center bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
                             <button 
                               onClick={() => removeOneFromCart(cartItem.dish.id)}
-                              className="px-2.5 py-1 text-xs font-black text-stone-500 hover:bg-stone-50"
+                              className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50"
                             >
                               -
                             </button>
-                            <span className="px-3 text-xs font-black text-stone-800 font-mono">{cartItem.quantity}</span>
+                            <span className="px-3 text-xs font-semibold text-stone-800 font-mono">{cartItem.quantity}</span>
                             <button 
                               onClick={() => addToCart(cartItem.dish)}
-                              className="px-2.5 py-1 text-xs font-black text-stone-500 hover:bg-stone-50"
+                              className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50"
                             >
                               +
                             </button>
@@ -571,11 +571,11 @@ export const RestroSignature: React.FC = () => {
                 <div className="space-y-4 pt-4 border-t border-stone-100">
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">Active VIP Suite</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Active VIP Suite</label>
                       <select 
                         value={targetRoomId}
                         onChange={(e) => setTargetRoomId(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-black text-stone-800"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800"
                       >
                         {pdrs.map(pdr => (
                           <option key={pdr.id} value={pdr.id}>{pdr.name}</option>
@@ -584,11 +584,11 @@ export const RestroSignature: React.FC = () => {
                     </div>
 
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">Payment Tender</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Payment Tender</label>
                       <select 
                         value={paymentMethod}
                         onChange={(e: any) => setPaymentMethod(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-black text-stone-800"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800"
                       >
                         <option value="UPI">Instant Imperial UPI</option>
                         <option value="Card">Visa / AMEX Centurion</option>
@@ -604,18 +604,18 @@ export const RestroSignature: React.FC = () => {
                       placeholder="Imperial Membership Key (e.g. VIPROYAL)"
                       value={discountCode}
                       onChange={(e) => setDiscountCode(e.target.value)}
-                      className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold uppercase tracking-widest"
+                      className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold uppercase tracking-widest"
                     />
                     <button 
                       type="button" 
                       onClick={applyRestroDiscount}
-                      className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-brand-accent text-[10px] font-black uppercase tracking-wider rounded-xl transition-all"
+                      className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-brand-accent text-[10px] font-semibold uppercase tracking-wider rounded-xl transition-all"
                     >
                       Authenticate
                     </button>
                   </div>
                   {appliedDiscount > 0 && (
-                     <p className="text-[10px] text-brand-success font-black uppercase tracking-widest">
+                     <p className="text-[10px] text-brand-success font-semibold uppercase tracking-widest">
                        ✓ Signature Privilege Verified: {appliedDiscount}% Chef Tasting Rebate approved.
                      </p>
                   )}
@@ -645,9 +645,9 @@ export const RestroSignature: React.FC = () => {
                     <span>SGST (9%)</span>
                     <span>₹{sgst.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm text-stone-900 font-black border-t border-stone-200/80 pt-2">
+                  <div className="flex justify-between items-center text-sm text-stone-900 font-semibold border-t border-stone-200/80 pt-2">
                     <span>Total Bill Balance</span>
-                    <span className="text-base font-black text-brand-primary font-display">₹{cartTotal.toLocaleString()}</span>
+                    <span className="text-base font-semibold text-brand-primary font-display">₹{cartTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -656,7 +656,7 @@ export const RestroSignature: React.FC = () => {
                   type="button"
                   onClick={handleRestroCheckout}
                   disabled={cart.length === 0}
-                  className="w-full py-4 bg-brand-primary text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40"
+                  className="w-full py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40"
                 >
                   Generate Royal Invoice & Settle Suite
                 </button>
@@ -677,27 +677,27 @@ export const RestroSignature: React.FC = () => {
                   </div>
 
                   <div className="pt-4 text-center">
-                     <p className="text-xs font-black text-stone-900 uppercase tracking-[0.25em] font-display">★ THE IMPERIAL CHAMBERS ★</p>
-                     <p className="text-[7.5px] text-stone-400 uppercase tracking-widest font-black font-mono">Elite Signature Tasting Lounge</p>
+                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.25em] font-display">★ THE IMPERIAL CHAMBERS ★</p>
+                     <p className="text-[7.5px] text-stone-400 uppercase tracking-widest font-semibold font-mono">Elite Signature Tasting Lounge</p>
                      <p className="text-[9px] text-stone-400 font-medium mt-1">Taj-Maison Cellar Wing #03, New Delhi</p>
                   </div>
 
                   <div className="space-y-4 pt-6 border-b border-dashed border-stone-200 pb-4 text-xs font-mono">
                     <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Docket Id:</span>
-                      <span className="text-stone-800 font-black">{checkoutReceipt.invoiceNumber}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Docket Id:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.invoiceNumber}</span>
                     </div>
                     <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Timestamp:</span>
-                      <span className="text-stone-800 font-bold">{checkoutReceipt.timestamp}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Timestamp:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.timestamp}</span>
                     </div>
                     <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Assigned Cabin:</span>
-                      <span className="text-stone-800 font-black">{checkoutReceipt.roomName}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Assigned Cabin:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.roomName}</span>
                     </div>
                     <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Sommelier:</span>
-                      <span className="text-stone-800 font-bold">{checkoutReceipt.chef}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Sommelier:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.chef}</span>
                     </div>
                   </div>
 
@@ -705,7 +705,7 @@ export const RestroSignature: React.FC = () => {
                   <div className="py-4 border-b border-dashed border-stone-200 font-mono text-xs space-y-3">
                     {checkoutReceipt.items.map((cartItem: any, idx: number) => (
                       <div key={idx} className="space-y-0.5">
-                        <div className="flex justify-between text-[11px] font-bold text-stone-900">
+                        <div className="flex justify-between text-[11px] font-semibold text-stone-900">
                           <span>{cartItem.dish.name} (x{cartItem.quantity})</span>
                           <span>₹{(cartItem.dish.price * cartItem.quantity).toLocaleString()}</span>
                         </div>
@@ -742,19 +742,19 @@ export const RestroSignature: React.FC = () => {
                      </div>
                   </div>
 
-                  <div className="pt-4 flex justify-between font-mono font-black text-stone-950 text-sm">
+                  <div className="pt-4 flex justify-between font-mono font-semibold text-stone-950 text-sm">
                      <span>IMPERIAL GRAND TOTAL</span>
                      <span className="text-base font-display">₹{checkoutReceipt.total.toLocaleString()}</span>
                   </div>
 
                   <div className="mt-8 pt-4 border-t border-stone-200 text-center font-mono">
-                     <p className="text-[9px] text-stone-400 font-black tracking-widest uppercase">Thank you for dining in luxury</p>
+                     <p className="text-[9px] text-stone-400 font-semibold tracking-widest uppercase">Thank you for dining in luxury</p>
                      <p className="text-[7.5px] text-stone-300 mt-1 uppercase">SCA Certified Kitchen Registry</p>
                      <div className="flex justify-center mt-4">
                         <div className="grid grid-cols-2 gap-2 w-full max-w-sm mx-auto">
                           <button 
                             onClick={() => window.print()}
-                            className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-black uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
+                            className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
                           >
                             <Printer size={12} />
                             Print Ticket
@@ -778,7 +778,7 @@ export const RestroSignature: React.FC = () => {
                                 paymentMethod: checkoutReceipt.payment
                               });
                             }}
-                            className="px-3 py-2.5 bg-stone-900 border border-amber-900/40 text-brand-accent rounded-xl text-[9.5px] font-sans font-black uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg hover:scale-102 active:scale-98 transition-all"
+                            className="px-3 py-2.5 bg-stone-900 border border-amber-900/40 text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg hover:scale-102 active:scale-98 transition-all"
                           >
                             <FileText size={12} />
                             Download PDF
@@ -810,14 +810,14 @@ export const RestroSignature: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 border border-amber-900/15 overflow-hidden"
             >
-              <h3 className="text-2xl font-black text-stone-900 font-display mb-1">{selectedRoom.name}</h3>
-              <p className="text-[10px] text-stone-400 font-black uppercase tracking-widest mb-6 border-b border-stone-100 pb-3">{selectedRoom.notes}</p>
+              <h3 className="text-2xl font-semibold text-stone-900 font-display mb-1">{selectedRoom.name}</h3>
+              <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest mb-6 border-b border-stone-100 pb-3">{selectedRoom.notes}</p>
 
               <div className="space-y-4">
-                 <p className="text-xs font-black text-stone-400 uppercase tracking-widest px-1 mb-2">Switch Active Status</p>
+                 <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest px-1 mb-2">Switch Active Status</p>
                  <button 
                    onClick={() => handleToggleRoomStatus(selectedRoom.id, 'Available')}
-                   className={`w-full p-4 rounded-2xl font-black text-left flex items-center justify-between border ${
+                   className={`w-full p-4 rounded-2xl font-semibold text-left flex items-center justify-between border ${
                      selectedRoom.status === 'Available' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-stone-50 border-stone-100 text-stone-600 hover:bg-stone-100'
                    }`}
                  >
@@ -826,7 +826,7 @@ export const RestroSignature: React.FC = () => {
                  </button>
                  <button 
                    onClick={() => handleToggleRoomStatus(selectedRoom.id, 'Occupied')}
-                   className={`w-full p-4 rounded-2xl font-black text-left flex items-center justify-between border ${
+                   className={`w-full p-4 rounded-2xl font-semibold text-left flex items-center justify-between border ${
                      selectedRoom.status === 'Occupied' ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-stone-50 border-stone-100 text-stone-600 hover:bg-stone-100'
                    }`}
                  >
@@ -835,7 +835,7 @@ export const RestroSignature: React.FC = () => {
                  </button>
                  <button 
                    onClick={() => handleToggleRoomStatus(selectedRoom.id, 'Reserved')}
-                   className={`w-full p-4 rounded-2xl font-black text-left flex items-center justify-between border ${
+                   className={`w-full p-4 rounded-2xl font-semibold text-left flex items-center justify-between border ${
                      selectedRoom.status === 'Reserved' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' : 'bg-stone-50 border-stone-100 text-stone-600 hover:bg-stone-100'
                    }`}
                  >
@@ -845,7 +845,7 @@ export const RestroSignature: React.FC = () => {
               </div>
 
               <div className="mt-8 flex gap-3">
-                 <button onClick={() => setSelectedRoom(null)} className="w-full py-4 bg-stone-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-stone-900/10">CLOSE DIALOG</button>
+                 <button onClick={() => setSelectedRoom(null)} className="w-full py-4 bg-stone-900 text-white rounded-2xl font-semibold text-xs uppercase tracking-widest shadow-xl shadow-stone-900/10">CLOSE DIALOG</button>
               </div>
             </motion.div>
           </div>
@@ -869,24 +869,24 @@ export const RestroSignature: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-black text-stone-900 mb-2 font-display">Propose Chef Signature</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-black mb-6">Introduce high-end recipes to VIP menus</p>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Propose Chef Signature</h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Introduce high-end recipes to VIP menus</p>
 
               <form onSubmit={handleCreateSignature} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Signature Masterpiece Name</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Signature Masterpiece Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Saffron-Roasted King Quail" 
                     value={newDishName}
                     onChange={(e) => setNewDishName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Gourmet Description & Sourcing</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gourmet Description & Sourcing</label>
                   <textarea 
                     placeholder="Describe wild sourcing, age, rare elements, plating designs..." 
                     value={newDescription}
@@ -897,11 +897,11 @@ export const RestroSignature: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Course Placement</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Course Placement</label>
                     <select 
                       value={newCourse} 
                       onChange={(e) => setNewCourse(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm text-stone-600"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="Starter">Starter / Appetizer</option>
                       <option value="Main Course">Main Course</option>
@@ -909,37 +909,37 @@ export const RestroSignature: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Chef Sommelier</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Chef Sommelier</label>
                     <input 
                       type="text" 
                       required
                       placeholder="e.g. Master Chef Ranveer" 
                       value={newChef}
                       onChange={(e) => setNewChef(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">VIP Base Price (₹)</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Base Price (₹)</label>
                     <input 
                       type="number" 
                       required
                       placeholder="e.g. 2400" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Dietary Category</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dietary Category</label>
                     <div className="flex gap-2 pt-1">
                        <button 
                          type="button" 
                          onClick={() => setNewIsVeg(true)}
-                         className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all border ${
+                         className={`flex-1 py-3 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all border ${
                            newIsVeg ? 'bg-green-50 text-green-700 border-green-200' : 'bg-stone-50 border-stone-100 text-stone-400'
                          }`}
                        >
@@ -948,7 +948,7 @@ export const RestroSignature: React.FC = () => {
                        <button 
                          type="button" 
                          onClick={() => setNewIsVeg(false)}
-                         className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all border ${
+                         className={`flex-1 py-3 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all border ${
                            !newIsVeg ? 'bg-red-50 text-red-700 border-red-200' : 'bg-stone-50 border-stone-100 text-stone-400'
                          }`}
                        >
@@ -959,8 +959,8 @@ export const RestroSignature: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddDishModal(false)} className="flex-1 py-4 font-black text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">CONFIRM RECOMMENDATION</button>
+                  <button type="button" onClick={() => setShowAddDishModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
+                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">CONFIRM RECOMMENDATION</button>
                 </div>
               </form>
             </motion.div>

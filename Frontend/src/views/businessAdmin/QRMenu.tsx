@@ -53,21 +53,21 @@ export const QRMenu: React.FC = () => {
         >
           <CheckCircle2 className="text-white" size={48} />
         </motion.div>
-        <h2 className="text-3xl font-black text-slate-900 mb-2">Order Confirmed!</h2>
+        <h2 className="text-3xl font-semibold text-slate-900 mb-2">Order Confirmed!</h2>
         <p className="text-slate-500 font-medium mb-8">Chef is starting to prep your meal at Table #4.</p>
         <div className="bg-slate-50 p-6 rounded-3xl w-full max-w-sm space-y-4 mb-8">
-           <div className="flex justify-between items-center text-sm font-bold">
+           <div className="flex justify-between items-center text-sm font-semibold">
               <span className="text-slate-400">Order ID</span>
               <span className="text-brand-primary">#QR-9921</span>
            </div>
-           <div className="flex justify-between items-center text-sm font-bold">
+           <div className="flex justify-between items-center text-sm font-semibold">
               <span className="text-slate-400">Est. Time</span>
               <span className="text-brand-primary">15-20 Mins</span>
            </div>
         </div>
         <button 
            onClick={() => { setOrderPlaced(false); setCart([]); }}
-           className="w-full max-w-sm bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg"
+           className="w-full max-w-sm bg-brand-primary text-white py-4 rounded-2xl font-semibold shadow-lg"
         >
            ORDER MORE
         </button>
@@ -85,8 +85,8 @@ export const QRMenu: React.FC = () => {
                  <Navigation size={20} />
               </div>
               <div>
-                 <h1 className="text-lg font-black leading-tight">The Royal Indian</h1>
-                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Table #04</p>
+                 <h1 className="text-lg font-semibold leading-tight">The Royal Indian</h1>
+                 <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Table #04</p>
               </div>
            </div>
            <button className="p-2 bg-slate-100 rounded-lg text-slate-400">
@@ -106,7 +106,7 @@ export const QRMenu: React.FC = () => {
       {/* Categories */}
       <div className="p-6 flex gap-3 overflow-x-auto no-scrollbar">
          {['Recommends', 'Starters', 'Mains', 'Breads', 'Desserts'].map((cat, i) => (
-           <button key={cat} className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+           <button key={cat} className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
              i === 0 ? 'bg-brand-accent text-white shadow-lg shadow-brand-accent/20' : 'bg-white text-slate-500'
            }`}>
              {cat}
@@ -116,7 +116,7 @@ export const QRMenu: React.FC = () => {
 
       {/* Menu Items */}
       <div className="px-6 space-y-6">
-         <h3 className="font-black text-xl flex items-center gap-2">
+         <h3 className="font-semibold text-xl flex items-center gap-2">
             Chef's Special
             <Star size={18} className="text-brand-warning fill-brand-warning" />
          </h3>
@@ -130,16 +130,16 @@ export const QRMenu: React.FC = () => {
                     </div>
                  </div>
                  <div className="flex-1">
-                    <h5 className="font-bold text-slate-900 leading-tight">{item.name}</h5>
+                    <h5 className="font-semibold text-slate-900 leading-tight">{item.name}</h5>
                     <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
                        <Clock size={10} />
                        15 mins
                     </div>
                     <div className="flex items-center justify-between mt-3">
-                       <span className="font-black text-brand-primary">₹{item.price}</span>
+                       <span className="font-semibold text-brand-primary">₹{item.price}</span>
                        <button 
                          onClick={() => addToCart(item)}
-                         className="px-4 py-1.5 bg-slate-50 hover:bg-brand-accent hover:text-white text-brand-accent rounded-lg text-xs font-black transition-all"
+                         className="px-4 py-1.5 bg-slate-50 hover:bg-brand-accent hover:text-white text-brand-accent rounded-lg text-xs font-semibold transition-all"
                        >
                           ADD
                        </button>
@@ -161,12 +161,12 @@ export const QRMenu: React.FC = () => {
              onClick={() => setShowCart(true)}
              className="w-full bg-brand-primary text-white p-4 rounded-[28px] flex items-center bg-gradient-to-r from-brand-primary to-slate-800 shadow-2xl"
            >
-              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center font-black">
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center font-semibold">
                  {cart.length}
               </div>
               <div className="ml-4 text-left">
-                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">View Cart</p>
-                 <p className="font-black">₹{cartTotal}</p>
+                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">View Cart</p>
+                 <p className="font-semibold">₹{cartTotal}</p>
               </div>
               <ChevronRight className="ml-auto" />
            </button>
@@ -192,20 +192,20 @@ export const QRMenu: React.FC = () => {
                 className="relative bg-white w-full max-w-md rounded-t-[40px] shadow-2xl p-8"
               >
                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-black">Your Order</h3>
-                    <div className="bg-slate-100 px-4 py-1 rounded-full text-xs font-bold">Table #04</div>
+                    <h3 className="text-2xl font-semibold">Your Order</h3>
+                    <div className="bg-slate-100 px-4 py-1 rounded-full text-xs font-semibold">Table #04</div>
                  </div>
 
                  <div className="space-y-6 mb-8 max-h-[40vh] overflow-y-auto custom-scrollbar">
                     {cart.map((item) => (
                       <div key={item.itemId} className="flex items-center gap-4">
                          <div className="flex-1">
-                            <h6 className="font-bold">{item.name}</h6>
+                            <h6 className="font-semibold">{item.name}</h6>
                             <p className="text-xs text-slate-400">₹{item.price}</p>
                          </div>
                          <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-xl">
                             <button onClick={() => removeFromCart(item.itemId)} className="p-1 text-slate-400"><Minus size={16} /></button>
-                            <span className="font-black text-sm w-4 text-center">{item.quantity}</span>
+                            <span className="font-semibold text-sm w-4 text-center">{item.quantity}</span>
                             <button onClick={() => addToCart(MOCK_MENU.find(m => m.id === item.itemId)!)} className="p-1 text-brand-primary"><Plus size={16} /></button>
                          </div>
                       </div>
@@ -213,9 +213,9 @@ export const QRMenu: React.FC = () => {
                  </div>
 
                  <div className="border-t border-slate-100 pt-6 space-y-4 mb-8">
-                    <div className="flex justify-between font-bold text-slate-400">
+                    <div className="flex justify-between font-semibold text-slate-400">
                        <span>Total Payable</span>
-                       <span className="text-brand-primary text-xl font-black">₹{cartTotal}</span>
+                       <span className="text-brand-primary text-xl font-semibold">₹{cartTotal}</span>
                     </div>
                  </div>
 
@@ -224,7 +224,7 @@ export const QRMenu: React.FC = () => {
                     setShowCart(false);
                     setOrderPlaced(true);
                   }}
-                  className="w-full bg-brand-accent text-white py-5 rounded-[24px] font-black shadow-xl shadow-brand-accent/20 active:scale-95 transition-all"
+                  className="w-full bg-brand-accent text-white py-5 rounded-[24px] font-semibold shadow-xl shadow-brand-accent/20 active:scale-95 transition-all"
                  >
                     SEND TO KITCHEN
                  </button>

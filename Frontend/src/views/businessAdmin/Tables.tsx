@@ -39,7 +39,7 @@ const StatusBadge = ({ status }: { status: TableStatus }) => {
     'Billing': 'bg-blue-100 text-blue-600',
   };
   return (
-    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${styles[status]}`}>
+    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${styles[status]}`}>
       {status}
     </span>
   );
@@ -202,12 +202,12 @@ export const Tables: React.FC = () => {
   });
 
   return (
-    <div className="p-8 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       <div className="flex items-center justify-between bg-white p-4 rounded-3xl border border-slate-200 shadow-soft">
         <div className="flex items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
           <button 
             onClick={() => setActiveFloor(1)}
-            className={`px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            className={`px-6 py-3 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
               activeFloor === 1 ? 'bg-white text-brand-accent shadow-md border border-slate-100' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -215,7 +215,7 @@ export const Tables: React.FC = () => {
           </button>
           <button 
             onClick={() => setActiveFloor(2)}
-            className={`px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            className={`px-6 py-3 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
               activeFloor === 2 ? 'bg-white text-brand-accent shadow-md border border-slate-100' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -224,13 +224,13 @@ export const Tables: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-           <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-xs font-black text-slate-500 uppercase tracking-widest hover:bg-slate-50">
+           <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-500 uppercase tracking-widest hover:bg-slate-50">
               <History size={16} />
               Waitlist
            </button>
            <button 
              onClick={() => setShowAddTableModal(true)}
-             className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-brand-primary/10 hover:scale-105 transition-all"
+             className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-xs font-semibold uppercase tracking-widest shadow-lg shadow-brand-primary/10 hover:scale-105 transition-all"
            >
               <Plus size={16} strokeWidth={3} />
               ADD NEW TABLE
@@ -253,8 +253,8 @@ export const Tables: React.FC = () => {
           >
             <div className="flex items-start justify-between mb-8">
               <div>
-                <h3 className="text-3xl font-black text-slate-900 group-hover:text-brand-accent transition-colors">#{table.number}</h3>
-                <p className="text-xs font-bold text-slate-400 mt-1 uppercase flex items-center gap-1">
+                <h3 className="text-3xl font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">#{table.number}</h3>
+                <p className="text-xs font-semibold text-slate-400 mt-1 uppercase flex items-center gap-1">
                   <Users size={12} />
                   {table.capacity} Seater
                 </p>
@@ -264,7 +264,7 @@ export const Tables: React.FC = () => {
 
             {table.status === 'Occupied' || table.status === 'Billing' ? (
               <div className="space-y-4">
-                 <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
                     <span className="flex items-center gap-1">
                       <Clock size={12} />
                       Dine Sessions
@@ -278,17 +278,17 @@ export const Tables: React.FC = () => {
             ) : table.status === 'Cleaning' ? (
               <div className="flex flex-col items-center justify-center py-4 rounded-2xl bg-brand-warning/5 border border-brand-warning/10">
                  <RefreshCw className="text-brand-warning animate-spin mb-2" size={20} />
-                 <p className="text-[10px] font-black text-brand-warning uppercase tracking-widest">Cleaning / Resetting</p>
+                 <p className="text-[10px] font-semibold text-brand-warning uppercase tracking-widest">Cleaning / Resetting</p>
               </div>
             ) : (
               <div className="h-14 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
-                 <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">Available</p>
+                 <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest">Available</p>
               </div>
             )}
 
             <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
-               <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{table.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
-               <button className="text-[10px] font-black text-brand-accent hover:opacity-80 uppercase tracking-wider flex items-center gap-1">
+               <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{table.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
+               <button className="text-[10px] font-semibold text-brand-accent hover:opacity-80 uppercase tracking-wider flex items-center gap-1">
                   BILL & ORDER <ChevronRight size={10} strokeWidth={3} />
                </button>
             </div>
@@ -318,13 +318,13 @@ export const Tables: React.FC = () => {
                  <div className="p-8 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                        <div className="w-16 h-16 bg-brand-primary text-white rounded-3xl flex items-center justify-center shadow-xl">
-                          <h2 className="text-2xl font-black">#{selectedTable.number}</h2>
+                          <h2 className="text-2xl font-semibold">#{selectedTable.number}</h2>
                        </div>
                        <div>
-                          <h3 className="text-xl font-black text-slate-900">Table Billing & POS</h3>
+                          <h3 className="text-xl font-semibold text-slate-900">Table Billing & POS</h3>
                           <div className="flex items-center gap-2 mt-1">
                              <StatusBadge status={selectedTable.status} />
-                             <span className="text-xs font-bold text-slate-400 uppercase">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
+                             <span className="text-xs font-semibold text-slate-400 uppercase">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
                           </div>
                        </div>
                     </div>
@@ -337,13 +337,13 @@ export const Tables: React.FC = () => {
                  <div className="flex bg-slate-50 p-2 mx-8 mt-6 rounded-2xl border border-slate-100">
                    <button
                      onClick={() => setModalTab('checkout')}
-                     className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all ${modalTab === 'checkout' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/55' : 'text-slate-400 hover:text-slate-600'}`}
+                     className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all ${modalTab === 'checkout' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/55' : 'text-slate-400 hover:text-slate-600'}`}
                    >
                      Bill & Checkout
                    </button>
                    <button
                      onClick={() => setModalTab('add_items')}
-                     className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all ${modalTab === 'add_items' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/55' : 'text-slate-400 hover:text-slate-600'}`}
+                     className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all ${modalTab === 'add_items' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/55' : 'text-slate-400 hover:text-slate-600'}`}
                    >
                      Take Order (+ Menu)
                    </button>
@@ -357,11 +357,11 @@ export const Tables: React.FC = () => {
                        {selectedTable.status === 'Cleaning' && (
                          <div className="p-6 bg-brand-warning/10 border border-brand-warning/20 text-brand-warning rounded-3xl text-center space-y-3">
                            <RefreshCw className="mx-auto animate-spin" size={28} />
-                           <p className="text-xs font-black uppercase tracking-wider">Sanitization In Progress</p>
+                           <p className="text-xs font-semibold uppercase tracking-wider">Sanitization In Progress</p>
                            <p className="text-xs font-medium text-slate-500">Waiters are preparing and wiping table #{selectedTable.number}. Click 'Complete Reset' below to clear.</p>
                            <button 
                              onClick={() => setTableStatus(selectedTable.id, 'Available')}
-                             className="px-5 py-2.5 bg-brand-warning text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md shadow-brand-warning/10"
+                             className="px-5 py-2.5 bg-brand-warning text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md shadow-brand-warning/10"
                            >
                              Complete Reset & Open Table
                            </button>
@@ -373,7 +373,7 @@ export const Tables: React.FC = () => {
                          <div className="p-6 bg-slate-50 rounded-[32px] border border-dashed border-slate-300 space-y-4">
                            <div className="text-center pb-2 border-b border-dashed border-slate-200">
                              <Receipt size={24} className="mx-auto text-brand-success mb-1" />
-                             <p className="text-xs font-black uppercase tracking-wider text-slate-900">Settled Receipt Summary</p>
+                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-900">Settled Receipt Summary</p>
                              <p className="text-[9px] font-mono text-slate-400 mt-0.5">Invoice: {settledReceipt.invoiceNumber}</p>
                            </div>
 
@@ -384,7 +384,7 @@ export const Tables: React.FC = () => {
                                  <span>₹{(item.price * item.quantity).toLocaleString()}</span>
                                </div>
                              ))}
-                             <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between font-bold text-slate-900">
+                             <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between font-semibold text-slate-900">
                                <span>Grand Total Paid ({settledReceipt.payment})</span>
                                <span>₹{settledReceipt.total.toLocaleString()}</span>
                              </div>
@@ -395,7 +395,7 @@ export const Tables: React.FC = () => {
                                onClick={() => {
                                  window.print();
                                 }}
-                               className="py-2.5 border border-slate-300 text-slate-705 text-stone-700 bg-white hover:bg-slate-50 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1.5 hover:scale-102 active:scale-98 transition-all"
+                               className="py-2.5 border border-slate-300 text-slate-705 text-stone-700 bg-white hover:bg-slate-50 font-semibold text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1.5 hover:scale-102 active:scale-98 transition-all"
                              >
                                <Printer size={12} />
                                Print Receipt
@@ -414,7 +414,7 @@ export const Tables: React.FC = () => {
                                    paymentMethod: settledReceipt.payment
                                  });
                                }}
-                               className="py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md shadow-brand-accent/10 hover:scale-102 active:scale-98 transition-all"
+                               className="py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md shadow-brand-accent/10 hover:scale-102 active:scale-98 transition-all"
                              >
                                <FileText size={12} />
                                Download PDF
@@ -427,7 +427,7 @@ export const Tables: React.FC = () => {
                        {(tableOrders[selectedTable.id]?.length || 0) > 0 ? (
                          <div className="space-y-4">
                            <div className="flex items-center justify-between px-2">
-                             <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                             <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-1">
                                <ShoppingCart size={14} className="text-brand-accent" />
                                Table Order Docket
                              </h4>
@@ -442,7 +442,7 @@ export const Tables: React.FC = () => {
                                    setTableStatus(selectedTable.id, 'Available');
                                  }
                                }}
-                               className="text-[10px] font-bold text-red-500 hover:underline uppercase"
+                               className="text-[10px] font-semibold text-red-500 hover:underline uppercase"
                              >
                                Reset Order
                              </button>
@@ -453,20 +453,20 @@ export const Tables: React.FC = () => {
                                {tableOrders[selectedTable.id]?.map(item => (
                                  <div key={item.itemId} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-xl hover:bg-slate-50/80">
                                    <div className="truncate flex-1">
-                                     <p className="text-xs font-black text-slate-800 truncate">{item.name}</p>
+                                     <p className="text-xs font-semibold text-slate-800 truncate">{item.name}</p>
                                      <p className="text-[10px] text-slate-400 font-mono">₹{item.price} each</p>
                                    </div>
                                    <div className="flex items-center gap-2">
                                      <button 
                                        onClick={() => removeFromTableOrder(selectedTable.id, item.itemId)}
-                                       className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-black text-xs"
+                                       className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-semibold text-xs"
                                      >
                                        -
                                      </button>
-                                     <span className="text-xs font-bold text-slate-950 font-mono min-w-[14px] text-center">{item.quantity}</span>
+                                     <span className="text-xs font-semibold text-slate-950 font-mono min-w-[14px] text-center">{item.quantity}</span>
                                      <button 
                                        onClick={() => addToTableOrder(selectedTable.id, { id: item.itemId, name: item.name, price: item.price } as MenuItem)}
-                                       className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-black text-xs"
+                                       className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-semibold text-xs"
                                      >
                                        +
                                      </button>
@@ -492,12 +492,12 @@ export const Tables: React.FC = () => {
                                  <span className="font-mono text-slate-800">₹{computeTableTax(selectedTable.id).toLocaleString()}</span>
                                </div>
                                {appliedDiscount > 0 && (
-                                 <div className="flex justify-between text-brand-success font-black">
+                                 <div className="flex justify-between text-brand-success font-semibold">
                                    <span>Membership Discount ({appliedDiscount}%)</span>
                                    <span className="font-mono">-₹{Math.round(computeTableSubtotal(selectedTable.id) * (appliedDiscount / 100)).toLocaleString()}</span>
                                  </div>
                                )}
-                               <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-black text-slate-900">
+                               <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-semibold text-slate-900">
                                  <span>Total Billing Balance</span>
                                  <span className="font-display text-brand-primary text-base">₹{computeTableTotal(selectedTable.id).toLocaleString()}</span>
                                </div>
@@ -505,18 +505,18 @@ export const Tables: React.FC = () => {
 
                              {/* Privilege Promotions Form */}
                              <div className="space-y-2 pt-2 border-t border-slate-100">
-                               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Privilege Discount Code</label>
+                               <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Privilege Discount Code</label>
                                <div className="flex gap-2">
                                  <input
                                    type="text"
                                    placeholder="Try VIP25, WELCOME20, TASTY10"
                                    value={discountCode}
                                    onChange={e => setDiscountCode(e.target.value)}
-                                   className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest placeholder-slate-300"
+                                   className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold uppercase tracking-widest placeholder-slate-300"
                                  />
                                  <button
                                    onClick={verifyDiscount}
-                                   className="px-4 py-2 bg-slate-900 text-brand-accent text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-slate-800"
+                                   className="px-4 py-2 bg-slate-900 text-brand-accent text-[10px] font-semibold uppercase tracking-wider rounded-xl hover:bg-slate-800"
                                  >
                                    Apply
                                  </button>
@@ -525,13 +525,13 @@ export const Tables: React.FC = () => {
 
                              {/* Payment Method Selector */}
                              <div className="space-y-2 pt-2">
-                               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Settlement Option</label>
+                               <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Settlement Option</label>
                                <div className="grid grid-cols-3 gap-2">
                                  {(['UPI', 'Card', 'Cash'] as const).map(mode => (
                                    <button
                                      key={mode}
                                      onClick={() => setPaymentMethod(mode)}
-                                     className={`py-2 px-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${paymentMethod === mode ? 'border-brand-accent text-brand-accent bg-brand-accent/5' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                                     className={`py-2 px-3 border rounded-xl text-xs font-semibold uppercase tracking-wider transition-all ${paymentMethod === mode ? 'border-brand-accent text-brand-accent bg-brand-accent/5' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                                    >
                                      {mode}
                                    </button>
@@ -544,12 +544,12 @@ export const Tables: React.FC = () => {
                          <div className="py-12 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 text-center flex flex-col items-center gap-3">
                            <UtensilsCrossed size={36} className="text-slate-400" />
                            <div>
-                             <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No Active Billing</p>
+                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">No Active Billing</p>
                              <p className="text-[10px] text-slate-400 max-w-[240px] mt-1 font-medium">There are no items recorded yet. Choose "Take Order (+ Menu)" to register customers' dining dockets.</p>
                            </div>
                            <button 
                              onClick={() => setModalTab('add_items')}
-                             className="px-4 py-2 mt-2 bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-md shadow-brand-primary/10 hover:scale-[1.03] transition-all"
+                             className="px-4 py-2 mt-2 bg-brand-primary text-white text-[10px] font-semibold uppercase tracking-widest rounded-xl shadow-md shadow-brand-primary/10 hover:scale-[1.03] transition-all"
                            >
                              Take Table Order
                            </button>
@@ -558,13 +558,13 @@ export const Tables: React.FC = () => {
 
                        {/* Status Override */}
                        <div className="space-y-3">
-                         <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lifecycle Management</h4>
+                         <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Lifecycle Management</h4>
                          <div className="grid grid-cols-4 gap-2">
                            {(['Available', 'Occupied', 'Reserved', 'Cleaning'] as TableStatus[]).map(status => (
                              <button
                                key={status}
                                onClick={() => setTableStatus(selectedTable.id, status)}
-                               className={`py-2 text-[10px] font-bold uppercase rounded-lg border text-center transition-all ${selectedTable.status === status ? 'bg-slate-900 border-slate-900 text-white' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                               className={`py-2 text-[10px] font-semibold uppercase rounded-lg border text-center transition-all ${selectedTable.status === status ? 'bg-slate-900 border-slate-900 text-white' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                              >
                                {status}
                              </button>
@@ -582,7 +582,7 @@ export const Tables: React.FC = () => {
                            placeholder="Search recipe catalog..."
                            value={searchQuery}
                            onChange={e => setSearchQuery(e.target.value)}
-                           className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold leading-relaxed placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/10"
+                           className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold leading-relaxed placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/10"
                          />
                        </div>
 
@@ -592,7 +592,7 @@ export const Tables: React.FC = () => {
                            <button
                              key={cat}
                              onClick={() => setSelectedCategory(cat)}
-                             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400 hover:text-slate-600 border border-slate-200/50'}`}
+                             className={`px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400 hover:text-slate-600 border border-slate-200/50'}`}
                            >
                              {cat}
                            </button>
@@ -609,25 +609,25 @@ export const Tables: React.FC = () => {
                                  <img src={dish.image} className="w-full h-full object-cover animate-fade-in" alt={dish.name} />
                                </div>
                                <div className="flex-1 min-w-0">
-                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${dish.isVeg ? 'bg-green-50 text-green-600 border border-green-200/50' : 'bg-red-50 text-red-600 border border-red-200/50'}`}>
+                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold uppercase tracking-wider ${dish.isVeg ? 'bg-green-50 text-green-600 border border-green-200/50' : 'bg-red-50 text-red-600 border border-red-200/50'}`}>
                                    {dish.category}
                                  </span>
-                                 <h5 className="text-xs font-black text-slate-800 truncate mt-1">{dish.name}</h5>
-                                 <p className="text-xs font-mono text-slate-500 font-black mb-0.5">₹{dish.price}</p>
+                                 <h5 className="text-xs font-semibold text-slate-800 truncate mt-1">{dish.name}</h5>
+                                 <p className="text-xs font-mono text-slate-500 font-semibold mb-0.5">₹{dish.price}</p>
                                </div>
                                <div className="flex items-center gap-2">
                                  {quantity > 0 ? (
                                    <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
                                      <button
                                        onClick={() => removeFromTableOrder(selectedTable.id, dish.id)}
-                                       className="px-2 py-1 text-xs font-black text-slate-500 hover:bg-slate-100"
+                                       className="px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
                                      >
                                        -
                                      </button>
-                                     <span className="px-2 text-xs font-black text-slate-800 font-mono">{quantity}</span>
+                                     <span className="px-2 text-xs font-semibold text-slate-800 font-mono">{quantity}</span>
                                      <button
                                        onClick={() => addToTableOrder(selectedTable.id, dish)}
-                                       className="px-2 py-1 text-xs font-black text-slate-500 hover:bg-slate-100"
+                                       className="px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
                                      >
                                        +
                                      </button>
@@ -635,7 +635,7 @@ export const Tables: React.FC = () => {
                                  ) : (
                                    <button
                                      onClick={() => addToTableOrder(selectedTable.id, dish)}
-                                     className="px-3 py-1.5 bg-brand-accent text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:scale-105 active:scale-95 transition-all"
+                                     className="px-3 py-1.5 bg-brand-accent text-white text-[10px] font-semibold uppercase tracking-wider rounded-lg hover:scale-105 active:scale-95 transition-all"
                                    >
                                      ADD +
                                    </button>
@@ -654,7 +654,7 @@ export const Tables: React.FC = () => {
                     <button 
                       onClick={() => handleSettleAndClear(selectedTable.id)}
                       disabled={(tableOrders[selectedTable.id]?.length || 0) === 0}
-                      className="flex-1 bg-brand-success text-white py-5 rounded-[24px] font-black text-sm shadow-xl shadow-brand-success/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                      className="flex-1 bg-brand-success text-white py-5 rounded-[24px] font-semibold text-sm shadow-xl shadow-brand-success/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                        <CheckCircle2 size={20} strokeWidth={3} />
                        SETTLE & PRINT RECEIPT
@@ -688,15 +688,15 @@ export const Tables: React.FC = () => {
                  exit={{ scale: 0.9, opacity: 0 }}
                  className="relative bg-white w-full max-w-md rounded-[40px] shadow-2xl p-10"
                >
-                  <h3 className="text-3xl font-black text-slate-900 mb-8">New Table Entity</h3>
+                  <h3 className="text-3xl font-semibold text-slate-900 mb-8">New Table Entity</h3>
                   <div className="space-y-6">
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Table Identifier</label>
-                        <input type="text" placeholder="e.g. 15, V1, T10" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-black text-xl" />
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Identifier</label>
+                        <input type="text" placeholder="e.g. 15, V1, T10" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl" />
                      </div>
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Guest Capacity</label>
-                        <select className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-black text-xl">
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Guest Capacity</label>
+                        <select className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl">
                            <option>2 Seater</option>
                            <option>4 Seater</option>
                            <option>6 Seater</option>
@@ -704,16 +704,16 @@ export const Tables: React.FC = () => {
                         </select>
                      </div>
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Floor Assignment</label>
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Floor Assignment</label>
                         <div className="flex gap-2">
-                           <button className="flex-1 py-4 bg-brand-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest">Ground</button>
-                           <button className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest">Terrace</button>
+                           <button className="flex-1 py-4 bg-brand-primary text-white rounded-2xl font-semibold text-xs uppercase tracking-widest">Ground</button>
+                           <button className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-semibold text-xs uppercase tracking-widest">Terrace</button>
                         </div>
                      </div>
                   </div>
                   <div className="flex gap-4 mt-10">
-                     <button onClick={() => setShowAddTableModal(false)} className="flex-1 py-4 font-black text-slate-400">DISCARD</button>
-                     <button onClick={() => setShowAddTableModal(false)} className="flex-[2] py-4 bg-brand-accent text-white font-black rounded-2xl shadow-xl shadow-brand-accent/20">PROVISION TABLE</button>
+                     <button onClick={() => setShowAddTableModal(false)} className="flex-1 py-4 font-semibold text-slate-400">DISCARD</button>
+                     <button onClick={() => setShowAddTableModal(false)} className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20">PROVISION TABLE</button>
                   </div>
                </motion.div>
             </div>
@@ -724,8 +724,8 @@ export const Tables: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          <div className="lg:col-span-2 bg-white rounded-[40px] border border-slate-200 shadow-soft p-8">
             <div className="flex items-center justify-between mb-8">
-               <h4 className="text-xl font-black font-display uppercase tracking-tight text-slate-800">Advanced Reservations</h4>
-               <button className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-2xl text-xs font-black border border-slate-100 hover:bg-slate-100 transition-all uppercase tracking-widest">View Archives</button>
+               <h4 className="text-xl font-semibold font-display uppercase tracking-tight text-slate-800">Advanced Reservations</h4>
+               <button className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-2xl text-xs font-semibold border border-slate-100 hover:bg-slate-100 transition-all uppercase tracking-widest">View Archives</button>
             </div>
             <div className="space-y-4">
                {[
@@ -734,15 +734,15 @@ export const Tables: React.FC = () => {
                  { name: 'Dr. Mehra', guests: 8, time: '21:00', phone: '+91 70XXX XXX99', status: 'Delayed' },
                ].map((res) => (
                  <div key={res.name} className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-3xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all">
-                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center font-black text-brand-primary text-sm border border-slate-100">
+                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center font-semibold text-brand-primary text-sm border border-slate-100">
                        {res.time}
                     </div>
                     <div className="flex-1">
-                       <h6 className="font-bold text-slate-900 group-hover:text-brand-accent transition-colors">{res.name}</h6>
+                       <h6 className="font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">{res.name}</h6>
                        <p className="text-xs text-slate-500 font-medium">{res.phone} • {res.guests} Guests</p>
                     </div>
                     <div className="flex items-center gap-3">
-                       <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
+                       <span className={`px-4 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-wider ${
                          res.status === 'Confirmed' ? 'bg-brand-success/10 text-brand-success' : 
                          res.status === 'Awaiting' ? 'bg-brand-warning/10 text-brand-warning' : 'bg-brand-danger/10 text-brand-danger'
                        }`}>
@@ -763,13 +763,13 @@ export const Tables: React.FC = () => {
                   <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10">
                      <MapIcon className="text-brand-accent" size={24} />
                   </div>
-                  <h4 className="text-xl font-black font-display uppercase tracking-tight text-white">System Controls</h4>
+                  <h4 className="text-xl font-semibold font-display uppercase tracking-tight text-white">System Controls</h4>
                </div>
                <div className="space-y-4">
                   <div className="flex items-center justify-between p-5 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                      <div>
-                        <p className="text-sm font-black uppercase tracking-widest text-slate-200">Smart Mapping</p>
-                        <p className="text-[10px] text-slate-400 font-bold">Auto-allocate sessions</p>
+                        <p className="text-sm font-semibold uppercase tracking-widest text-slate-200">Smart Mapping</p>
+                        <p className="text-[10px] text-slate-400 font-semibold">Auto-allocate sessions</p>
                      </div>
                      <div className="w-12 h-6 bg-brand-accent rounded-full relative">
                         <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-lg" />
@@ -777,8 +777,8 @@ export const Tables: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between p-5 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                      <div>
-                        <p className="text-sm font-black uppercase tracking-widest text-slate-200">KDS Webhook</p>
-                        <p className="text-[10px] text-slate-400 font-bold">Push updates to kitchen</p>
+                        <p className="text-sm font-semibold uppercase tracking-widest text-slate-200">KDS Webhook</p>
+                        <p className="text-[10px] text-slate-400 font-semibold">Push updates to kitchen</p>
                      </div>
                      <div className="w-12 h-6 bg-slate-700 rounded-full relative">
                         <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-lg" />
@@ -786,16 +786,16 @@ export const Tables: React.FC = () => {
                   </div>
                   
                   <div className="pt-8 text-center bg-white/5 rounded-[32px] p-6 border border-white/5">
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Floor Utilization</p>
+                     <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-4">Floor Utilization</p>
                      <div className="flex items-center justify-between px-4">
                         <div className="text-center">
-                           <p className="text-4xl font-black text-brand-accent font-display">82</p>
-                           <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Active %</p>
+                           <p className="text-4xl font-semibold text-brand-accent font-display">82</p>
+                           <p className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Active %</p>
                         </div>
                         <div className="w-[1px] h-12 bg-white/10" />
                         <div className="text-center">
-                           <p className="text-4xl font-black text-brand-success font-display">18</p>
-                           <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Available %</p>
+                           <p className="text-4xl font-semibold text-brand-success font-display">18</p>
+                           <p className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Available %</p>
                         </div>
                         <div className="w-[1px] h-12 bg-white/10" />
                      </div>

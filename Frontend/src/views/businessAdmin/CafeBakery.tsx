@@ -266,15 +266,15 @@ export const CafeBakery: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Luxury Cafe Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-brand-accent font-black text-xs uppercase tracking-[0.25em]">
+          <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-ping" />
             Specialty Extraction & Patisserie Console
           </div>
-          <h3 className="text-3xl font-black font-display text-white tracking-tight">Cafe & Patisserie</h3>
+          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Cafe & Patisserie</h3>
           <p className="text-sm text-stone-400 max-w-xl">
             Monitor real-time espresso extraction cycles, schedule craft pastry batches, and bill guests at the express barista POS.
           </p>
@@ -285,14 +285,14 @@ export const CafeBakery: React.FC = () => {
           <button 
             type="button"
             onClick={() => setActiveTab('display')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === 'display' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
+            className={`px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${activeTab === 'display' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
           >
              Artisan Display
           </button>
           <button 
             type="button"
             onClick={() => setActiveTab('billing')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === 'billing' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
+            className={`px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${activeTab === 'billing' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
           >
              Barista POS Counter
           </button>
@@ -303,15 +303,15 @@ export const CafeBakery: React.FC = () => {
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
             <Timer className="text-amber-500" size={24} />
             <div>
-              <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Espresso Boiler Pressure</p>
-              <p className="text-lg font-black text-white font-mono">9.2 Bar</p>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Espresso Boiler Pressure</p>
+              <p className="text-lg font-semibold text-white font-mono">9.2 Bar</p>
             </div>
           </div>
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
             <Flame className="text-amber-500 animate-bounce" size={24} />
             <div>
-              <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Patisserie Oven Temp</p>
-              <p className="text-lg font-black text-white font-mono">180 °C</p>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Patisserie Oven Temp</p>
+              <p className="text-lg font-semibold text-white font-mono">180 °C</p>
             </div>
           </div>
         </div>
@@ -345,7 +345,7 @@ export const CafeBakery: React.FC = () => {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+                    className={`px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
                       selectedCategory === cat 
                         ? 'bg-brand-primary text-brand-accent shadow-lg shadow-brand-primary/10' 
                         : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
@@ -357,7 +357,7 @@ export const CafeBakery: React.FC = () => {
                 <div className="h-6 w-[1px] bg-stone-200 mx-2 hidden xl:block" />
                 <button 
                   onClick={() => setShowAddModal(true)}
-                  className="px-6 py-3 bg-brand-accent text-stone-950 font-black rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
+                  className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
                 >
                   <Plus size={16} strokeWidth={3} />
                   Bake / Roast Item
@@ -382,16 +382,16 @@ export const CafeBakery: React.FC = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                        <span className="absolute top-4 left-4 px-3 py-1 bg-brand-primary text-brand-accent border border-amber-950/20 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                        <span className="absolute top-4 left-4 px-3 py-1 bg-brand-primary text-brand-accent border border-amber-950/20 rounded-xl text-[10px] font-semibold uppercase tracking-widest">
                           {item.category}
                         </span>
-                        <span className="absolute top-4 right-4 bg-amber-500/10 text-brand-accent px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border border-amber-500/20 flex items-center gap-1">
+                        <span className="absolute top-4 right-4 bg-amber-500/10 text-brand-accent px-3 py-1 rounded-xl text-[10px] font-semibold uppercase tracking-widest border border-amber-500/20 flex items-center gap-1">
                           <Award size={10} />
                           {item.scoreOrAward}
                         </span>
                         <div className="absolute bottom-4 left-6 right-6">
-                          <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-1">{item.roastOrBakeTime}</p>
-                          <h4 className="text-xl font-black text-white">{item.name}</h4>
+                          <p className="text-[10px] font-semibold text-amber-400 uppercase tracking-widest mb-1">{item.roastOrBakeTime}</p>
+                          <h4 className="text-xl font-semibold text-white">{item.name}</h4>
                         </div>
                       </div>
 
@@ -402,12 +402,12 @@ export const CafeBakery: React.FC = () => {
                           </p>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="p-3 bg-stone-50 rounded-2xl text-center">
-                              <p className="text-[8px] font-black text-stone-400 uppercase tracking-wider mb-1">Stock Level</p>
-                              <p className="text-xs font-black text-stone-800">{item.stockCount} Units</p>
+                              <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">Stock Level</p>
+                              <p className="text-xs font-semibold text-stone-800">{item.stockCount} Units</p>
                             </div>
                             <div className="p-3 bg-stone-50 rounded-2xl text-center">
-                              <p className="text-[8px] font-black text-stone-400 uppercase tracking-wider mb-1">State</p>
-                              <p className={`text-xs font-black ${item.stockCount <= 5 ? 'text-brand-danger animate-pulse' : 'text-brand-success'}`}>
+                              <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">State</p>
+                              <p className={`text-xs font-semibold ${item.stockCount <= 5 ? 'text-brand-danger animate-pulse' : 'text-brand-success'}`}>
                                  {item.stockCount <= 5 ? 'Restock Req' : 'Optimized'}
                               </p>
                             </div>
@@ -416,15 +416,15 @@ export const CafeBakery: React.FC = () => {
 
                         <div className="flex items-center justify-between pt-4 border-t border-stone-100">
                           <div>
-                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">List Price</p>
-                            <p className="text-2xl font-black text-brand-primary font-display">₹{item.price.toLocaleString()}</p>
+                            <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">List Price</p>
+                            <p className="text-2xl font-semibold text-brand-primary font-display">₹{item.price.toLocaleString()}</p>
                           </div>
                           <div className="flex items-center gap-1.5">
                             {item.category.includes('Beans') || item.category.includes('Beverage') ? (
                               <button 
                                 onClick={() => handleStartBrew(item.name)}
                                 disabled={activeBrew.isBrewing || item.stockCount <= 0}
-                                className="px-4 py-3 bg-brand-primary text-brand-accent hover:opacity-90 disabled:opacity-40 text-xs font-black uppercase tracking-widest rounded-xl transition-all"
+                                className="px-4 py-3 bg-brand-primary text-brand-accent hover:opacity-90 disabled:opacity-40 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all"
                               >
                                 Extract Shot
                               </button>
@@ -432,7 +432,7 @@ export const CafeBakery: React.FC = () => {
                             <button 
                               onClick={() => handleSettleItem(item.id)}
                               disabled={item.stockCount <= 0}
-                              className="px-4 py-3 bg-amber-500/10 border border-amber-500/20 text-brand-primary hover:bg-amber-100 disabled:opacity-40 text-xs font-black uppercase tracking-widest rounded-xl transition-all"
+                              className="px-4 py-3 bg-amber-500/10 border border-amber-500/20 text-brand-primary hover:bg-amber-100 disabled:opacity-40 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all"
                             >
                               Sell / Dispatch
                             </button>
@@ -447,21 +447,21 @@ export const CafeBakery: React.FC = () => {
               {/* Live Brewing Timers & Lab Equipment status */}
               <div className="space-y-6">
                 <div className="bg-stone-950 p-8 rounded-[40px] border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
-                  <h5 className="text-[10px] font-black text-brand-accent uppercase tracking-[0.25em] mb-4">Gourmet Extraction Lab</h5>
+                  <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Gourmet Extraction Lab</h5>
                   
                   {activeBrew.isBrewing ? (
                     <div className="space-y-4">
                        <div className="flex items-center justify-between">
                           <div>
-                             <p className="text-[10px] font-black text-brand-accent uppercase tracking-widest">Active Extract</p>
-                             <p className="text-sm font-black text-stone-200 mt-1">{activeBrew.name}</p>
+                             <p className="text-[10px] font-semibold text-brand-accent uppercase tracking-widest">Active Extract</p>
+                             <p className="text-sm font-semibold text-stone-200 mt-1">{activeBrew.name}</p>
                           </div>
                           <Loader2 className="text-brand-accent animate-spin" size={24} />
                        </div>
                        <div className="space-y-2">
                           <div className="flex justify-between items-center text-[10.5px] font-mono">
-                             <span className="text-stone-500 font-bold uppercase">Time remaining</span>
-                             <span className="text-brand-accent font-black">{activeBrew.secondsLeft}s</span>
+                             <span className="text-stone-500 font-semibold uppercase">Time remaining</span>
+                             <span className="text-brand-accent font-semibold">{activeBrew.secondsLeft}s</span>
                           </div>
                           <div className="h-2 bg-stone-900 rounded-full overflow-hidden">
                              <div 
@@ -478,21 +478,21 @@ export const CafeBakery: React.FC = () => {
                   )}
 
                   <div className="pt-6 border-t border-stone-900">
-                    <h5 className="text-[10px] font-black text-brand-accent uppercase tracking-[0.25em] mb-4">Patisserie Batching</h5>
+                    <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Patisserie Batching</h5>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center bg-stone-900/50 p-4 rounded-2xl border border-stone-800">
                         <div className="flex items-center gap-3">
                           <div className="w-2.5 h-2.5 rounded-full bg-brand-accent" />
-                          <span className="text-xs text-stone-300 font-bold">Golden Croissants Batch B</span>
+                          <span className="text-xs text-stone-300 font-semibold">Golden Croissants Batch B</span>
                         </div>
-                        <span className="text-[10px] bg-amber-500/15 text-brand-accent border border-amber-500/10 px-2.5 py-1 rounded-xl uppercase font-black tracking-widest font-mono">Baked Now</span>
+                        <span className="text-[10px] bg-amber-500/15 text-brand-accent border border-amber-500/10 px-2.5 py-1 rounded-xl uppercase font-semibold tracking-widest font-mono">Baked Now</span>
                       </div>
                       <div className="flex justify-between items-center bg-stone-900/50 p-4 rounded-2xl border border-stone-800">
                         <div className="flex items-center gap-3">
                           <div className="w-2.5 h-2.5 rounded-full bg-stone-600" />
-                          <span className="text-xs text-stone-400 font-bold">Sourdough Loaf Batch E</span>
+                          <span className="text-xs text-stone-400 font-semibold">Sourdough Loaf Batch E</span>
                         </div>
-                        <span className="text-[10px] bg-stone-800 text-stone-500 border border-stone-700 px-2.5 py-1 rounded-xl uppercase font-black tracking-widest font-mono">4:30 PM</span>
+                        <span className="text-[10px] bg-stone-800 text-stone-500 border border-stone-700 px-2.5 py-1 rounded-xl uppercase font-semibold tracking-widest font-mono">4:30 PM</span>
                       </div>
                     </div>
                   </div>
@@ -500,13 +500,13 @@ export const CafeBakery: React.FC = () => {
 
                 {/* Luxury Quality Seal */}
                 <div className="bg-white p-8 rounded-[40px] border border-stone-200/60 shadow-soft space-y-6">
-                  <h5 className="text-xs font-black text-stone-400 uppercase tracking-[0.25em] flex items-center gap-1">
+                  <h5 className="text-xs font-semibold text-stone-400 uppercase tracking-[0.25em] flex items-center gap-1">
                     <Sparkles size={14} className="text-amber-500" />
                     SCA Certified Workspace
                   </h5>
                   <div className="p-5 bg-stone-50 rounded-3xl border border-stone-100">
                     <p className="text-[11px] text-stone-500 leading-relaxed font-medium">
-                      The water filter configuration must be manually flushed. Water mineral count is currently optimized at <span className="text-brand-accent font-bold">140 ppm</span> to perfectly complement Geisha fruity notes.
+                      The water filter configuration must be manually flushed. Water mineral count is currently optimized at <span className="text-brand-accent font-semibold">140 ppm</span> to perfectly complement Geisha fruity notes.
                     </p>
                   </div>
                 </div>
@@ -524,8 +524,8 @@ export const CafeBakery: React.FC = () => {
             {/* Left Column: Premium Cafe Menu items layout for POS selection (7 cols) */}
             <div className="xl:col-span-7 space-y-6">
               <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-stone-200/80">
-                <span className="text-xs font-black text-stone-500 uppercase tracking-widest">Select Menu Offerings</span>
-                <span className="text-xs font-bold text-brand-primary">{items.length} artisan SKUs loaded</span>
+                <span className="text-xs font-semibold text-stone-500 uppercase tracking-widest">Select Menu Offerings</span>
+                <span className="text-xs font-semibold text-brand-primary">{items.length} artisan SKUs loaded</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -539,21 +539,21 @@ export const CafeBakery: React.FC = () => {
                     <div className="w-20 h-20 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0 relative">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
                       {item.stockCount <= 5 && item.stockCount > 0 && (
-                        <span className="absolute bottom-1 left-1 right-1 text-center text-[7px] font-black bg-rose-500 text-white rounded uppercase tracking-wider">
+                        <span className="absolute bottom-1 left-1 right-1 text-center text-[7px] font-semibold bg-rose-500 text-white rounded uppercase tracking-wider">
                            Low stock
                         </span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
-                      <span className="px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-500 rounded text-[8px] font-bold uppercase tracking-widest">
+                      <span className="px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-500 rounded text-[8px] font-semibold uppercase tracking-widest">
                         {item.category}
                       </span>
-                      <h5 className="text-sm font-black text-stone-900 group-hover:text-brand-primary transition-colors truncate">{item.name}</h5>
-                      <p className="text-[10px] text-stone-400 font-bold truncate">{item.originOrType}</p>
+                      <h5 className="text-sm font-semibold text-stone-900 group-hover:text-brand-primary transition-colors truncate">{item.name}</h5>
+                      <p className="text-[10px] text-stone-400 font-semibold truncate">{item.originOrType}</p>
                       
                       <div className="flex items-center justify-between pt-2">
-                        <span className="text-sm font-black text-stone-950 font-mono">₹{item.price.toLocaleString()}</span>
-                        <span className="text-[9px] font-black text-brand-accent uppercase tracking-wider group-hover:underline">Add to docket +</span>
+                        <span className="text-sm font-semibold text-stone-950 font-mono">₹{item.price.toLocaleString()}</span>
+                        <span className="text-[9px] font-semibold text-brand-accent uppercase tracking-wider group-hover:underline">Add to docket +</span>
                       </div>
                     </div>
                   </button>
@@ -567,12 +567,12 @@ export const CafeBakery: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-stone-100 pb-4">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="text-brand-accent" size={18} />
-                    <h4 className="text-sm font-black text-stone-900 uppercase tracking-wider">Active Billing Docket</h4>
+                    <h4 className="text-sm font-semibold text-stone-900 uppercase tracking-wider">Active Billing Docket</h4>
                   </div>
                   <button 
                     onClick={() => setCart([])}
                     disabled={cart.length === 0}
-                    className="text-[10px] font-black text-stone-400 hover:text-stone-950 uppercase tracking-widest disabled:opacity-40"
+                    className="text-[10px] font-semibold text-stone-400 hover:text-stone-950 uppercase tracking-widest disabled:opacity-40"
                   >
                     Clear Docket
                   </button>
@@ -583,7 +583,7 @@ export const CafeBakery: React.FC = () => {
                   <div className="py-12 text-center rounded-3xl bg-stone-50/50 border border-dashed border-stone-150 p-6 flex flex-col items-center gap-3">
                     <Coffee className="text-stone-300 animate-pulse" size={40} />
                     <div>
-                      <p className="text-xs font-black text-stone-400 uppercase tracking-widest">No Active Brews or Patisseries</p>
+                      <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest">No Active Brews or Patisseries</p>
                       <p className="text-[11px] text-stone-400 mt-1 max-w-[240px]">Select any premium brew or delicacy from the menu to activate the tax transaction form.</p>
                     </div>
                   </div>
@@ -595,21 +595,21 @@ export const CafeBakery: React.FC = () => {
                         <div key={cartItem.item.id} className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-3">
                           <div className="flex items-start justify-between gap-4">
                             <div>
-                              <p className="text-xs font-black text-stone-900">{cartItem.item.name}</p>
+                              <p className="text-xs font-semibold text-stone-900">{cartItem.item.name}</p>
                               <p className="text-[10px] text-stone-400 font-mono">₹{cartItem.item.price} each</p>
                             </div>
                             
                             <div className="flex items-center bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
                               <button 
                                 onClick={() => removeOneFromCart(cartItem.item.id)}
-                                className="px-2.5 py-1 text-xs font-black text-stone-500 hover:bg-stone-50"
+                                className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50"
                               >
                                 -
                               </button>
-                              <span className="px-3 text-xs font-black text-stone-800 font-mono">{cartItem.quantity}</span>
+                              <span className="px-3 text-xs font-semibold text-stone-800 font-mono">{cartItem.quantity}</span>
                               <button 
                                 onClick={() => addToCart(cartItem.item)}
-                                className="px-2.5 py-1 text-xs font-black text-stone-500 hover:bg-stone-50"
+                                className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50"
                               >
                                 +
                               </button>
@@ -620,11 +620,11 @@ export const CafeBakery: React.FC = () => {
                           {isBeverage && (
                             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-200/60">
                               <div>
-                                <label className="text-[8px] font-black text-stone-400 uppercase tracking-widest block mb-1">Milk Choice</label>
+                                <label className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest block mb-1">Milk Choice</label>
                                 <select
                                   value={cartItem.milk}
                                   onChange={(e: any) => updateCartModifier(cartItem.item.id, 'milk', e.target.value)}
-                                  className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-bold text-stone-700 focus:outline-none"
+                                  className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-semibold text-stone-700 focus:outline-none"
                                 >
                                   <option value="Whole Milk">Whole Milk</option>
                                   <option value="Almond">Almond (+₹40)</option>
@@ -635,11 +635,11 @@ export const CafeBakery: React.FC = () => {
                               </div>
 
                               <div>
-                                <label className="text-[8px] font-black text-stone-400 uppercase tracking-widest block mb-1">Sweetness</label>
+                                <label className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest block mb-1">Sweetness</label>
                                 <select
                                   value={cartItem.sweetness}
                                   onChange={(e: any) => updateCartModifier(cartItem.item.id, 'sweetness', e.target.value)}
-                                  className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-bold text-stone-700 focus:outline-none"
+                                  className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-semibold text-stone-700 focus:outline-none"
                                 >
                                   <option value="Elegant Sweet">Maison (Standard)</option>
                                   <option value="No Sweet">Sugar Free</option>
@@ -666,11 +666,11 @@ export const CafeBakery: React.FC = () => {
                 <div className="space-y-4 pt-4 border-t border-stone-100">
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">Cabin / Seating Destination</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Cabin / Seating Destination</label>
                       <select 
                         value={targetTable}
                         onChange={(e) => setTargetTable(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-black text-stone-800"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800"
                       >
                         <option value="PDR Cabin #1">PDR Cabin #1 (Exclusive)</option>
                         <option value="Lounge Salon A">Lounge Salon A</option>
@@ -681,11 +681,11 @@ export const CafeBakery: React.FC = () => {
                     </div>
 
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">Tender Payment</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Tender Payment</label>
                       <select 
                         value={paymentMethod}
                         onChange={(e: any) => setPaymentMethod(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-black text-stone-800"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800"
                       >
                         <option value="UPI">Instant UPI (Paytm / BHIM)</option>
                         <option value="Card">Visa / Amex Metallic</option>
@@ -701,18 +701,18 @@ export const CafeBakery: React.FC = () => {
                       placeholder="Enter Membership Key (e.g., MAISONVIP)"
                       value={discountCode}
                       onChange={(e) => setDiscountCode(e.target.value)}
-                      className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold uppercase tracking-widest"
+                      className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold uppercase tracking-widest"
                     />
                     <button 
                       type="button" 
                       onClick={applyLoyaltyDiscount}
-                      className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-brand-accent text-[10px] font-black uppercase tracking-wider rounded-xl transition-all"
+                      className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-brand-accent text-[10px] font-semibold uppercase tracking-wider rounded-xl transition-all"
                     >
                       Apply
                     </button>
                   </div>
                   {appliedDiscount > 0 && (
-                     <p className="text-[10px] text-brand-success font-black uppercase tracking-widest">✓ Member Promo Code Approved: {appliedDiscount}% Fine Dining Privilege discount applied.</p>
+                     <p className="text-[10px] text-brand-success font-semibold uppercase tracking-widest">✓ Member Promo Code Approved: {appliedDiscount}% Fine Dining Privilege discount applied.</p>
                   )}
                 </div>
 
@@ -740,9 +740,9 @@ export const CafeBakery: React.FC = () => {
                     <span>CGST (2.5%)</span>
                     <span className="font-mono">₹{cgst.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm text-stone-900 font-black border-t border-stone-200/80 pt-2">
+                  <div className="flex justify-between items-center text-sm text-stone-900 font-semibold border-t border-stone-200/80 pt-2">
                     <span>Grand Luxury Total</span>
-                    <span className="text-lg font-black text-brand-primary font-display">₹{cartTotal.toLocaleString()}</span>
+                    <span className="text-lg font-semibold text-brand-primary font-display">₹{cartTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -751,7 +751,7 @@ export const CafeBakery: React.FC = () => {
                   type="button"
                   onClick={handleCheckout}
                   disabled={cart.length === 0}
-                  className="w-full py-4 bg-brand-primary text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40"
+                  className="w-full py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40"
                 >
                   Generate Tax Invoice & Checkout
                 </button>
@@ -772,26 +772,26 @@ export const CafeBakery: React.FC = () => {
                   </div>
 
                   <div className="pt-4 text-center">
-                     <p className="text-xs font-black text-stone-900 uppercase tracking-[0.2em] font-display">THE MAISON DE LUXE</p>
-                     <p className="text-[8px] text-stone-400 uppercase tracking-widest font-black font-mono">Artisan Coffee & Patisserie Extraction</p>
+                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.2em] font-display">THE MAISON DE LUXE</p>
+                     <p className="text-[8px] text-stone-400 uppercase tracking-widest font-semibold font-mono">Artisan Coffee & Patisserie Extraction</p>
                      <p className="text-[9px] text-stone-400 font-medium mt-1">SCA Cellar Suite #01, New Delhi</p>
                   </div>
 
                   <div className="space-y-4 pt-6 border-b border-dashed border-stone-200 pb-4 text-xs">
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Docket Id:</span>
-                      <span className="text-stone-800 font-black">{checkoutReceipt.invoiceNumber}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Docket Id:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.invoiceNumber}</span>
                     </div>
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Timestamp:</span>
-                      <span className="text-stone-800 font-bold">{checkoutReceipt.timestamp}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Timestamp:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.timestamp}</span>
                     </div>
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Assigned Cabin:</span>
-                      <span className="text-stone-800 font-black">{checkoutReceipt.table}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Assigned Cabin:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.table}</span>
                     </div>
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Cashier Hand:</span>
+                      <span className="text-stone-400 font-semibold uppercase">Cashier Hand:</span>
                       <span className="text-stone-800 font-medium">{checkoutReceipt.barista}</span>
                     </div>
                   </div>
@@ -800,7 +800,7 @@ export const CafeBakery: React.FC = () => {
                   <div className="py-4 border-b border-dashed border-stone-200 font-mono text-xs space-y-3">
                     {checkoutReceipt.items.map((cartItem: any, idx: number) => (
                       <div key={idx} className="space-y-0.5">
-                        <div className="flex justify-between text-[11px] font-bold text-stone-900">
+                        <div className="flex justify-between text-[11px] font-semibold text-stone-900">
                           <span>{cartItem.item.name} (x{cartItem.quantity})</span>
                           <span>₹{(cartItem.item.price * cartItem.quantity).toLocaleString()}</span>
                         </div>
@@ -810,7 +810,7 @@ export const CafeBakery: React.FC = () => {
                           </div>
                         )}
                         {cartItem.notes && (
-                          <p className="text-[8px] text-stone-500 font-bold">↳ Remarks: "{cartItem.notes}"</p>
+                          <p className="text-[8px] text-stone-500 font-semibold">↳ Remarks: "{cartItem.notes}"</p>
                         )}
                       </div>
                     ))}
@@ -844,12 +844,12 @@ export const CafeBakery: React.FC = () => {
 
                   {/* Receipt Total */}
                   <div className="pt-4 text-center font-mono space-y-3">
-                     <div className="flex justify-between text-stone-900 font-black text-sm">
+                     <div className="flex justify-between text-stone-900 font-semibold text-sm">
                         <span>GRAND INVOICE TOTAL</span>
                         <span>₹{checkoutReceipt.total.toLocaleString()}</span>
                      </div>
                      
-                     <div className="p-3 bg-stone-900 text-brand-accent rounded-xl text-[9px] font-black uppercase tracking-widest font-sans flex items-center justify-center gap-1.5 shadow">
+                     <div className="p-3 bg-stone-900 text-brand-accent rounded-xl text-[9px] font-semibold uppercase tracking-widest font-sans flex items-center justify-center gap-1.5 shadow">
                         <CheckCircle size={12} />
                         TENDERED COMPLETED VIA {checkoutReceipt.payment}
                      </div>
@@ -857,7 +857,7 @@ export const CafeBakery: React.FC = () => {
                      <div className="grid grid-cols-2 gap-2 mt-4">
                        <button 
                          onClick={() => window.print()}
-                         className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-black uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
+                         className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
                        >
                          <Printer size={12} />
                          Print Receipt
@@ -881,7 +881,7 @@ export const CafeBakery: React.FC = () => {
                              paymentMethod: checkoutReceipt.payment
                            });
                          }}
-                         className="px-3 py-2.5 bg-brand-primary text-brand-accent rounded-xl text-[9.5px] font-sans font-black uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-brand-primary/10 hover:scale-102 active:scale-98 transition-all"
+                         className="px-3 py-2.5 bg-brand-primary text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-brand-primary/10 hover:scale-102 active:scale-98 transition-all"
                        >
                          <FileText size={12} />
                          Download PDF
@@ -912,29 +912,29 @@ export const CafeBakery: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-black text-stone-900 mb-2 font-display">Bake or Roast Item</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-black mb-6">Catalog hand-roasted coffee beans or fresh-baked patisseries</p>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Bake or Roast Item</h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Catalog hand-roasted coffee beans or fresh-baked patisseries</p>
 
               <form onSubmit={handleAddArtisanItem} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Artisan Item Name</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Artisan Item Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Ethiopia Guji Sidamo Coffee G1" 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Label Category</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Label Category</label>
                     <select 
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm text-stone-600"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="Specialty Beans">Specialty Beans</option>
                       <option value="Artisan Patisserie">Artisan Patisserie</option>
@@ -943,67 +943,67 @@ export const CafeBakery: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Certified Grade / Score</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Grade / Score</label>
                     <input 
                       type="text" 
                       placeholder="e.g. SCA Score: 92 or Sourdough Loaf" 
                       value={newScore}
                       onChange={(e) => setNewScore(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm bg-white"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm bg-white"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Unit Price (₹)</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Unit Price (₹)</label>
                     <input 
                       type="number" 
                       required
                       placeholder="e.g. 550" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Starting Stock</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Starting Stock</label>
                     <input 
                       type="number" 
                       required
                       placeholder="e.g. 10" 
                       value={newStock}
                       onChange={(e) => setNewStock(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Roast / Bake Schedule</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Roast / Bake Schedule</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Fresh Baked: 5:00 AM or Roast Date: June 1st" 
                     value={newTime}
                     onChange={(e) => setNewTime(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Origin Detail / Bean Ferment</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Origin Detail / Bean Ferment</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Sidamo, Ethiopia (Honey Processed)" 
                     value={newOrigin}
                     onChange={(e) => setNewOrigin(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-black text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">PROVISION ARTISAN BATCH</button>
+                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
+                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">PROVISION ARTISAN BATCH</button>
                 </div>
               </form>
             </motion.div>

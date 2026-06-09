@@ -48,9 +48,9 @@ const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => 
   <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-start justify-between h-full">
     <div>
       <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
-      <h3 className="text-2xl font-bold font-display text-slate-900">{value}</h3>
+      <h3 className="text-2xl font-semibold font-display text-slate-900">{value}</h3>
       <div className="flex items-center gap-1.5 mt-2">
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 ${
           trend > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
         }`}>
           {trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
@@ -67,7 +67,7 @@ const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => 
 
 export const Dashboard: React.FC = () => {
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
@@ -109,7 +109,7 @@ export const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h4 className="text-lg font-bold font-display">Revenue Velocity</h4>
+              <h4 className="text-lg font-semibold font-display">Revenue Velocity</h4>
               <p className="text-sm text-slate-500">Live sales performance across day parts</p>
             </div>
             <select className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium">
@@ -161,13 +161,13 @@ export const Dashboard: React.FC = () => {
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-6">
               <Zap className="text-brand-accent fill-brand-accent" size={20} />
-              <h4 className="text-lg font-bold font-display uppercase tracking-wider text-slate-300 text-sm">AI Business Insights</h4>
+              <h4 className="text-lg font-semibold font-display uppercase tracking-wider text-slate-300 text-sm">AI Business Insights</h4>
             </div>
             <div className="space-y-4">
               <div className="bg-white/10 p-4 rounded-xl border border-white/10">
                 <p className="text-sm font-medium mb-1">Stock Alert</p>
                 <p className="text-xs text-slate-400">Chicken Breast stock is below threshold. Estimated depletion: 3.5 hours.</p>
-                <button className="mt-3 text-xs font-bold text-brand-accent hover:underline">REORDER NOW</button>
+                <button className="mt-3 text-xs font-semibold text-brand-accent hover:underline">REORDER NOW</button>
               </div>
               <div className="bg-white/10 p-4 rounded-xl border border-white/10">
                 <p className="text-sm font-medium mb-1">Peak Prediction</p>
@@ -186,7 +186,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Category Breakdown */}
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
-           <h4 className="text-lg font-bold font-display mb-6">Sales Mix by Category</h4>
+           <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
            <div className="flex items-center gap-8 h-[250px]">
              <div className="w-1/2 h-full">
                <ResponsiveContainer width="100%" height="100%">
@@ -213,7 +213,7 @@ export const Dashboard: React.FC = () => {
                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: cat.color}} />
                      <span className="text-sm font-medium text-slate-600">{cat.name}</span>
                    </div>
-                   <span className="text-sm font-bold">{cat.value}%</span>
+                   <span className="text-sm font-semibold">{cat.value}%</span>
                  </div>
                ))}
              </div>
@@ -222,7 +222,7 @@ export const Dashboard: React.FC = () => {
 
         {/* Top Selling Items */}
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
-           <h4 className="text-lg font-bold font-display mb-6">Top Performing Items</h4>
+           <h4 className="text-lg font-semibold font-display mb-6">Top Performing Items</h4>
            <div className="space-y-4">
               {[
                 { name: 'Butter Chicken', sales: 142, revenue: '₹53,960', progress: 100 },
@@ -233,10 +233,10 @@ export const Dashboard: React.FC = () => {
                 <div key={item.name} className="space-y-2">
                    <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-sm font-bold text-slate-900">{item.name}</p>
+                        <p className="text-sm font-semibold text-slate-900">{item.name}</p>
                         <p className="text-xs text-slate-500">{item.sales} units sold</p>
                       </div>
-                      <p className="text-sm font-bold text-slate-900">{item.revenue}</p>
+                      <p className="text-sm font-semibold text-slate-900">{item.revenue}</p>
                    </div>
                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <motion.div 

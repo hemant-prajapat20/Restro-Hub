@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
           <Crown className="text-white w-6 h-6" />
         </div>
-        <span className="font-display font-black text-lg tracking-wider text-brand-accent uppercase">IndiServe Reserve</span>
+        <span className="font-sans font-semibold text-lg tracking-wider text-brand-accent uppercase">IndiServe Reserve</span>
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1">
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
               )}
             >
               <Icon className={cn("w-5 h-5", isActive ? "text-white" : "group-hover:text-white")} />
-              <span className="font-bold">{item.label}</span>
+              <span className="font-semibold">{item.label}</span>
               {isActive && (
                 <motion.div 
                   layoutId="active-pill"
@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
             : "text-slate-400 hover:bg-slate-800 hover:text-white"
         )}>
           <Settings className={cn("w-5 h-5", currentPath === 'settings' ? "text-white" : "group-hover:text-white")} />
-          <span className={cn("font-medium", currentPath === 'settings' && "font-bold")}>Settings</span>
+          <span className="font-semibold">Settings</span>
           {currentPath === 'settings' && (
             <motion.div 
               layoutId="active-pill"
@@ -118,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         </Link>
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
           <LogOut className="w-5 h-5" />
-          <span className="font-bold">Logout</span>
+          <span className="font-semibold">Logout</span>
         </button>
       </div>
     </aside>
@@ -146,7 +146,7 @@ export const Header: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-brand-success/10 text-brand-success rounded-full text-xs font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-brand-success/10 text-brand-success rounded-full text-xs font-semibold uppercase tracking-wider">
           <div className="w-2 h-2 bg-brand-success rounded-full animate-pulse" />
           Server Live
         </div>
@@ -160,7 +160,7 @@ export const Header: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-bold text-slate-900">{fullName}</p>
+            <p className="text-sm font-semibold text-slate-900">{fullName}</p>
             <p className="text-xs text-slate-500 capitalize">{roleDisplay}</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center">

@@ -319,16 +319,16 @@ export const BarLounge: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1700px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+    <div className="p-8 space-y-8 max-w-[1700px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       
       {/* Golden Luxury Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 via-stone-950 to-stone-900 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-brand-accent font-black text-xs uppercase tracking-[0.25em]">
+          <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-ping" />
             SOMMELIER & MIXOLOGY SUITE
           </div>
-          <h3 className="text-3xl font-black font-display text-white tracking-tight">Bar Cellar & Lounge</h3>
+          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Bar Cellar & Lounge</h3>
           <p className="text-sm text-stone-400 max-w-xl">
             Authorize state-of-the-art climate monitors, audit luxury pours, and coordinate premium wine, cognac, single malt, & signature cocktails dockets.
           </p>
@@ -339,15 +339,15 @@ export const BarLounge: React.FC = () => {
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-850 rounded-3xl flex items-center gap-3">
             <Thermometer className="text-amber-500 animate-pulse" size={24} />
             <div>
-              <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Wine Cellar Temp</p>
-              <p className="text-lg font-black text-white font-mono">11.8 °C</p>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Wine Cellar Temp</p>
+              <p className="text-lg font-semibold text-white font-mono">11.8 °C</p>
             </div>
           </div>
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-850 rounded-3xl flex items-center gap-3">
             <Droplet className="text-blue-400" size={24} />
             <div>
-              <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Cellar Humidity</p>
-              <p className="text-lg font-black text-white font-mono">68.5 %</p>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Cellar Humidity</p>
+              <p className="text-lg font-semibold text-white font-mono">68.5 %</p>
             </div>
           </div>
         </div>
@@ -358,7 +358,7 @@ export const BarLounge: React.FC = () => {
       <div className="flex border-b border-stone-200/80">
         <button
           onClick={() => setActiveTab('display')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative cursor-pointer ${
+          className={`px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] transition-all relative cursor-pointer ${
             activeTab === 'display' ? 'text-amber-600 font-extrabold' : 'text-stone-400 hover:text-stone-700'
           }`}
         >
@@ -369,7 +369,7 @@ export const BarLounge: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('billing')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative cursor-pointer ${
+          className={`px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] transition-all relative cursor-pointer ${
             activeTab === 'billing' ? 'text-amber-600 font-extrabold' : 'text-stone-400 hover:text-stone-700'
           }`}
         >
@@ -407,7 +407,7 @@ export const BarLounge: React.FC = () => {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer ${
+                    className={`px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all cursor-pointer ${
                       selectedCategory === cat 
                         ? 'bg-amber-500 text-stone-950 shadow-lg shadow-amber-500/20 font-extrabold' 
                         : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
@@ -419,7 +419,7 @@ export const BarLounge: React.FC = () => {
                 <div className="h-6 w-[1px] bg-stone-200 mx-2 hidden xl:block" />
                 <button 
                   onClick={() => setShowAddModal(true)}
-                  className="px-6 py-3 bg-stone-900 border border-amber-500/20 text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-850 active:scale-95 transition-all flex items-center gap-2 shadow-lg cursor-pointer"
+                  className="px-6 py-3 bg-stone-900 border border-amber-500/20 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-850 active:scale-95 transition-all flex items-center gap-2 shadow-lg cursor-pointer"
                 >
                   <Plus size={16} strokeWidth={3} />
                   Acquire Vintage Bottle
@@ -449,16 +449,16 @@ export const BarLounge: React.FC = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-                          <span className="absolute top-4 left-4 px-3 py-1 bg-stone-950 text-brand-accent rounded-xl text-[10px] font-black uppercase tracking-widest border border-amber-500/20">
+                          <span className="absolute top-4 left-4 px-3 py-1 bg-stone-950 text-brand-accent rounded-xl text-[10px] font-semibold uppercase tracking-widest border border-amber-500/20">
                             {item.category}
                           </span>
-                          <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest font-mono">
+                          <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] font-semibold text-white uppercase tracking-widest font-mono">
                             {item.alcoholContent} ABV
                           </span>
                           <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
                             <div>
-                              <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-1">{item.vintage}</p>
-                              <h4 className="text-xl font-black text-white tracking-tight leading-tight">{item.name}</h4>
+                              <p className="text-[10px] font-semibold text-amber-400 uppercase tracking-widest mb-1">{item.vintage}</p>
+                              <h4 className="text-xl font-semibold text-white tracking-tight leading-tight">{item.name}</h4>
                             </div>
                           </div>
                         </div>
@@ -466,23 +466,23 @@ export const BarLounge: React.FC = () => {
                         <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
                           <div className="grid grid-cols-3 gap-4">
                             <div className="p-3 bg-stone-50 rounded-2xl text-center border border-stone-100">
-                              <p className="text-[8px] font-black text-stone-400 uppercase tracking-wider mb-1">State</p>
-                              <p className="text-xs font-black text-emerald-600 uppercase font-mono">Climate Ok</p>
+                              <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">State</p>
+                              <p className="text-xs font-semibold text-emerald-600 uppercase font-mono">Climate Ok</p>
                             </div>
                             <div className="p-3 bg-stone-50 rounded-2xl text-center border border-stone-100">
-                              <p className="text-[8px] font-black text-stone-400 uppercase tracking-wider mb-1">Stock</p>
-                              <p className="text-xs font-bold text-stone-800">{item.stockBottles} btl.</p>
+                              <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">Stock</p>
+                              <p className="text-xs font-semibold text-stone-800">{item.stockBottles} btl.</p>
                             </div>
                             <div className="p-3 bg-stone-50 rounded-2xl text-center border border-stone-100">
-                              <p className="text-[8px] font-black text-stone-400 uppercase tracking-wider mb-1">Vol / Size</p>
-                              <p className="text-xs font-bold text-stone-800">{item.capacityMl} ml</p>
+                              <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">Vol / Size</p>
+                              <p className="text-xs font-semibold text-stone-800">{item.capacityMl} ml</p>
                             </div>
                           </div>
 
                           <div className="flex items-center justify-between pt-4 border-t border-stone-100">
                             <div>
-                              <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Est Glass Pour</p>
-                              <p className="text-2xl font-black text-stone-950 font-display">₹{item.pricePerGlass.toLocaleString()}</p>
+                              <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">Est Glass Pour</p>
+                              <p className="text-2xl font-semibold text-stone-950 font-display">₹{item.pricePerGlass.toLocaleString()}</p>
                             </div>
                             <div className="flex gap-2">
                               <button 
@@ -495,7 +495,7 @@ export const BarLounge: React.FC = () => {
                               <button 
                                 onClick={() => handleDispenseGlass(item.id)}
                                 disabled={item.stockBottles <= 0}
-                                className="px-5 py-3 bg-stone-900 border border-amber-500/20 text-brand-accent hover:bg-stone-850 disabled:opacity-40 text-xs font-black uppercase tracking-widest rounded-2xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer"
+                                className="px-5 py-3 bg-stone-900 border border-amber-500/20 text-brand-accent hover:bg-stone-850 disabled:opacity-40 text-xs font-semibold uppercase tracking-widest rounded-2xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer"
                               >
                                 <GlassWater size={14} />
                                 Dispense Glass
@@ -512,7 +512,7 @@ export const BarLounge: React.FC = () => {
               {/* Live Dispense logs & Sommelier Stats */}
               <div className="space-y-6">
                 <div className="bg-stone-950 p-8 rounded-[40px] border border-amber-950/50 text-white space-y-6 shadow-xl relative overflow-hidden">
-                  <h5 className="text-[10px] font-black text-brand-accent uppercase tracking-[0.25em] mb-4">Sommelier Pour Logs</h5>
+                  <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Sommelier Pour Logs</h5>
                   {dispenseLog.length === 0 ? (
                     <div className="py-8 text-center text-stone-500 italic text-xs border border-dashed border-stone-900 rounded-3xl p-4 bg-stone-950/60">
                       No manual pours recorded during active service roster. Select "Dispense Glass" above to register entries.
@@ -526,26 +526,26 @@ export const BarLounge: React.FC = () => {
                               <Wine size={16} />
                             </div>
                             <div>
-                              <p className="text-xs font-black text-stone-200">{log.name}</p>
-                              <p className="text-[9px] font-bold text-stone-500 uppercase tracking-widest">Dispensed to {log.tables}</p>
+                              <p className="text-xs font-semibold text-stone-200">{log.name}</p>
+                              <p className="text-[9px] font-semibold text-stone-500 uppercase tracking-widest">Dispensed to {log.tables}</p>
                             </div>
                           </div>
-                          <span className="text-[10px] font-mono font-bold text-brand-accent">{log.timestamp}</span>
+                          <span className="text-[10px] font-mono font-semibold text-brand-accent">{log.timestamp}</span>
                         </div>
                       ))}
                     </div>
                   )}
                   
                   <div className="pt-6 border-t border-stone-900">
-                    <h5 className="text-[10px] font-black text-brand-accent uppercase tracking-[0.25em] mb-4 font-display">Vault Performance</h5>
+                    <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4 font-display">Vault Performance</h5>
                     <div className="space-y-4 font-mono">
                       <div className="flex justify-between items-center text-xs text-stone-400">
                         <span className="font-sans">Estimated Pour Valuation</span>
-                        <span className="text-white font-black">₹62,800 Est.</span>
+                        <span className="text-white font-semibold">₹62,800 Est.</span>
                       </div>
                       <div className="flex justify-between items-center text-xs text-stone-400">
                         <span className="font-sans">Registered Premium Corkage</span>
-                        <span className="text-white font-black">06 Pours Active</span>
+                        <span className="text-white font-semibold">06 Pours Active</span>
                       </div>
                     </div>
                   </div>
@@ -553,11 +553,11 @@ export const BarLounge: React.FC = () => {
 
                 {/* Luxury Cocktail Ratio Assistant */}
                 <div className="bg-white p-8 rounded-[40px] border border-stone-200/60 shadow-soft space-y-6">
-                  <h5 className="text-xs font-black text-stone-450 uppercase tracking-[0.25em] font-display">Maison Barrel Assistant</h5>
+                  <h5 className="text-xs font-semibold text-stone-450 uppercase tracking-[0.25em] font-display">Maison Barrel Assistant</h5>
                   <div className="p-5 bg-amber-500/10 rounded-3xl border border-amber-500/10 flex items-start gap-3">
                     <ShieldCheck className="text-amber-600 flex-shrink-0 mt-0.5" size={20} />
                     <div>
-                      <p className="text-xs font-black text-stone-900 uppercase">Automated Pour Security</p>
+                      <p className="text-xs font-semibold text-stone-900 uppercase">Automated Pour Security</p>
                       <p className="text-[11.5px] text-stone-500 leading-relaxed font-medium">
                         Automatic luxury bar thresholds applied. Pour events exceeding standard metric volumes report instant logs to the head mixologist ledger.
                       </p>
@@ -578,8 +578,8 @@ export const BarLounge: React.FC = () => {
             {/* Left Column: Premium Bar Menu listings for selection (7 cols) */}
             <div className="xl:col-span-7 space-y-6">
               <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-stone-200/80">
-                <span className="text-xs font-black text-stone-500 uppercase tracking-widest">Select Lounge Offerings</span>
-                <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">{items.length} premium bottles loaded</span>
+                <span className="text-xs font-semibold text-stone-500 uppercase tracking-widest">Select Lounge Offerings</span>
+                <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">{items.length} premium bottles loaded</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -593,7 +593,7 @@ export const BarLounge: React.FC = () => {
                     <div className="w-20 h-20 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0 relative">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
                       {item.stockBottles <= 5 && item.stockBottles > 0 && (
-                        <span className="absolute bottom-1 left-1 right-1 text-center text-[7px] font-black bg-rose-500 text-white rounded uppercase tracking-wider">
+                        <span className="absolute bottom-1 left-1 right-1 text-center text-[7px] font-semibold bg-rose-500 text-white rounded uppercase tracking-wider">
                            Low stock
                         </span>
                       )}
@@ -602,12 +602,12 @@ export const BarLounge: React.FC = () => {
                       <span className="px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-500 rounded text-[8px] font-extrabold uppercase tracking-widest">
                         {item.category}
                       </span>
-                      <h5 className="text-sm font-black text-stone-900 group-hover:text-amber-600 transition-colors truncate">{item.name}</h5>
-                      <p className="text-[10px] text-stone-400 font-bold truncate">{item.vintage} • {item.origin}</p>
+                      <h5 className="text-sm font-semibold text-stone-900 group-hover:text-amber-600 transition-colors truncate">{item.name}</h5>
+                      <p className="text-[10px] text-stone-400 font-semibold truncate">{item.vintage} • {item.origin}</p>
                       
                       <div className="flex items-center justify-between pt-2">
-                        <span className="text-sm font-black text-stone-950 font-mono">₹{item.pricePerGlass.toLocaleString()}</span>
-                        <span className="text-[9px] font-black text-amber-600 uppercase tracking-wider group-hover:underline">Add to ticket +</span>
+                        <span className="text-sm font-semibold text-stone-950 font-mono">₹{item.pricePerGlass.toLocaleString()}</span>
+                        <span className="text-[9px] font-semibold text-amber-600 uppercase tracking-wider group-hover:underline">Add to ticket +</span>
                       </div>
                     </div>
                   </button>
@@ -621,12 +621,12 @@ export const BarLounge: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-stone-100 pb-4">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="text-amber-500" size={18} />
-                    <h4 className="text-sm font-black text-stone-900 uppercase tracking-wider">Active Lounge Ticket</h4>
+                    <h4 className="text-sm font-semibold text-stone-900 uppercase tracking-wider">Active Lounge Ticket</h4>
                   </div>
                   <button 
                     onClick={() => setCart([])}
                     disabled={cart.length === 0}
-                    className="text-[10px] font-black text-stone-400 hover:text-stone-950 uppercase tracking-widest disabled:opacity-40 cursor-pointer"
+                    className="text-[10px] font-semibold text-stone-400 hover:text-stone-950 uppercase tracking-widest disabled:opacity-40 cursor-pointer"
                   >
                     Clear Cart
                   </button>
@@ -637,7 +637,7 @@ export const BarLounge: React.FC = () => {
                   <div className="py-12 text-center rounded-3xl bg-stone-50/50 border border-dashed border-stone-150 p-6 flex flex-col items-center gap-3">
                     <Wine className="text-stone-300 animate-pulse" size={40} />
                     <div>
-                      <p className="text-xs font-black text-stone-400 uppercase tracking-widest">No Active Pour Selections</p>
+                      <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest">No Active Pour Selections</p>
                       <p className="text-[11px] text-stone-400 mt-1 max-w-[240px]">Select any premium reserve bottle or mix from the cellar to open the tax invoice invoice generator.</p>
                     </div>
                   </div>
@@ -648,21 +648,21 @@ export const BarLounge: React.FC = () => {
                         <div key={cartItem.item.id} className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-3">
                           <div className="flex items-start justify-between gap-4">
                             <div>
-                              <p className="text-xs font-black text-stone-900">{cartItem.item.name}</p>
+                              <p className="text-xs font-semibold text-stone-900">{cartItem.item.name}</p>
                               <p className="text-[10px] text-stone-400 font-mono">₹{cartItem.item.pricePerGlass} per glass</p>
                             </div>
                             
                             <div className="flex items-center bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
                               <button 
                                 onClick={() => removeOneFromCart(cartItem.item.id)}
-                                className="px-2.5 py-1 text-xs font-black text-stone-500 hover:bg-stone-50 cursor-pointer"
+                                className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50 cursor-pointer"
                               >
                                 -
                               </button>
-                              <span className="px-3 text-xs font-black text-stone-800 font-mono">{cartItem.quantity}</span>
+                              <span className="px-3 text-xs font-semibold text-stone-800 font-mono">{cartItem.quantity}</span>
                               <button 
                                 onClick={() => addToCart(cartItem.item)}
-                                className="px-2.5 py-1 text-xs font-black text-stone-500 hover:bg-stone-50 cursor-pointer"
+                                className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50 cursor-pointer"
                               >
                                 +
                               </button>
@@ -672,7 +672,7 @@ export const BarLounge: React.FC = () => {
                           {/* Modifiers (Mixers & Pour Size choices) */}
                           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-200/60">
                             <div>
-                              <label className="text-[8px] font-black text-stone-400 uppercase tracking-widest block mb-1">Choice of Mixer</label>
+                              <label className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest block mb-1">Choice of Mixer</label>
                               <select
                                 value={cartItem.mixer}
                                 onChange={(e: any) => updateCartModifier(cartItem.item.id, 'mixer', e.target.value)}
@@ -687,7 +687,7 @@ export const BarLounge: React.FC = () => {
                             </div>
 
                             <div>
-                              <label className="text-[8px] font-black text-stone-400 uppercase tracking-widest block mb-1">Pour Specification</label>
+                              <label className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest block mb-1">Pour Specification</label>
                               <select
                                 value={cartItem.pourSize}
                                 onChange={(e: any) => updateCartModifier(cartItem.item.id, 'pourSize', e.target.value)}
@@ -717,11 +717,11 @@ export const BarLounge: React.FC = () => {
                 <div className="space-y-4 pt-4 border-t border-stone-100">
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">Lounge / Seating Cabin</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Lounge / Seating Cabin</label>
                       <select 
                         value={targetTable}
                         onChange={(e) => setTargetTable(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-black text-stone-800 focus:outline-none"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none"
                       >
                         <option value="Main Salon Table #12">Main Salon Table #12</option>
                         <option value="Exclusive Cabana #A">Exclusive Cabana #A</option>
@@ -731,11 +731,11 @@ export const BarLounge: React.FC = () => {
                     </div>
 
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">Clearing Ledger</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Clearing Ledger</label>
                       <select 
                         value={paymentMethod}
                         onChange={(e: any) => setPaymentMethod(e.target.value as any)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-black text-stone-800 focus:outline-none"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none"
                       >
                         <option value="UPI">Instant UPI (Tejas/BHIM)</option>
                         <option value="Card">Visa Signature Metallic</option>
@@ -751,18 +751,18 @@ export const BarLounge: React.FC = () => {
                       placeholder="Access Voucher (e.g. MAISONVIP)"
                       value={discountCode}
                       onChange={(e) => setDiscountCode(e.target.value)}
-                      className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold uppercase tracking-widest text-stone-800 focus:outline-none"
+                      className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold uppercase tracking-widest text-stone-800 focus:outline-none"
                     />
                     <button 
                       type="button" 
                       onClick={applyLoyaltyDiscount}
-                      className="px-4 py-2 bg-stone-900 hover:bg-stone-850 text-brand-accent text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+                      className="px-4 py-2 bg-stone-900 hover:bg-stone-850 text-brand-accent text-[10px] font-semibold uppercase tracking-wider rounded-xl transition-all cursor-pointer"
                     >
                       Apply
                     </button>
                   </div>
                   {appliedDiscount > 0 && (
-                     <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">
+                     <p className="text-[10px] text-emerald-600 font-semibold uppercase tracking-widest">
                        ✓ Member Promo Code Approved: {appliedDiscount}% Fine Sommelier Privilege discount applied.
                      </p>
                   )}
@@ -792,9 +792,9 @@ export const BarLounge: React.FC = () => {
                     <span className="font-sans">SGST (9%)</span>
                     <span>₹{sgst.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm text-stone-900 font-black border-t border-stone-200/80 pt-2">
+                  <div className="flex justify-between items-center text-sm text-stone-900 font-semibold border-t border-stone-200/80 pt-2">
                     <span>Grand Luxury Total</span>
-                    <span className="text-lg font-black text-amber-600 font-display">₹{cartTotal.toLocaleString()}</span>
+                    <span className="text-lg font-semibold text-amber-600 font-display">₹{cartTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -803,7 +803,7 @@ export const BarLounge: React.FC = () => {
                   type="button"
                   onClick={handleCheckout}
                   disabled={cart.length === 0}
-                  className="w-full py-4 bg-stone-950 text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-stone-950/10 hover:bg-stone-900 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
+                  className="w-full py-4 bg-stone-950 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-stone-950/10 hover:bg-stone-900 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
                 >
                   Generate Tax Invoice & Checkout
                 </button>
@@ -824,26 +824,26 @@ export const BarLounge: React.FC = () => {
                   </div>
 
                   <div className="pt-4 text-center">
-                     <p className="text-xs font-black text-stone-900 uppercase tracking-[0.2em] font-display">THE MAISON DE LUXE</p>
-                     <p className="text-[8px] text-stone-405 uppercase tracking-widest font-black font-mono text-amber-600">Premium Cellars & Lounge Guild</p>
+                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.2em] font-display">THE MAISON DE LUXE</p>
+                     <p className="text-[8px] text-stone-405 uppercase tracking-widest font-semibold font-mono text-amber-600">Premium Cellars & Lounge Guild</p>
                      <p className="text-[9px] text-stone-400 font-medium mt-1">Lounge Suite #03, Connaught Court, New Delhi</p>
                   </div>
 
                   <div className="space-y-4 pt-6 border-b border-dashed border-stone-200 pb-4 text-xs">
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Docket Id:</span>
-                      <span className="text-stone-800 font-black">{checkoutReceipt.invoiceNumber}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Docket Id:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.invoiceNumber}</span>
                     </div>
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Timestamp:</span>
-                      <span className="text-stone-800 font-bold">{checkoutReceipt.timestamp}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Timestamp:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.timestamp}</span>
                     </div>
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Assigned Cabin:</span>
-                      <span className="text-stone-800 font-black">{checkoutReceipt.table}</span>
+                      <span className="text-stone-400 font-semibold uppercase">Assigned Cabin:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.table}</span>
                     </div>
                     <div className="flex justify-between font-mono text-[9.5px]">
-                      <span className="text-stone-400 font-bold uppercase">Mixologist hand:</span>
+                      <span className="text-stone-400 font-semibold uppercase">Mixologist hand:</span>
                       <span className="text-stone-800 font-medium">{checkoutReceipt.mixologist}</span>
                     </div>
                   </div>
@@ -854,7 +854,7 @@ export const BarLounge: React.FC = () => {
                       const finalItemPrice = getItemPrice(cartItem);
                       return (
                         <div key={idx} className="space-y-0.5">
-                          <div className="flex justify-between text-[11px] font-bold text-stone-900">
+                          <div className="flex justify-between text-[11px] font-semibold text-stone-900">
                             <span>{cartItem.item.name} (x{cartItem.quantity})</span>
                             <span>₹{(finalItemPrice * cartItem.quantity).toLocaleString()}</span>
                           </div>
@@ -862,7 +862,7 @@ export const BarLounge: React.FC = () => {
                              <span>↳ Pour: {cartItem.pourSize} / {cartItem.mixer}</span>
                           </div>
                           {cartItem.notes && (
-                            <p className="text-[8px] text-stone-500 font-bold">↳ Directives: "{cartItem.notes}"</p>
+                            <p className="text-[8px] text-stone-500 font-semibold">↳ Directives: "{cartItem.notes}"</p>
                           )}
                         </div>
                       );
@@ -876,7 +876,7 @@ export const BarLounge: React.FC = () => {
                         <span>₹{checkoutReceipt.subtotal.toLocaleString()}</span>
                      </div>
                      {checkoutReceipt.discount > 0 && (
-                       <div className="flex justify-between text-[10px] text-rose-600 font-bold">
+                       <div className="flex justify-between text-[10px] text-rose-600 font-semibold">
                           <span>VIP PRIVILEGE DISCOUNT</span>
                           <span>-₹{checkoutReceipt.discount.toLocaleString()}</span>
                        </div>
@@ -897,12 +897,12 @@ export const BarLounge: React.FC = () => {
 
                   {/* Receipt Total */}
                   <div className="pt-4 text-center font-mono space-y-3">
-                     <div className="flex justify-between text-stone-900 font-black text-sm">
+                     <div className="flex justify-between text-stone-900 font-semibold text-sm">
                         <span>GRAND INVOICE TOTAL</span>
                         <span>₹{checkoutReceipt.total.toLocaleString()}</span>
                      </div>
                      
-                     <div className="p-3 bg-stone-905 bg-stone-900 text-brand-accent rounded-xl text-[9px] font-black uppercase tracking-widest font-sans flex items-center justify-center gap-1.5 shadow">
+                     <div className="p-3 bg-stone-905 bg-stone-900 text-brand-accent rounded-xl text-[9px] font-semibold uppercase tracking-widest font-sans flex items-center justify-center gap-1.5 shadow">
                         <CheckCircle size={12} className="text-amber-500" />
                         TENDERED COMPLETED VIA {checkoutReceipt.payment}
                      </div>
@@ -910,7 +910,7 @@ export const BarLounge: React.FC = () => {
                      <div className="grid grid-cols-2 gap-2 mt-4">
                        <button 
                          onClick={() => window.print()}
-                         className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-black uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
+                         className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
                        >
                          <Printer size={12} />
                          Print Ticket
@@ -934,7 +934,7 @@ export const BarLounge: React.FC = () => {
                              paymentMethod: checkoutReceipt.payment
                            });
                          }}
-                         className="px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-[9.5px] font-sans font-black uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/10 hover:scale-102 active:scale-98 transition-all"
+                         className="px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/10 hover:scale-102 active:scale-98 transition-all"
                        >
                          <FileText size={12} />
                          Download PDF
@@ -965,29 +965,29 @@ export const BarLounge: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden text-stone-800"
             >
-              <h3 className="text-2xl font-black text-stone-900 mb-2 font-display">Acquire Premium Bottle</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-black mb-6">Catalog fine wines, single malts or custom creations</p>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Acquire Premium Bottle</h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Catalog fine wines, single malts or custom creations</p>
 
               <form onSubmit={handleAddLiquor} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Liquor / Label Name</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Liquor / Label Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Glenfiddich Grande Couronne 26 Y.O." 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Label Category</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Label Category</label>
                     <select 
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     >
                       <option value="Single Malt">Single Malt</option>
                       <option value="Vintage Wine">Vintage Wine</option>
@@ -996,20 +996,20 @@ export const BarLounge: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Vintage / Age</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Vintage / Age</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 26 Y.O. or 2018" 
                       value={newVintage}
                       onChange={(e) => setNewVintage(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Alcohol (ABV %)</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Alcohol (ABV %)</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 43.8%" 
@@ -1019,56 +1019,56 @@ export const BarLounge: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Bottle Size (Ml)</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Bottle Size (Ml)</label>
                     <input 
                       type="number" 
                       placeholder="750" 
                       value={newCapacity}
                       onChange={(e) => setNewCapacity(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Glass Price (₹)</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Glass Price (₹)</label>
                     <input 
                       type="number" 
                       required
                       placeholder="3500" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Stock Bottles</label>
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock Bottles</label>
                     <input 
                       type="number" 
                       required
                       placeholder="6" 
                       value={newStock}
                       onChange={(e) => setNewStock(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest px-2">Origin / Estate Vineyard</label>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Origin / Estate Vineyard</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Champagne region, France" 
                     value={newOrigin}
                     onChange={(e) => setNewOrigin(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-bold text-sm focus:outline-none"
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                   />
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-black text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest cursor-pointer">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-stone-900 border border-amber-500/20 text-brand-accent font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl cursor-pointer">CELLAR ACQUISITION</button>
+                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest cursor-pointer">DISCARD</button>
+                  <button type="submit" className="flex-[2] py-4 bg-stone-900 border border-amber-500/20 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl cursor-pointer">CELLAR ACQUISITION</button>
                 </div>
               </form>
             </motion.div>
