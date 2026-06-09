@@ -14,6 +14,9 @@ const AVAILABLE_PLATFORMS = ['Restaurant', 'Cafeteria', 'Bar'];
 
 export const Businesses: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All');
+  const filterOptions = ['All', 'Active', 'Inactive'];
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -202,21 +205,26 @@ export const Businesses: React.FC = () => {
     }
   };
 
-  const filteredBusinesses = businesses.filter(b => 
-    b.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (b.ownerId?.firstName + " " + b.ownerId?.lastName).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBusinesses = businesses.filter(b => {
+    const matchesSearch = b.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (b.ownerId?.firstName + " " + b.ownerId?.lastName).toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (activeFilter === 'All') return matchesSearch;
+    if (activeFilter === 'Active') return matchesSearch && b.isActive;
+    if (activeFilter === 'Inactive') return matchesSearch && !b.isActive;
+    return matchesSearch;
+  });
 
   return (
-    <div className="p-8 pb-24">
-      <div className="flex justify-between items-end mb-8">
+    <div className="p-4 sm:p-8 pb-24">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-semibold text-slate-900 font-display truncate">Business Management</h1>
           <p className="text-slate-500 mt-2 font-medium break-words">Manage all tenant restaurants and franchises.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-brand-accent hover:bg-brand-accent/90 text-white px-6 py-3 rounded-2xl font-semibold flex items-center gap-2 shadow-lg shadow-brand-accent/30 transition-all active:scale-95"
+          className="bg-brand-accent hover:bg-brand-accent/90 text-white px-6 py-3 rounded-2xl font-semibold flex items-center justify-center w-full sm:w-auto gap-2 shadow-lg shadow-brand-accent/30 transition-all active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Register New Business
@@ -225,7 +233,7 @@ export const Businesses: React.FC = () => {
 
       <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
         {/* Toolbar */}
-        <div className="p-4 border-b border-slate-100 flex items-center gap-4 bg-slate-50/50">
+        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-slate-50/50">
           <div className="flex-1 relative">
             <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
             <input 
@@ -236,14 +244,32 @@ export const Businesses: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="p-3 bg-white border-2 border-slate-100 rounded-2xl text-slate-500 hover:text-brand-accent hover:border-brand-accent transition-colors flex items-center gap-2 font-semibold">
-            <Filter className="w-5 h-5" />
-            Filters
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              className="p-3 w-full bg-white border-2 border-slate-100 rounded-2xl text-slate-500 hover:text-brand-accent hover:border-brand-accent transition-colors flex items-center justify-center gap-2 font-semibold"
+            >
+              <Filter className="w-5 h-5" />
+              {activeFilter === 'All' ? 'Filters' : activeFilter}
+            </button>
+            {showFilterDropdown && (
+               <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-100 shadow-xl rounded-xl overflow-hidden z-50">
+                 {filterOptions.map(opt => (
+                   <button 
+                     key={opt}
+                     onClick={() => { setActiveFilter(opt); setShowFilterDropdown(false); }}
+                     className={`w-full text-left px-4 py-3 text-sm font-semibold hover:bg-slate-50 transition-colors ${activeFilter === opt ? 'text-brand-accent bg-brand-accent/5' : 'text-slate-600'}`}
+                   >
+                     {opt}
+                   </button>
+                 ))}
+               </div>
+            )}
+          </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
@@ -342,7 +368,7 @@ export const Businesses: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl z-[101] p-8"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] sm:w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl z-[101] p-4 sm:p-8"
             >
               <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
                 <div>
@@ -436,7 +462,7 @@ export const Businesses: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
                         <span>Base Duration</span>
@@ -466,11 +492,11 @@ export const Businesses: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 flex justify-end gap-4">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-4 font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">
+                <div className="pt-4 flex flex-col sm:flex-row justify-end gap-4">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-4 font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors order-2 sm:order-1">
                     Cancel
                   </button>
-                  <button type="submit" disabled={isSubmitting} className="bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-50 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-brand-accent/30 transition-all active:scale-95 flex items-center gap-2">
+                  <button type="submit" disabled={isSubmitting} className="bg-brand-accent hover:bg-brand-accent/90 disabled:opacity-50 text-white px-8 py-4 rounded-xl font-semibold shadow-lg shadow-brand-accent/30 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
                     {isSubmitting ? 'Registering...' : 'Complete Registration'}
                   </button>
                 </div>

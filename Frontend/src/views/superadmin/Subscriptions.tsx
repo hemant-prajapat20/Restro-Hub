@@ -49,15 +49,15 @@ export const Subscriptions: React.FC = () => {
   ];
 
   return (
-    <div className="p-8 pb-24">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+    <div className="p-4 sm:p-8 pb-24">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-semibold text-slate-900 font-display truncate">Subscription Guidelines</h1>
           <p className="text-slate-500 mt-2 font-medium break-words">Rules and pricing structures for provisioning new tenant accounts.</p>
         </div>
         <button 
           onClick={() => navigate('/super-admin/businesses')}
-          className="bg-brand-accent hover:bg-brand-accent/90 text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-2 shadow-lg shadow-brand-accent/30 transition-all active:scale-95 shrink-0"
+          className="bg-brand-accent hover:bg-brand-accent/90 text-white px-8 py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-brand-accent/30 transition-all active:scale-95 shrink-0 w-full sm:w-auto"
         >
           <Building2 className="w-5 h-5" />
           Register New Business
@@ -65,7 +65,7 @@ export const Subscriptions: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-brand-primary/5 border border-brand-primary/10 rounded-3xl p-6 mb-8 flex gap-4 items-start">
+      <div className="bg-brand-primary/5 border border-brand-primary/10 rounded-3xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row gap-4 items-start">
         <div className="shrink-0 w-12 h-12 bg-brand-primary text-white rounded-2xl flex items-center justify-center">
           <Info className="w-6 h-6" />
         </div>
@@ -84,7 +84,7 @@ export const Subscriptions: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm flex flex-col relative overflow-hidden group hover:border-slate-300 transition-colors"
+            className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col relative overflow-hidden group hover:border-slate-300 transition-colors"
           >
             <div className={`absolute top-0 left-0 w-full h-2 ${guide.color}`} />
             

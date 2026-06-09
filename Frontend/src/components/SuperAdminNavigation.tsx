@@ -9,7 +9,9 @@ import {
   Settings, 
   LogOut,
   Bell,
-  Crown
+  Crown,
+  Menu,
+  X
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -28,20 +30,30 @@ const navItems = [
   { id: 'messages', label: 'Message Center', icon: Bell },
 ];
 
-export const SuperAdminSidebar: React.FC = () => {
+export const SuperAdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({ isOpen = false, onClose }) => {
   const location = useLocation();
   const currentPath = location.pathname.split('/').pop();
 
   return (
-    <aside className="hidden lg:flex w-64 h-screen bg-brand-sidebar text-white flex-col fixed left-0 top-0 z-50">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
-          <Crown className="text-white w-6 h-6" />
+    <aside className={cn(
+      "w-64 h-screen bg-brand-sidebar text-white flex-col fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
+      <div className="p-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
+            <Crown className="text-white w-6 h-6" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-display font-semibold text-lg tracking-wider text-brand-accent uppercase leading-none truncate">IndiServe</span>
+            <span className="text-[10px] font-semibold text-slate-400 tracking-[0.2em] uppercase mt-1 truncate">Super Admin</span>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <span className="font-display font-semibold text-lg tracking-wider text-brand-accent uppercase leading-none truncate">IndiServe</span>
-          <span className="text-[10px] font-semibold text-slate-400 tracking-[0.2em] uppercase mt-1 truncate">Super Admin</span>
-        </div>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1">
@@ -58,6 +70,9 @@ export const SuperAdminSidebar: React.FC = () => {
                   ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
                   : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
               )}
+              onClick={() => {
+                if (onClose) onClose();
+              }}
             >
               <Icon className={cn("w-5 h-5", isActive ? "text-white" : "group-hover:text-white")} />
               <span className="font-semibold truncate">{item.label}</span>
@@ -83,7 +98,7 @@ export const SuperAdminSidebar: React.FC = () => {
   );
 };
 
-export const SuperAdminHeader: React.FC = () => {
+export const SuperAdminHeader: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -124,13 +139,23 @@ export const SuperAdminHeader: React.FC = () => {
 
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 lg:ml-64 sticky top-0 z-40 glass">
-      <div className="flex flex-col">
-        <h2 className="text-2xl font-semibold font-display text-slate-900 truncate">IndiServe Admin</h2>
-        <p className="text-sm text-slate-500 break-words">Platform-wide Management Console</p>
+      <div className="flex items-center gap-4">
+        {onOpenSidebar && (
+          <button 
+            onClick={onOpenSidebar}
+            className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
+        <div className="hidden sm:flex flex-col">
+          <h2 className="text-xl sm:text-2xl font-semibold font-display text-slate-900 truncate">IndiServe Admin</h2>
+          <p className="text-xs sm:text-sm text-slate-500 break-words">Platform-wide Management Console</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-brand-accent/10 text-brand-accent rounded-full text-xs font-semibold uppercase tracking-wider">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-brand-accent/10 text-brand-accent rounded-full text-xs font-semibold uppercase tracking-wider">
           <div className="w-2 h-2 bg-brand-accent rounded-full animate-pulse" />
           Network Status: Optimal
         </div>
@@ -149,7 +174,7 @@ export const SuperAdminHeader: React.FC = () => {
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50">
+            <div className="absolute right-[-1rem] sm:right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50">
               <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <span className="font-semibold text-sm">Notifications</span>
                 {unreadCount > 0 && (

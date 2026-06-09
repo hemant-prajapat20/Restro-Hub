@@ -19,6 +19,9 @@ export const SuperAdminDashboard: React.FC = () => {
     chartData: [] as any[]
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [showTimeFilter, setShowTimeFilter] = useState(false);
+  const [timeFilter, setTimeFilter] = useState('Last 6 Months');
+  const timeOptions = ['Last 7 Days', 'Last 30 Days', 'Last 6 Months', 'Last Year'];
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -48,7 +51,7 @@ export const SuperAdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="p-8 pb-24">
+    <div className="p-4 sm:p-8 pb-24">
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
@@ -89,12 +92,31 @@ export const SuperAdminDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          {/* Main Chart Area */}
-         <div className="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-8">
+         <div className="lg:col-span-2 bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                <h3 className="text-xl font-semibold text-slate-900 truncate">Revenue Growth</h3>
-               <select className="bg-slate-50 border-none outline-none font-semibold text-slate-500 rounded-xl px-4 py-2">
-                 <option>Last 6 Months</option>
-               </select>
+               <div className="relative w-full sm:w-auto z-20">
+                 <button 
+                   onClick={() => setShowTimeFilter(!showTimeFilter)}
+                   className="bg-slate-50 border-2 border-slate-50 outline-none font-semibold text-slate-500 rounded-xl px-4 py-2 w-full flex items-center justify-between gap-3 text-sm sm:text-base cursor-pointer hover:border-slate-200 transition-colors"
+                 >
+                   {timeFilter}
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" className="w-4 h-4 text-slate-400"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 7l5 5 5-5"/></svg>
+                 </button>
+                 {showTimeFilter && (
+                   <div className="absolute top-full right-0 left-0 sm:left-auto sm:min-w-[160px] mt-2 bg-white border border-slate-100 shadow-xl rounded-xl overflow-hidden">
+                     {timeOptions.map(opt => (
+                       <button 
+                         key={opt}
+                         onClick={() => { setTimeFilter(opt); setShowTimeFilter(false); }}
+                         className={`w-full text-left px-4 py-3 text-sm font-semibold hover:bg-slate-50 transition-colors ${timeFilter === opt ? 'text-brand-accent bg-brand-accent/5' : 'text-slate-600'}`}
+                       >
+                         {opt}
+                       </button>
+                     ))}
+                   </div>
+                 )}
+               </div>
             </div>
             <div className="flex-1 w-full min-h-[300px]">
                {isLoading ? (
@@ -125,7 +147,7 @@ export const SuperAdminDashboard: React.FC = () => {
          </div>
 
          {/* Alerts & Activity (Static Design Preserved) */}
-         <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col">
+         <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-sm flex flex-col overflow-hidden">
             <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2 truncate">
                <AlertCircle className="w-5 h-5 text-orange-500" />
                System Alerts
