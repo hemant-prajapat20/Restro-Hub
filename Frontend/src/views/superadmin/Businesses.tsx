@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, MoreVertical, Building2, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { CustomDatePicker } from '../../components/CustomDatePicker';
 
 const INDIAN_STATES = [
   "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", 
@@ -520,7 +521,11 @@ export const Businesses: React.FC = () => {
                         <span>Exact Expiry Date</span>
                         <span className="text-brand-accent text-[10px] bg-brand-accent/10 px-2 py-0.5 rounded-full">Editable</span>
                       </label>
-                      <input type="date" name="subscriptionExpiry" required value={formData.subscriptionExpiry} onChange={handleInputChange} className="px-2 py-4 sm:p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full text-sm sm:text-base" />
+                      <CustomDatePicker 
+                        value={formData.subscriptionExpiry} 
+                        onChange={(val) => setFormData({...formData, subscriptionExpiry: val})} 
+                        className="px-4 py-4 sm:p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-brand-accent font-medium w-full text-sm sm:text-base hover:border-slate-200 transition-colors" 
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
