@@ -619,7 +619,7 @@ export const Tables: React.FC = () => {
                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                          <input
                            type="text"
-                           placeholder="Search recipe catalog..."
+                           placeholder="Search recipes..."
                            value={searchQuery}
                            onChange={e => setSearchQuery(e.target.value)}
                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold leading-relaxed placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/10"

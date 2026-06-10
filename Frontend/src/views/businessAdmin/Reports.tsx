@@ -80,7 +80,7 @@ export const Reports: React.FC = () => {
                    <input 
                      type="text" 
                      placeholder="Search Bill #" 
-                     className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-accent/10"
+                     className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-accent/10 truncate"
                    />
                 </div>
              </div>

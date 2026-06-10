@@ -395,7 +395,7 @@ export const BarLounge: React.FC = () => {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
                 <input 
                   type="text" 
-                  placeholder="Search rare labels, origins or vintages..."
+                  placeholder="Search inventory..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500/10 font-medium text-stone-800"
