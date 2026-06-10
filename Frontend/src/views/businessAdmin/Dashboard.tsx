@@ -118,7 +118,7 @@ export const Dashboard: React.FC = () => {
             </select>
           </div>
           <div className="h-[300px] w-full min-w-0">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
+            <ResponsiveContainer width="99%" height={300}>
               <AreaChart data={salesData}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
@@ -187,9 +187,9 @@ export const Dashboard: React.FC = () => {
         {/* Category Breakdown */}
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
-           <div className="flex items-center gap-8 h-[250px] min-w-0">
-             <div className="w-1/2 h-full min-w-0">
-               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={250}>
+           <div className="flex flex-col lg:flex-row items-center gap-8 h-auto lg:h-[250px] min-w-0">
+             <div className="w-full lg:w-1/2 h-[250px] lg:h-full min-w-0 flex items-center justify-center">
+               <ResponsiveContainer width="99%" height={250}>
                  <PieChart>
                    <Pie
                      data={categoryData}
@@ -206,7 +206,7 @@ export const Dashboard: React.FC = () => {
                  </PieChart>
                </ResponsiveContainer>
              </div>
-             <div className="w-1/2 space-y-4">
+             <div className="w-full lg:w-1/2 space-y-4">
                {categoryData.map((cat) => (
                  <div key={cat.name} className="flex items-center justify-between">
                    <div className="flex items-center gap-2">

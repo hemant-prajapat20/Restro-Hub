@@ -195,8 +195,8 @@ export const Inventory: React.FC = () => {
       </div>
 
       {/* Main Table */}
-      <div className="bg-white rounded-[32px] border border-stone-200 shadow-soft overflow-hidden">
-        <table className="w-full text-left border-collapse">
+      <div className="bg-white rounded-[32px] border border-stone-200 shadow-soft overflow-x-auto w-full">
+        <table className="w-full text-left border-collapse min-w-[800px]">
             <thead className="bg-stone-50 border-b border-stone-200">
                <tr>
                   <th className="px-6 py-4 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">Item / Spec Details</th>

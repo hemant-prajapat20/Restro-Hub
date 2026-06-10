@@ -28,7 +28,8 @@ function cn(...inputs: ClassValue[]) {
 }
 
 interface SidebarProps {
-  // Props removed since active state is determined by location
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const navItems = [
@@ -52,7 +53,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { RootState } from '../store';
 
-export const Sidebar: React.FC<SidebarProps> = () => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -64,12 +65,22 @@ export const Sidebar: React.FC<SidebarProps> = () => {
   };
 
   return (
-    <aside className="w-64 bottom-0 overflow-y-auto bg-brand-sidebar text-white flex flex-col fixed left-0 top-0 z-50">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
-          <Crown className="text-white w-6 h-6" />
+    <aside className={cn(
+      "w-64 bottom-0 overflow-y-auto bg-brand-sidebar text-white flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
+      <div className="p-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
+            <Crown className="text-white w-6 h-6" />
+          </div>
+          <span className="font-sans font-semibold text-lg tracking-wider text-brand-accent uppercase truncate">IndiServe</span>
         </div>
-        <span className="font-sans font-semibold text-lg tracking-wider text-brand-accent uppercase">IndiServe Reserve</span>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1">
@@ -80,6 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
             <Link
               key={item.id}
               to={`/admin/${item.id}`}
+              onClick={() => { if (onClose) onClose(); }}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm",
                 isActive 
@@ -101,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
       </nav>
 
       <div className="p-4 border-t border-slate-800 space-y-1">
-        <Link to="/admin/settings" className={cn(
+        <Link to="/admin/settings" onClick={() => { if (onClose) onClose(); }} className={cn(
           "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group",
           currentPath === 'settings' 
             ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
@@ -125,28 +137,37 @@ export const Sidebar: React.FC<SidebarProps> = () => {
   );
 };
 
-export const Header: React.FC = () => {
+export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar }) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const fullName = user ? `${user.firstName} ${user.lastName}` : 'Guest User';
   const roleDisplay = user ? user.role.replace('_', ' ') : 'System Admin';
 
   return (
-    <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 ml-64 sticky top-0 z-40 glass">
+    <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 lg:ml-64 sticky top-0 z-40 glass">
       
-      {/* Global Search Bar */}
-      <div className="flex-1 max-w-xl">
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-brand-accent transition-colors" />
-          <input 
-            type="text" 
-            placeholder="Search orders, menu items, or customers..." 
-            className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:bg-white transition-all font-medium text-sm text-slate-800 shadow-sm"
-          />
+      <div className="flex items-center gap-4 flex-1">
+        <button 
+          onClick={onOpenSidebar}
+          className="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+
+        {/* Global Search Bar */}
+        <div className="flex-1 max-w-xl hidden md:block">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-brand-accent transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Search orders, menu items, or customers..." 
+              className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:bg-white transition-all font-medium text-sm text-slate-800 shadow-sm"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-brand-success/10 text-brand-success rounded-full text-xs font-semibold uppercase tracking-wider">
+      <div className="flex items-center gap-2 md:gap-4">
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-success/10 text-brand-success rounded-full text-xs font-semibold uppercase tracking-wider">
           <div className="w-2 h-2 bg-brand-success rounded-full animate-pulse" />
           Server Live
         </div>
@@ -156,10 +177,10 @@ export const Header: React.FC = () => {
           <span className="absolute top-2 right-2 w-2 h-2 bg-brand-accent rounded-full border-2 border-white" />
         </button>
 
-        <div className="h-10 w-[1px] bg-slate-200 mx-2" />
+        <div className="h-10 w-[1px] bg-slate-200 mx-1 md:mx-2" />
 
         <div className="flex items-center gap-3">
-          <div className="text-right">
+          <div className="hidden md:block text-right">
             <p className="text-sm font-semibold text-slate-900">{fullName}</p>
             <p className="text-xs text-slate-500 capitalize">{roleDisplay}</p>
           </div>

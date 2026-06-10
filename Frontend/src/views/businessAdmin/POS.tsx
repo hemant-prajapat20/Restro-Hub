@@ -114,9 +114,9 @@ export const POS: React.FC = () => {
   const total = subTotal + sgst + cgst;
 
   return (
-    <div className="flex h-[calc(100vh-80px)] overflow-hidden font-[Inter] font-semibold">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] overflow-y-auto lg:overflow-hidden font-[Inter] font-semibold">
       {/* Menu Area */}
-      <div className="flex-1 flex flex-col bg-slate-50">
+      <div className="flex-1 flex flex-col bg-slate-50 min-h-[60vh] lg:min-h-0">
         {/* Top Controls */}
         <div className="p-6 bg-white border-b border-slate-200 space-y-4">
           <div className="flex items-center gap-4">
@@ -185,7 +185,7 @@ export const POS: React.FC = () => {
       </div>
 
       {/* Cart Sidebar */}
-      <div className="w-[400px] bg-white border-l border-slate-200 flex flex-col">
+      <div className="w-full lg:w-[400px] bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col">
         <div className="p-6 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-lg font-display uppercase tracking-tight text-slate-800">Current Order</h4>
