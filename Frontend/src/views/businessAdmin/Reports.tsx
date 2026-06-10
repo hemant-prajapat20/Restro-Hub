@@ -12,8 +12,23 @@ import {
   Search
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useQuery } from '@tanstack/react-query';
+import api from '../../utils/api';
 
 export const Reports: React.FC = () => {
+  const { data: reports, isLoading } = useQuery({
+    queryKey: ['businessReports'],
+    queryFn: async () => {
+      const response = await api.get('/analytics/business/reports');
+      return response.data.data;
+    }
+  });
+
+  if (isLoading) {
+    return <div className="p-8 flex justify-center items-center h-[calc(100vh-80px)]">Loading Reports...</div>;
+  }
+
+  const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices } = reports;
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -35,10 +50,10 @@ export const Reports: React.FC = () => {
 
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { label: 'Net Revenue', value: '₹24.8L', trend: 15.2, icon: BarChart3, color: 'blue' },
-            { label: 'Total GST (5%)', value: '₹1.24L', trend: 12.8, icon: Calculator, color: 'emerald' },
-            { label: 'Operating Cost', value: '₹14.2L', trend: -4.2, icon: ArrowDownRight, color: 'orange' },
-            { label: 'Net Profit', value: '₹9.36L', trend: 22.4, icon: ArrowUpRight, color: 'brand-accent' },
+            { label: 'Net Revenue', value: `₹${netRevenue.toLocaleString()}`, trend: 15.2, icon: BarChart3, color: 'blue' },
+            { label: 'Total GST (5%)', value: `₹${totalGst.toLocaleString()}`, trend: 12.8, icon: Calculator, color: 'emerald' },
+            { label: 'Operating Cost', value: `₹${operatingCost.toLocaleString()}`, trend: -4.2, icon: ArrowDownRight, color: 'orange' },
+            { label: 'Net Profit', value: `₹${netProfit.toLocaleString()}`, trend: 22.4, icon: ArrowUpRight, color: 'brand-accent' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex flex-col gap-4 h-full justify-between">
                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-${stat.color}-50 text-${stat.color}-600`}>
@@ -81,19 +96,21 @@ export const Reports: React.FC = () => {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-100">
-                      {[1,2,3,4,5].map((i) => (
-                        <tr key={i} className="hover:bg-slate-50/50 transition-all group">
+                      {recentInvoices.length === 0 ? (
+                        <tr><td colSpan={5} className="p-4 text-center text-slate-500 font-medium">No recent invoices</td></tr>
+                      ) : recentInvoices.map((invoice: any) => (
+                        <tr key={invoice.id} className="hover:bg-slate-50/50 transition-all group">
                            <td className="px-6 py-4">
-                              <p className="text-sm font-semibold text-brand-primary">#INV-8842-10{i}</p>
-                              <p className="text-[10px] font-semibold text-slate-400 mt-0.5">09 May 2026, 12:4{i} PM</p>
+                              <p className="text-sm font-semibold text-brand-primary">#{invoice.id.slice(-8).toUpperCase()}</p>
+                              <p className="text-[10px] font-semibold text-slate-400 mt-0.5">{new Date(invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                            </td>
                            <td className="px-6 py-4">
-                              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-semibold uppercase tracking-widest">Dine-In</span>
+                              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-semibold uppercase tracking-widest">{invoice.type}</span>
                            </td>
-                           <td className="px-6 py-4 text-center font-semibold text-sm text-slate-900">₹{1200 + i*150}</td>
-                           <td className="px-6 py-4 text-center font-semibold text-sm text-brand-success">₹64.50</td>
+                           <td className="px-6 py-4 text-center font-semibold text-sm text-slate-900">₹{invoice.amount.toLocaleString()}</td>
+                           <td className="px-6 py-4 text-center font-semibold text-sm text-brand-success">₹{invoice.tax.toLocaleString()}</td>
                            <td className="px-6 py-4 text-right">
-                              <span className="px-2 py-0.5 bg-brand-success/10 text-brand-success rounded text-[10px] font-semibold uppercase tracking-widest">Settled</span>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-widest ${invoice.status === 'Completed' || invoice.status === 'Served' ? 'bg-brand-success/10 text-brand-success' : 'bg-orange-50 text-orange-500'}`}>{invoice.status}</span>
                            </td>
                         </tr>
                       ))}

@@ -4,6 +4,7 @@ import Business, { BusinessModule, BusinessStatus } from '../models/Business';
 import User, { Role } from '../models/User';
 import ActivityLog from '../models/ActivityLog';
 import mongoose from 'mongoose';
+import { seedTemplateData } from '../utils/seedData';
 
 // @desc    Create a new business and its admin user
 // @route   POST /api/businesses
@@ -96,6 +97,9 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
       type: 'success'
     });
     await log.save({ session });
+
+    // 7. Seed template data for the new business
+    await seedTemplateData(newBusiness._id as mongoose.Types.ObjectId, session);
 
     await session.commitTransaction();
     session.endSession();

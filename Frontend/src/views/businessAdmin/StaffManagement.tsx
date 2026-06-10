@@ -81,8 +81,12 @@ const INITIAL_STAFF: StaffMember[] = [
   }
 ];
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+
 export const StaffManagement: React.FC = () => {
-  const [crew, setCrew] = useState<StaffMember[]>(INITIAL_STAFF);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -96,6 +100,42 @@ export const StaffManagement: React.FC = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newScore, setNewScore] = useState('5.0');
 
+  const { data: crew = [], isLoading } = useQuery<StaffMember[]>({
+    queryKey: ['staff'],
+    queryFn: async () => {
+      const response = await api.get('/staff');
+      return response.data.map((item: any) => ({
+        ...item,
+        id: item._id
+      }));
+    }
+  });
+
+  const updateStaffMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      await api.put(`/staff/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+    }
+  });
+
+  const addStaffMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/staff', data);
+    },
+    onSuccess: () => {
+      toast.success('Staff onboarded successfully');
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+      setNewName('');
+      setNewSalary('');
+      setNewContact('');
+      setNewEmail('');
+      setShowAddModal(false);
+    },
+    onError: () => toast.error('Failed to onboard staff')
+  });
+
   const filteredCrew = crew.filter(member => {
     const matchesCategory = selectedRoleFilter === 'All' || member.role === selectedRoleFilter;
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -104,20 +144,14 @@ export const StaffManagement: React.FC = () => {
   });
 
   const handleUpdateStatus = (memberId: string, nextStatus: 'Clocked In' | 'On Break' | 'Off-Duty') => {
-    setCrew(prev => prev.map(m => {
-      if (m.id === memberId) {
-        return { ...m, status: nextStatus };
-      }
-      return m;
-    }));
+    updateStaffMutation.mutate({ id: memberId, data: { status: nextStatus } });
   };
 
   const handleOnboardStaff = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newSalary || !newContact) return;
 
-    const newMember: StaffMember = {
-      id: 'ST' + (crew.length + 1),
+    addStaffMutation.mutate({
       name: newName,
       role: newRole,
       shift: newShift,
@@ -127,17 +161,12 @@ export const StaffManagement: React.FC = () => {
       email: newEmail || `${newName.toLowerCase().replace(/\s/g, '')}@indiserve.pro`,
       score: Number(newScore) || 5.0,
       image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newName}`
-    };
-
-    setCrew([...crew, newMember]);
-
-    // Reset Form
-    setNewName('');
-    setNewSalary('');
-    setNewContact('');
-    setNewEmail('');
-    setShowAddModal(false);
+    });
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div></div>;
+  }
 
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">

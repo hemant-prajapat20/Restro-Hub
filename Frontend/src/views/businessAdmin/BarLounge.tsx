@@ -122,8 +122,12 @@ const INITIAL_BAR_ITEMS: LiquorItem[] = [
   }
 ];
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+
 export const BarLounge: React.FC = () => {
-  const [items, setItems] = useState<LiquorItem[]>(INITIAL_BAR_ITEMS);
+  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -150,6 +154,14 @@ export const BarLounge: React.FC = () => {
   const [newOrigin, setNewOrigin] = useState('');
   const [newCapacity, setNewCapacity] = useState('750');
 
+  const { data: items = [], isLoading } = useQuery<LiquorItem[]>({
+    queryKey: ['liquorItems'],
+    queryFn: async () => {
+      const response = await api.get('/barlounge/liquor');
+      return response.data.map((item: any) => ({ ...item, id: item._id }));
+    }
+  });
+
   const filteredItems = items.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -157,111 +169,68 @@ export const BarLounge: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const addLiquorMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/barlounge/liquor', data);
+    },
+    onSuccess: () => {
+      toast.success('Liquor item added successfully');
+      queryClient.invalidateQueries({ queryKey: ['liquorItems'] });
+      setNewName('');
+      setNewVintage('');
+      setNewAbv('');
+      setNewPrice('');
+      setNewStock('');
+      setNewOrigin('');
+      setNewCapacity('750');
+      setShowAddModal(false);
+    },
+    onError: () => toast.error('Failed to add liquor item')
+  });
+
+  const dispenseGlassMutation = useMutation({
+    mutationFn: async ({ id, stockBottles }: { id: string, stockBottles: number }) => {
+      await api.put(`/barlounge/liquor/${id}/stock`, { stockBottles });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquorItems'] });
+    }
+  });
+
+  const checkoutBarMutation = useMutation({
+    mutationFn: async (cartData: any[]) => {
+      await api.post('/barlounge/checkout', { cart: cartData });
+    },
+    onSuccess: () => {
+      toast.success('Bar checkout successful');
+      queryClient.invalidateQueries({ queryKey: ['liquorItems'] });
+      setCart([]);
+    },
+    onError: () => toast.error('Failed to checkout')
+  });
+
   // Sommelier Manual Pour Dispense Handler
   const handleDispenseGlass = (id: string) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        if (item.stockBottles > 0) {
-          const logEntry = {
-            name: item.name,
-            timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            tables: `Table #${Math.floor(Math.random() * 8) + 1}`
-          };
-          setDispenseLog(prevLog => [logEntry, ...prevLog.slice(0, 9)]);
-          // Decrement stock fractionally or logically (e.g. 1 glass poured, bottle decreases after 5-10 pours. Let's just decrease stock bottle after 5 clicks, or simply do standard reduction)
-          const isBottleFinished = Math.random() > 0.8; 
-          return { 
-            ...item, 
-            stockBottles: isBottleFinished ? Math.max(0, item.stockBottles - 1) : item.stockBottles 
-          };
-        }
+    const item = items.find(i => i.id === id);
+    if (item && item.stockBottles > 0) {
+      const logEntry = {
+        name: item.name,
+        timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        tables: `Table #${Math.floor(Math.random() * 8) + 1}`
+      };
+      setDispenseLog(prevLog => [logEntry, ...prevLog.slice(0, 9)]);
+      
+      const isBottleFinished = Math.random() > 0.8; 
+      if (isBottleFinished) {
+        dispenseGlassMutation.mutate({ id, stockBottles: Math.max(0, item.stockBottles - 1) });
       }
-      return item;
-    }));
-  };
-
-  // Cart operations
-  const addToCart = (item: LiquorItem) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.item.id === item.id);
-      if (existing) {
-        return prev.map(i => i.item.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
-      }
-      return [...prev, { item, quantity: 1, mixer: 'Neat', pourSize: 'Single', notes: '' }];
-    });
-  };
-
-  const removeOneFromCart = (itemId: string) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.item.id === itemId);
-      if (!existing) return prev;
-      if (existing.quantity === 1) {
-        return prev.filter(i => i.item.id !== itemId);
-      }
-      return prev.map(i => i.item.id === itemId ? { ...i, quantity: i.quantity - 1 } : i);
-    });
-  };
-
-  const updateCartModifier = (itemId: string, field: 'mixer' | 'pourSize' | 'notes', value: string) => {
-    setCart(prev => prev.map(i => i.item.id === itemId ? { ...i, [field]: value } : i));
-  };
-
-  const applyLoyaltyDiscount = () => {
-    const code = discountCode.toUpperCase().trim();
-    if (code === 'MAISONVIP') {
-      setAppliedDiscount(20);
-    } else if (code === 'BAR10') {
-      setAppliedDiscount(10);
-    } else if (code === 'AMEXROYAL') {
-      setAppliedDiscount(15);
-    } else {
-      setAppliedDiscount(0);
     }
   };
-
-  const getItemPrice = (cartItem: { item: LiquorItem; pourSize: string; mixer: string }) => {
-    const basePrice = cartItem.item.pricePerGlass;
-    let multiplier = 1.0;
-    if (cartItem.pourSize === 'Double') multiplier = 1.8;
-    if (cartItem.pourSize === 'Full Bottle') multiplier = 5.0;
-
-    let mixerSurcharge = 0;
-    if (cartItem.mixer === 'Artisanal Ice Sphere') mixerSurcharge = 40;
-    if (cartItem.mixer === 'Fever Tree Tonic') mixerSurcharge = 100;
-    if (cartItem.mixer === 'Ginger Ale') mixerSurcharge = 80;
-    if (cartItem.mixer === 'Premium Gold Soda') mixerSurcharge = 50;
-
-    return Math.round((basePrice * multiplier) + mixerSurcharge);
-  };
-
-  const cartSubtotal = cart.reduce((sum, cartItem) => {
-    const itemPrice = getItemPrice(cartItem);
-    return sum + (itemPrice * cartItem.quantity);
-  }, 0);
-
-  const discountAmount = Math.round(cartSubtotal * (appliedDiscount / 100));
-  const amountAfterDiscount = cartSubtotal - discountAmount;
-  const serviceCharge = Math.round(amountAfterDiscount * 0.10); // Luxury 10% Service Charge
-  const cgst = Math.round(amountAfterDiscount * 0.09); // Standard luxury cellars 9% GCST
-  const sgst = Math.round(amountAfterDiscount * 0.09); // Standard luxury cellars 9% SGST
-  const cartTotal = amountAfterDiscount + serviceCharge + cgst + sgst;
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
-    // Settle stock decrement representation
-    setItems(prevItems => prevItems.map(item => {
-      const cartItem = cart.find(ci => ci.item.id === item.id);
-      if (cartItem) {
-        // Bottle purchase reduces bottle directly. Glass purchase reduces after multiple quantity orders
-        const reduction = cartItem.pourSize === 'Full Bottle' ? cartItem.quantity : Math.ceil(cartItem.quantity / 5);
-        return {
-          ...item,
-          stockBottles: Math.max(0, item.stockBottles - reduction)
-        };
-      }
-      return item;
-    }));
+    checkoutBarMutation.mutate(cart);
 
     // Generate Invoice receipt
     const invoiceNum = 'MSN-BAR-' + Math.floor(100000 + Math.random() * 900000);
@@ -281,17 +250,13 @@ export const BarLounge: React.FC = () => {
       payment: paymentMethod,
       mixologist: 'Alba Thorne (Head Sommelier)'
     });
-
-    // Clear cart docket
-    setCart([]);
   };
 
   const handleAddLiquor = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newPrice || !newStock) return;
 
-    const newItem: LiquorItem = {
-      id: 'B' + (items.length + 1),
+    addLiquorMutation.mutate({
       name: newName,
       vintage: newVintage || 'Premium Reserve',
       category: newCategory,
@@ -303,19 +268,7 @@ export const BarLounge: React.FC = () => {
       image: newCategory === 'Vintage Wine' 
         ? 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=400&fit=crop'
         : 'https://images.unsplash.com/photo-1527061011665-3652c757a4d5?w=400&h=400&fit=crop'
-    };
-
-    setItems([...items, newItem]);
-    
-    // Reset Acquisition Form
-    setNewName('');
-    setNewVintage('');
-    setNewAbv('');
-    setNewPrice('');
-    setNewStock('');
-    setNewOrigin('');
-    setNewCapacity('750');
-    setShowAddModal(false);
+    });
   };
 
   return (

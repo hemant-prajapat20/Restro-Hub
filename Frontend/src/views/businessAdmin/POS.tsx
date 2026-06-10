@@ -16,7 +16,9 @@ import {
   FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_MENU } from '../../mockData';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import api from '../../utils/api';
 import { MenuItem, OrderItem } from '../../types';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
@@ -28,14 +30,47 @@ export const POS: React.FC = () => {
   const [orderState, setOrderState] = useState<'idle' | 'sending' | 'submitted'>('idle');
   const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'Card' | 'UPI' | 'Wallet' | null>(null);
 
-  const categories = ['All', ...Array.from(new Set(MOCK_MENU.map(item => item.category)))];
+  const { data: menuItems = [], isLoading, isError } = useQuery<MenuItem[]>({
+    queryKey: ['menuItems'],
+    queryFn: async () => {
+      const response = await api.get('/menu');
+      return response.data;
+    }
+  });
+
+  const orderMutation = useMutation({
+    mutationFn: async (orderData: any) => {
+      const response = await api.post('/orders', orderData);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success('Order completed successfully!');
+      setOrderState('submitted');
+    },
+    onError: () => {
+      toast.error('Failed to create order');
+      setOrderState('idle');
+    }
+  });
+
+  const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
 
   const handleSendToKitchen = () => {
+    if (cart.length === 0) return;
     setOrderState('sending');
-    setTimeout(() => {
-      setOrderState('submitted');
-      // In a real app, this would hit the API and update the KDS view/DB
-    }, 1500);
+    orderMutation.mutate({
+      type: 'POS',
+      items: cart.map(c => ({
+        menuItem: c.itemId,
+        name: c.name,
+        quantity: c.quantity,
+        price: c.price
+      })),
+      subtotal: subTotal,
+      tax: sgst + cgst,
+      total: total,
+      status: 'In Kitchen'
+    });
   };
 
   const handleResetOrder = () => {
@@ -46,12 +81,12 @@ export const POS: React.FC = () => {
   };
 
   const filteredItems = useMemo(() => {
-    return MOCK_MENU.filter(item => {
+    return menuItems.filter(item => {
       const matchCategory = activeCategory === 'All' || item.category === activeCategory;
       const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, menuItems]);
 
   const addToCart = (item: MenuItem) => {
     setCart(prev => {
@@ -194,7 +229,7 @@ export const POS: React.FC = () => {
                   </button>
                   <span className="text-xs font-semibold w-4 text-center">{item.quantity}</span>
                   <button 
-                    onClick={() => addToCart(MOCK_MENU.find(m => m.id === item.itemId)!)}
+                    onClick={() => addToCart(menuItems.find(m => m.id === item.itemId || (m as any)._id === item.itemId)!)}
                     className="p-1 hover:bg-slate-100 rounded text-slate-500"
                   >
                     <Plus size={14} />
@@ -378,12 +413,28 @@ export const POS: React.FC = () => {
                         paymentMethod: paymentMethod || 'Cash'
                       });
 
-                      alert('Receipt PDF Generated and Downloaded Successfully!');
+                      // Also hit backend to save order
+                      orderMutation.mutate({
+                        type: 'POS',
+                        items: cart.map(c => ({
+                          menuItem: c.itemId,
+                          name: c.name,
+                          quantity: c.quantity,
+                          price: c.price,
+                          status: 'Served'
+                        })),
+                        subtotal: subTotal,
+                        tax: sgst + cgst,
+                        total: total,
+                        paymentMethod: paymentMethod || 'Cash',
+                        status: 'Completed'
+                      });
+
                       setCart([]);
                       setShowCheckout(false);
                       setPaymentMethod(null);
                     }}
-                    disabled={!paymentMethod}
+                    disabled={!paymentMethod || orderMutation.isPending}
                     className="flex-[2] bg-brand-success hover:bg-brand-success/90 disabled:bg-slate-300 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-success/20 transition-all"
                   >
                     COMPLETE & DOWNLOAD PDF

@@ -91,9 +91,12 @@ const INITIAL_PDRS: PrivateDiningRoom[] = [
   { id: 'P3', name: 'Maison Glass Gazebo (PDR 3)', capacity: 6, status: 'Available', activeBill: 0, minSpend: 10000, notes: 'Panoramic sky-view with personal sommelier service' }
 ];
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+
 export const RestroSignature: React.FC = () => {
-  const [signatures, setSignatures] = useState<SignatureItem[]>(INITIAL_SIGNATURES);
-  const [pdrs, setPdrs] = useState<PrivateDiningRoom[]>(INITIAL_PDRS);
+  const queryClient = useQueryClient();
   const [showAddDishModal, setShowAddDishModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<PrivateDiningRoom | null>(null);
 
@@ -160,20 +163,64 @@ export const RestroSignature: React.FC = () => {
   const sgst = Math.round(amountAfterDiscount * 0.09); // 9% SGST
   const cartTotal = amountAfterDiscount + serviceCharge + cgst + sgst;
 
+  const { data: signatures = [], isLoading: loadingSignatures } = useQuery<SignatureItem[]>({
+    queryKey: ['signatures'],
+    queryFn: async () => {
+      const response = await api.get('/restro/signatures');
+      return response.data.map((item: any) => ({ ...item, id: item._id }));
+    }
+  });
+
+  const { data: pdrs = [], isLoading: loadingPdrs } = useQuery<PrivateDiningRoom[]>({
+    queryKey: ['pdrs'],
+    queryFn: async () => {
+      const response = await api.get('/restro/pdrs');
+      return response.data.map((item: any) => ({ ...item, id: item._id }));
+    }
+  });
+
+  const addSignatureMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/restro/signatures', data);
+    },
+    onSuccess: () => {
+      toast.success('Signature dish added successfully');
+      queryClient.invalidateQueries({ queryKey: ['signatures'] });
+      setNewDishName('');
+      setNewDescription('');
+      setNewPrice('');
+      setNewChef('');
+      setShowAddDishModal(false);
+    },
+    onError: () => toast.error('Failed to add signature dish')
+  });
+
+  const updatePdrStatusMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      await api.put(`/restro/pdrs/${id}/status`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pdrs'] });
+    }
+  });
+
+  const checkoutPdrMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      await api.post(`/restro/pdrs/${id}/checkout`, data);
+    },
+    onSuccess: () => {
+      toast.success('PDR Checkout Successful');
+      queryClient.invalidateQueries({ queryKey: ['pdrs'] });
+      setCart([]);
+    },
+    onError: () => toast.error('Failed to checkout PDR')
+  });
+
   const handleRestroCheckout = () => {
     if (cart.length === 0) return;
 
-    // Update target PDR state & add transaction bill amount
-    setPdrs(prev => prev.map(room => {
-      if (room.id === targetRoomId) {
-        return {
-          ...room,
-          status: 'Occupied',
-          activeBill: room.activeBill + cartTotal
-        };
-      }
-      return room;
-    }));
+    // Checkout API
+    checkoutPdrMutation.mutate({ id: targetRoomId, data: { totalBill: cartTotal } });
 
     // Generate Imperial fine-dining receipt
     const invoiceNum = 'ROYAL-POS-' + Math.floor(100000 + Math.random() * 900000);
@@ -193,17 +240,13 @@ export const RestroSignature: React.FC = () => {
       payment: paymentMethod,
       chef: 'Ranveer Brar (Executive Chef)'
     });
-
-    // Reset active cart
-    setCart([]);
   };
 
   const handleCreateSignature = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDishName || !newPrice || !newChef) return;
 
-    const newItem: SignatureItem = {
-      id: 'S' + (signatures.length + 1),
+    addSignatureMutation.mutate({
       name: newDishName,
       description: newDescription || 'Premium Chef Signature Masterpiece',
       course: newCourse,
@@ -214,29 +257,11 @@ export const RestroSignature: React.FC = () => {
       image: newIsVeg 
         ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop'
         : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop'
-    };
-
-    setSignatures([...signatures, newItem]);
-    
-    // Reset Form & Close Modal
-    setNewDishName('');
-    setNewDescription('');
-    setNewPrice('');
-    setNewChef('');
-    setShowAddDishModal(false);
+    });
   };
 
   const handleToggleRoomStatus = (roomId: string, newStatus: 'Available' | 'Occupied' | 'Reserved') => {
-    setPdrs(prev => prev.map(room => {
-      if (room.id === roomId) {
-        return { 
-          ...room, 
-          status: newStatus,
-          activeBill: newStatus === 'Available' ? 0 : room.activeBill 
-        };
-      }
-      return room;
-    }));
+    updatePdrStatusMutation.mutate({ id: roomId, data: { status: newStatus, activeBill: newStatus === 'Available' ? 0 : undefined } });
     setSelectedRoom(null);
   };
 

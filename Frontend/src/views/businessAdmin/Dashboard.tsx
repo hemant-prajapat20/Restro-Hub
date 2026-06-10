@@ -27,22 +27,8 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
-const salesData = [
-  { name: '10 AM', sales: 4500 },
-  { name: '12 PM', sales: 12000 },
-  { name: '2 PM', sales: 18000 },
-  { name: '4 PM', sales: 6000 },
-  { name: '6 PM', sales: 15000 },
-  { name: '8 PM', sales: 28000 },
-  { name: '10 PM', sales: 22000 },
-];
-
-const categoryData = [
-  { name: 'Main Course', value: 45, color: '#0F172A' },
-  { name: 'Starters', value: 25, color: '#F97316' },
-  { name: 'Beverages', value: 20, color: '#38BDF8' },
-  { name: 'Desserts', value: 10, color: '#22C55E' },
-];
+import { useQuery } from '@tanstack/react-query';
+import api from '../../utils/api';
 
 const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => (
   <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-start justify-between h-full">
@@ -66,13 +52,27 @@ const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => 
 );
 
 export const Dashboard: React.FC = () => {
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['businessAnalytics'],
+    queryFn: async () => {
+      const response = await api.get('/analytics/business');
+      return response.data.data;
+    }
+  });
+
+  if (isLoading) {
+    return <div className="p-8 flex justify-center items-center h-[calc(100vh-80px)]">Loading Dashboard...</div>;
+  }
+
+  const { dailyRevenue, totalOrders, activeCustomers, avgTableTurnTime, salesData, categoryData } = analytics;
+
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Daily Revenue" 
-          value="₹42,850" 
+          value={`₹${dailyRevenue.toLocaleString()}`} 
           subValue="vs yesterday" 
           trend={12.5} 
           icon={CreditCard}
@@ -80,7 +80,7 @@ export const Dashboard: React.FC = () => {
         />
         <StatCard 
           title="Total Orders" 
-          value="184" 
+          value={totalOrders} 
           subValue="vs average" 
           trend={4.2} 
           icon={ShoppingBag}
@@ -88,7 +88,7 @@ export const Dashboard: React.FC = () => {
         />
         <StatCard 
           title="Active Customers" 
-          value="42" 
+          value={activeCustomers} 
           subValue="current dining" 
           trend={-2.1} 
           icon={Users}
@@ -96,7 +96,7 @@ export const Dashboard: React.FC = () => {
         />
         <StatCard 
           title="Avg. Table Turn Time" 
-          value="45m" 
+          value={avgTableTurnTime} 
           subValue="target 40m" 
           trend={-8.4} 
           icon={Timer}
@@ -117,8 +117,8 @@ export const Dashboard: React.FC = () => {
               <option>Yesterday</option>
             </select>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[300px] w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
               <AreaChart data={salesData}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
@@ -187,9 +187,9 @@ export const Dashboard: React.FC = () => {
         {/* Category Breakdown */}
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
-           <div className="flex items-center gap-8 h-[250px]">
-             <div className="w-1/2 h-full">
-               <ResponsiveContainer width="100%" height="100%">
+           <div className="flex items-center gap-8 h-[250px] min-w-0">
+             <div className="w-1/2 h-full min-w-0">
+               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={250}>
                  <PieChart>
                    <Pie
                      data={categoryData}

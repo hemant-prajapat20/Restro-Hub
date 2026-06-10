@@ -93,8 +93,12 @@ interface CartItem {
   notes: string;
 }
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+
 export const CafeBakery: React.FC = () => {
-  const [items, setItems] = useState<CafeItem[]>(INITIAL_CAFE_ITEMS);
+  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -124,6 +128,14 @@ export const CafeBakery: React.FC = () => {
   const [newTime, setNewTime] = useState('');
   const [newScore, setNewScore] = useState('');
 
+  const { data: items = [], isLoading } = useQuery<CafeItem[]>({
+    queryKey: ['cafeItems'],
+    queryFn: async () => {
+      const response = await api.get('/cafebakery/items');
+      return response.data.map((item: any) => ({ ...item, id: item._id }));
+    }
+  });
+
   const filteredItems = items.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -144,21 +156,57 @@ export const CafeBakery: React.FC = () => {
     }, 1000);
   };
 
+  const addCafeItemMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/cafebakery/items', data);
+    },
+    onSuccess: () => {
+      toast.success('Cafe item added successfully');
+      queryClient.invalidateQueries({ queryKey: ['cafeItems'] });
+      setNewName('');
+      setNewOrigin('');
+      setNewPrice('');
+      setNewStock('');
+      setNewTime('');
+      setNewScore('');
+      setShowAddModal(false);
+    },
+    onError: () => toast.error('Failed to add cafe item')
+  });
+
+  const updateCafeStockMutation = useMutation({
+    mutationFn: async ({ id, stockCount }: { id: string, stockCount: number }) => {
+      await api.put(`/cafebakery/items/${id}/stock`, { stockCount });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cafeItems'] });
+    }
+  });
+
+  const checkoutCafeMutation = useMutation({
+    mutationFn: async (cartData: any[]) => {
+      await api.post('/cafebakery/checkout', { cart: cartData });
+    },
+    onSuccess: () => {
+      toast.success('Cafe checkout successful');
+      queryClient.invalidateQueries({ queryKey: ['cafeItems'] });
+      setCart([]);
+    },
+    onError: () => toast.error('Failed to checkout cafe')
+  });
+
   const handleSettleItem = (id: string) => {
-    setItems(prev => prev.map(item => {
-      if (item.id === id) {
-        return { ...item, stockCount: Math.max(0, item.stockCount - 1) };
-      }
-      return item;
-    }));
+    const item = items.find(i => i.id === id);
+    if (item && item.stockCount > 0) {
+      updateCafeStockMutation.mutate({ id, stockCount: Math.max(0, item.stockCount - 1) });
+    }
   };
 
   const handleAddArtisanItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newPrice || !newStock) return;
 
-    const newItem: CafeItem = {
-      id: 'C' + (items.length + 1),
+    addCafeItemMutation.mutate({
       name: newName,
       category: newCategory,
       originOrType: newOrigin || 'Gourmet Selection',
@@ -169,18 +217,7 @@ export const CafeBakery: React.FC = () => {
       image: newCategory === 'Artisan Patisserie'
         ? 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=400&fit=crop'
         : 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=400&fit=crop'
-    };
-
-    setItems([...items, newItem]);
-
-    // Reset Form
-    setNewName('');
-    setNewOrigin('');
-    setNewPrice('');
-    setNewStock('');
-    setNewTime('');
-    setNewScore('');
-    setShowAddModal(false);
+    });
   };
 
   // Cart operations
@@ -236,14 +273,7 @@ export const CafeBakery: React.FC = () => {
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
-    // Deduct stock
-    setItems(prev => prev.map(p => {
-      const cartMatched = cart.find(ci => ci.item.id === p.id);
-      if (cartMatched) {
-        return { ...p, stockCount: Math.max(0, p.stockCount - cartMatched.quantity) };
-      }
-      return p;
-    }));
+    checkoutCafeMutation.mutate(cart);
 
     // Create virtual physical receipt
     const receipt = {
@@ -262,7 +292,6 @@ export const CafeBakery: React.FC = () => {
     };
 
     setCheckoutReceipt(receipt);
-    setCart([]); // Reset Cart
   };
 
   return (

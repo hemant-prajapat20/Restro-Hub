@@ -26,7 +26,10 @@ import {
   FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_TABLES, MOCK_MENU } from '../../mockData';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+import { MOCK_MENU } from '../../mockData';
 import { Table, TableStatus, MenuItem } from '../../types';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
@@ -46,10 +49,45 @@ const StatusBadge = ({ status }: { status: TableStatus }) => {
 };
 
 export const Tables: React.FC = () => {
-  const [tables, setTables] = useState<Table[]>(MOCK_TABLES);
+  const queryClient = useQueryClient();
   const [activeFloor, setActiveFloor] = useState(1);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [showAddTableModal, setShowAddTableModal] = useState(false);
+
+  // Form states for new table
+  const [newTableIdentifier, setNewTableIdentifier] = useState('');
+  const [newTableCapacity, setNewTableCapacity] = useState(4);
+  const [newTableFloor, setNewTableFloor] = useState(1);
+
+  const { data: tables = [], isLoading } = useQuery<Table[]>({
+    queryKey: ['tables'],
+    queryFn: async () => {
+      const response = await api.get('/tables');
+      return response.data;
+    }
+  });
+
+  const updateTableMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      await api.put(`/tables/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+    }
+  });
+
+  const addTableMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/tables', data);
+    },
+    onSuccess: () => {
+      toast.success('Table added successfully');
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      setShowAddTableModal(false);
+      setNewTableIdentifier('');
+    },
+    onError: () => toast.error('Failed to add table')
+  });
 
   // Dynamic table billing state
   const [tableOrders, setTableOrders] = useState<Record<string, { itemId: string; name: string; price: number; quantity: number }[]>>({
@@ -142,7 +180,7 @@ export const Tables: React.FC = () => {
   };
 
   const setTableStatus = (tableId: string, status: TableStatus) => {
-    setTables(prev => prev.map(t => t.id === tableId ? { ...t, status } : t));
+    updateTableMutation.mutate({ id: tableId, data: { status } });
   };
 
   const verifyDiscount = () => {
@@ -180,7 +218,7 @@ export const Tables: React.FC = () => {
     });
 
     // Reset table order and mark table as 'Cleaning'
-    setTables(prev => prev.map(t => t.id === tableId ? { ...t, status: 'Cleaning' } : t));
+    updateTableMutation.mutate({ id: tableId, data: { status: 'Cleaning' } });
     setTableOrders(prev => {
       const copy = { ...prev };
       delete copy[tableId];
@@ -200,6 +238,10 @@ export const Tables: React.FC = () => {
                           item.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div></div>;
+  }
 
   return (
     <div className="p-8 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
@@ -692,28 +734,62 @@ export const Tables: React.FC = () => {
                   <div className="space-y-6">
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Identifier</label>
-                        <input type="text" placeholder="e.g. 15, V1, T10" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl" />
+                        <input 
+                           type="text" 
+                           placeholder="e.g. 15, V1, T10" 
+                           value={newTableIdentifier}
+                           onChange={e => setNewTableIdentifier(e.target.value)}
+                           className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl" 
+                        />
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Guest Capacity</label>
-                        <select className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl">
-                           <option>2 Seater</option>
-                           <option>4 Seater</option>
-                           <option>6 Seater</option>
-                           <option>8 Seater (Royal)</option>
+                        <select 
+                           value={newTableCapacity}
+                           onChange={e => setNewTableCapacity(Number(e.target.value))}
+                           className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl"
+                        >
+                           <option value={2}>2 Seater</option>
+                           <option value={4}>4 Seater</option>
+                           <option value={6}>6 Seater</option>
+                           <option value={8}>8 Seater (Royal)</option>
                         </select>
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Floor Assignment</label>
                         <div className="flex gap-2">
-                           <button className="flex-1 py-4 bg-brand-primary text-white rounded-2xl font-semibold text-xs uppercase tracking-widest">Ground</button>
-                           <button className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-semibold text-xs uppercase tracking-widest">Terrace</button>
+                           <button 
+                              onClick={() => setNewTableFloor(1)}
+                              className={`flex-1 py-4 rounded-2xl font-semibold text-xs uppercase tracking-widest ${newTableFloor === 1 ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400'}`}
+                           >
+                              Ground
+                           </button>
+                           <button 
+                              onClick={() => setNewTableFloor(2)}
+                              className={`flex-1 py-4 rounded-2xl font-semibold text-xs uppercase tracking-widest ${newTableFloor === 2 ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400'}`}
+                           >
+                              Terrace
+                           </button>
                         </div>
                      </div>
                   </div>
                   <div className="flex gap-4 mt-10">
                      <button onClick={() => setShowAddTableModal(false)} className="flex-1 py-4 font-semibold text-slate-400">DISCARD</button>
-                     <button onClick={() => setShowAddTableModal(false)} className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20">PROVISION TABLE</button>
+                     <button 
+                        onClick={() => {
+                           if (!newTableIdentifier) return toast.error('Table Identifier is required');
+                           addTableMutation.mutate({
+                              number: newTableIdentifier,
+                              capacity: newTableCapacity,
+                              floor: newTableFloor,
+                              status: 'Available'
+                           });
+                        }}
+                        disabled={addTableMutation.isPending}
+                        className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
+                     >
+                        {addTableMutation.isPending ? 'PROVISIONING...' : 'PROVISION TABLE'}
+                     </button>
                   </div>
                </motion.div>
             </div>

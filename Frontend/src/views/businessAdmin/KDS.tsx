@@ -12,31 +12,65 @@ import {
   Timer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MOCK_ORDERS } from '../../mockData';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
 
 type OrderStatus = 'New' | 'Preparing' | 'Ready' | 'Completed';
 
 export const KDS: React.FC = () => {
-  const [orders, setOrders] = useState(MOCK_ORDERS.map(o => ({
-    ...o,
-    status: o.status as OrderStatus,
-    completedItems: [] as string[]
-  })));
+  const queryClient = useQueryClient();
+  const [completedItemsMap, setCompletedItemsMap] = useState<Record<string, string[]>>({});
 
-  const handleToggleItem = (orderId: string, itemId: string) => {
-    setOrders(prev => prev.map(order => {
-      if (order.id !== orderId) return order;
-      const completed = order.completedItems.includes(itemId)
-        ? order.completedItems.filter(id => id !== itemId)
-        : [...order.completedItems, itemId];
-      return { ...order, completedItems: completed };
+  const { data: rawOrders = [], isLoading } = useQuery({
+    queryKey: ['kdsOrders'],
+    queryFn: async () => {
+      const response = await api.get('/orders');
+      return response.data;
+    },
+    refetchInterval: 5000 // auto refresh every 5s for KDS
+  });
+
+  const orders = rawOrders
+    .filter((o: any) => o.status !== 'Completed' && o.status !== 'Cancelled' && o.status !== 'Out for Delivery')
+    .map((o: any) => ({
+      id: o._id.toString().slice(-4).toUpperCase(),
+      dbId: o._id,
+      tableId: o.tableId?.name || (o.type === 'Delivery' ? 'DELIVERY' : 'TAKEAWAY'),
+      type: o.type,
+      status: o.status === 'Pending' ? 'New' : o.status === 'In Kitchen' ? 'Preparing' : o.status === 'Ready' ? 'Ready' : o.status,
+      items: o.items.map((i: any) => ({ itemId: i._id, name: i.name, quantity: i.quantity, notes: '' })),
+      completedItems: completedItemsMap[o._id] || []
     }));
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => {
+      // Map frontend status to backend status
+      let backendStatus = status;
+      if (status === 'New') backendStatus = 'Pending';
+      if (status === 'Preparing') backendStatus = 'In Kitchen';
+      if (status === 'Completed') backendStatus = 'Completed';
+      
+      await api.put(`/orders/${id}/status`, { status: backendStatus });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['kdsOrders'] });
+    },
+    onError: () => toast.error('Failed to update order status')
+  });
+
+  const handleToggleItem = (orderDbId: string, itemId: string) => {
+    setCompletedItemsMap(prev => {
+      const existing = prev[orderDbId] || [];
+      const updated = existing.includes(itemId)
+        ? existing.filter(id => id !== itemId)
+        : [...existing, itemId];
+      return { ...prev, [orderDbId]: updated };
+    });
   };
 
-  const updateOrderStatus = (orderId: string, status: OrderStatus) => {
-    setOrders(prev => prev.map(order => 
-      order.id === orderId ? { ...order, status } : order
-    ));
+  const updateOrderStatus = (orderDbId: string, status: OrderStatus) => {
+    updateStatusMutation.mutate({ id: orderDbId, status });
   };
 
   const getStatusColor = (status: OrderStatus) => {
@@ -120,7 +154,7 @@ export const KDS: React.FC = () => {
                   return (
                     <motion.div 
                       key={item.itemId} 
-                      onClick={() => handleToggleItem(order.id, item.itemId)}
+                      onClick={() => handleToggleItem(order.dbId, item.itemId)}
                       className={`flex items-start gap-4 cursor-pointer group transition-all p-2 rounded-2xl ${isCompleted ? 'bg-black/20 opacity-50' : 'hover:bg-white/5'}`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-semibold transition-all border ${
@@ -144,28 +178,31 @@ export const KDS: React.FC = () => {
               </div>
 
               {/* Ticket Footer Actions */}
-              <div className="p-6 bg-black/30 rounded-b-[32px] border-t border-white/5 flex gap-3">
+               <div className="p-6 bg-black/30 rounded-b-[32px] border-t border-white/5 flex gap-3">
                  {order.status === 'New' ? (
                    <button 
-                     onClick={() => updateOrderStatus(order.id, 'Preparing')}
+                     onClick={() => updateOrderStatus(order.dbId, 'Preparing')}
                      className="flex-1 py-4 bg-brand-accent text-white rounded-2xl text-xs font-semibold uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-brand-accent/20"
                    >
                      START COOKING
                    </button>
                  ) : order.status === 'Preparing' ? (
                    <button 
-                     onClick={() => updateOrderStatus(order.id, 'Ready')}
+                     onClick={() => updateOrderStatus(order.dbId, 'Ready')}
                      className="flex-1 py-4 bg-brand-success text-white rounded-2xl text-xs font-semibold uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-brand-success/20"
                    >
                      MARK AS READY
                    </button>
                  ) : (
                    <div className="flex-1 flex gap-2">
-                     <button className="flex-1 py-4 bg-slate-800 text-white rounded-2xl text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-2">
+                     <button 
+                       onClick={() => updateOrderStatus(order.dbId, 'Completed')}
+                       className="flex-1 py-4 bg-slate-800 text-white rounded-2xl text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-2"
+                     >
                         <CheckCircle2 size={16} /> PICKED UP
                      </button>
                      <button 
-                       onClick={() => updateOrderStatus(order.id, 'Preparing')}
+                       onClick={() => updateOrderStatus(order.dbId, 'Preparing')}
                        className="w-14 h-14 bg-white/5 text-slate-500 rounded-2xl flex items-center justify-center hover:text-white"
                      >
                        <RotateCcw size={20} />

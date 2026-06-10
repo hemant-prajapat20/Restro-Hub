@@ -15,9 +15,12 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_INVENTORY } from '../../mockData';
 import { InventoryItem } from '../../types';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
 
 export const Inventory: React.FC = () => {
-  const [inventoryList, setInventoryList] = useState<InventoryItem[]>(MOCK_INVENTORY);
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -29,6 +32,43 @@ export const Inventory: React.FC = () => {
   const [newMinStock, setNewMinStock] = useState('');
   const [newCategory, setNewCategory] = useState('Essentials');
 
+  const { data: inventoryList = [], isLoading } = useQuery<InventoryItem[]>({
+    queryKey: ['inventory'],
+    queryFn: async () => {
+      const response = await api.get('/inventory');
+      return response.data.map((item: any) => ({
+        ...item,
+        id: item._id,
+        currentStock: item.quantity,
+        minStock: item.minThreshold
+      }));
+    }
+  });
+
+  const addInventoryMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/inventory', data);
+    },
+    onSuccess: () => {
+      toast.success('Inventory item added successfully');
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      setNewName('');
+      setNewStock('');
+      setNewMinStock('');
+      setShowAddModal(false);
+    },
+    onError: () => toast.error('Failed to add inventory item')
+  });
+
+  const updateInventoryMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      await api.put(`/inventory/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+    }
+  });
+
   const categories = ['All', ...Array.from(new Set(inventoryList.map(item => item.category)))];
 
   const filteredInventory = inventoryList.filter(item => {
@@ -39,53 +79,31 @@ export const Inventory: React.FC = () => {
   });
 
   const handleQuickAddStock = (id: string) => {
-    setInventoryList(prev => prev.map(item => {
-      if (item.id === id) {
-        return { 
-          ...item, 
-          currentStock: item.currentStock + 10,
-          lastUpdated: new Date()
-        };
-      }
-      return item;
-    }));
+    const item = inventoryList.find(i => i.id === id || (i as any)._id === id);
+    if (item) {
+      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: (item.quantity || (item as any).currentStock) + 10 } });
+    }
   };
 
   const handleQuickDispatch = (id: string) => {
-    setInventoryList(prev => prev.map(item => {
-      if (item.id === id) {
-        return { 
-          ...item, 
-          currentStock: Math.max(0, item.currentStock - 5),
-          lastUpdated: new Date()
-        };
-      }
-      return item;
-    }));
+    const item = inventoryList.find(i => i.id === id || (i as any)._id === id);
+    if (item) {
+      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: Math.max(0, (item.quantity || (item as any).currentStock) - 5) } });
+    }
   };
 
   const handleCreateInventoryItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newStock || !newMinStock) return;
 
-    const newItem: InventoryItem = {
-      id: 'I' + (inventoryList.length + 1),
+    addInventoryMutation.mutate({
       name: newName,
       unit: newUnit,
-      currentStock: Number(newStock),
-      minStock: Number(newMinStock),
+      quantity: Number(newStock),
+      minThreshold: Number(newMinStock),
       category: newCategory,
-      lastUpdated: new Date()
-    };
-
-    setInventoryList([...inventoryList, newItem]);
-
-    // Reset Form & Close
-    setNewName('');
-    setNewUnit('kg');
-    setNewStock('');
-    setNewMinStock('');
-    setShowAddModal(false);
+      vendor: 'Local Vendor' // Default vendor since we don't have an input for it
+    });
   };
 
   // Luxury Inventory KPI metrics

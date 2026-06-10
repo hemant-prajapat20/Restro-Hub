@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSuperAdminAnalytics } from '../controllers/analytics.controller';
+import { getSuperAdminAnalytics, getBusinessAnalytics, getBusinessReports } from '../controllers/analytics.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 import { Role } from '../models/User';
 
@@ -7,5 +7,11 @@ const router = express.Router();
 
 router.route('/superadmin')
   .get(protect, authorize(Role.SUPER_ADMIN), getSuperAdminAnalytics);
+
+router.route('/business')
+  .get(protect, authorize(Role.BUSINESS_ADMIN), getBusinessAnalytics);
+
+router.route('/business/reports')
+  .get(protect, authorize(Role.BUSINESS_ADMIN), getBusinessReports);
 
 export default router;

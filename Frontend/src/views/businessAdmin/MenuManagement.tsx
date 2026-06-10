@@ -16,18 +16,52 @@ import {
 import { motion } from 'motion/react';
 import { MOCK_MENU } from '../../mockData';
 import { MenuItem } from '../../types';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
 
 export const MenuManagement: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const categories = ['All', ...Array.from(new Set(MOCK_MENU.map(item => item.category)))];
+  const queryClient = useQueryClient();
 
-  const filteredItems = MOCK_MENU.filter(item => {
+  const { data: menuItems = [], isLoading, isError } = useQuery<MenuItem[]>({
+    queryKey: ['menuItems'],
+    queryFn: async () => {
+      const response = await api.get('/menu');
+      return response.data;
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/menu/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Menu item deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['menuItems'] });
+    },
+    onError: () => {
+      toast.error('Failed to delete menu item');
+    }
+  });
+
+  const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
+
+  const filteredItems = menuItems.filter(item => {
     const matchCat = selectedCategory === 'All' || item.category === selectedCategory;
     const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
   });
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div></div>;
+  }
+
+  if (isError) {
+    return <div className="flex items-center justify-center h-full text-brand-danger font-semibold">Failed to load menu. Please try again.</div>;
+  }
 
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
@@ -137,7 +171,15 @@ export const MenuManagement: React.FC = () => {
                       <button className="p-2.5 text-slate-400 hover:text-brand-primary hover:bg-slate-50 rounded-xl transition-all">
                          <Edit3 size={18} />
                       </button>
-                      <button className="p-2.5 text-slate-400 hover:text-brand-danger hover:bg-red-50 rounded-xl transition-all">
+                      <button 
+                         className="p-2.5 text-slate-400 hover:text-brand-danger hover:bg-red-50 rounded-xl transition-all disabled:opacity-50"
+                         onClick={() => {
+                           if(window.confirm('Are you sure you want to delete this item?')) {
+                             deleteMutation.mutate(item.id || (item as any)._id);
+                           }
+                         }}
+                         disabled={deleteMutation.isPending}
+                      >
                          <Trash2 size={18} />
                       </button>
                    </div>

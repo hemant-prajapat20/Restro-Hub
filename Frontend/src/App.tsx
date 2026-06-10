@@ -44,13 +44,20 @@ const CustomerPlaceholder = () => (
   </div>
 );
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
+
+const queryClient = new QueryClient();
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
+    <QueryClientProvider client={queryClient}>
+      <Toaster position="top-right" />
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/system-owner" element={<SystemOwnerLogin />} />
 
@@ -91,5 +98,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
+    </QueryClientProvider>
   );
 }
