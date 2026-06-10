@@ -399,10 +399,10 @@ export const RestroSignature: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start content-start">
                   {signatures.map((dish) => (
-                    <div key={dish.id} className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/50 transition-all flex flex-col md:flex-row">
-                      <div className="w-full md:w-36 h-48 md:h-full relative overflow-hidden flex-shrink-0">
+                    <div key={dish.id} className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/50 transition-all flex flex-col md:flex-row h-fit">
+                      <div className="w-full md:w-36 h-40 md:h-full relative overflow-hidden flex-shrink-0">
                         <img src={dish.image} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" alt={dish.name} />
                       </div>
                       <div className="p-4 flex-1 flex flex-col justify-between space-y-4">

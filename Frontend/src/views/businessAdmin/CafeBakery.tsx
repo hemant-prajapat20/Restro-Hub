@@ -398,13 +398,13 @@ export const CafeBakery: React.FC = () => {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
               {/* Specialty Listing */}
               <div className="xl:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start content-start">
                   {filteredItems.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/60 transition-all flex flex-col"
+                      className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/60 transition-all flex flex-col h-fit"
                     >
-                      <div className="h-48 relative overflow-hidden">
+                      <div className="h-40 relative overflow-hidden">
                         <img 
                           src={item.image} 
                           alt={item.name} 

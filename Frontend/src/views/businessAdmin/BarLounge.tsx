@@ -431,7 +431,7 @@ export const BarLounge: React.FC = () => {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
               {/* Liquor Cards list */}
               <div className="xl:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start content-start">
                   <AnimatePresence>
                     {filteredItems.map((item) => (
                       <motion.div
@@ -440,9 +440,9 @@ export const BarLounge: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden group hover:border-amber-500/60 transition-all flex flex-col"
+                        className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-amber-500/60 transition-all flex flex-col h-fit"
                       >
-                        <div className="h-48 relative overflow-hidden">
+                        <div className="h-40 relative overflow-hidden">
                           <img 
                             src={item.image} 
                             alt={item.name} 
