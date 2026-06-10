@@ -144,6 +144,53 @@ export const BarLounge: React.FC = () => {
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any>(null);
 
+  // Helper calculations
+  const getItemPrice = (cartItem: any) => {
+    if (cartItem.pourSize === 'Double') return cartItem.item.pricePerGlass * 1.8;
+    if (cartItem.pourSize === 'Full Bottle') return cartItem.item.pricePerGlass * 6; // Rough estimate
+    return cartItem.item.pricePerGlass;
+  };
+
+  const cartSubtotal = cart.reduce((total, cartItem) => total + (getItemPrice(cartItem) * cartItem.quantity), 0);
+  const discountAmount = appliedDiscount * cartSubtotal;
+  const serviceCharge = (cartSubtotal - discountAmount) * 0.10;
+  const cgst = (cartSubtotal - discountAmount) * 0.09;
+  const sgst = (cartSubtotal - discountAmount) * 0.09;
+  const cartTotal = cartSubtotal - discountAmount + serviceCharge + cgst + sgst;
+
+  // Cart actions
+  const addToCart = (item: LiquorItem) => {
+    const existing = cart.find(c => c.item.id === item.id && c.pourSize === 'Standard' && c.mixer === 'Neat');
+    if (existing) {
+      setCart(cart.map(c => c === existing ? { ...c, quantity: c.quantity + 1 } : c));
+    } else {
+      setCart([...cart, { item, quantity: 1, pourSize: 'Standard', mixer: 'Neat', notes: '' }]);
+    }
+  };
+
+  const removeOneFromCart = (id: string) => {
+    const existing = cart.find(c => c.item.id === id);
+    if (existing && existing.quantity > 1) {
+      setCart(cart.map(c => c.item.id === id ? { ...c, quantity: c.quantity - 1 } : c));
+    } else {
+      setCart(cart.filter(c => c.item.id !== id));
+    }
+  };
+
+  const updateCartModifier = (id: string, field: string, value: string) => {
+    setCart(cart.map(c => c.item.id === id ? { ...c, [field]: value } : c));
+  };
+
+  const applyLoyaltyDiscount = () => {
+    if (discountCode === 'GUILD20') {
+      setAppliedDiscount(0.20);
+      toast.success('20% Guild Discount Applied');
+    } else {
+      setAppliedDiscount(0);
+      toast.error('Invalid Guild Code');
+    }
+  };
+
   // Form states to add custom bottle
   const [newName, setNewName] = useState('');
   const [newVintage, setNewVintage] = useState('');
@@ -668,13 +715,13 @@ export const BarLounge: React.FC = () => {
 
                 {/* Logistics Configuration (Seating & Table) */}
                 <div className="space-y-4 pt-4 border-t border-stone-100">
-                  <div className="flex gap-4">
+                  <div className="flex flex-col gap-4">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Lounge / Seating Cabin</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1 block truncate">Lounge / Seating Cabin</label>
                       <select 
                         value={targetTable}
                         onChange={(e) => setTargetTable(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none truncate"
                       >
                         <option value="Main Salon Table #12">Main Salon Table #12</option>
                         <option value="Exclusive Cabana #A">Exclusive Cabana #A</option>
@@ -684,11 +731,11 @@ export const BarLounge: React.FC = () => {
                     </div>
 
                     <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Clearing Ledger</label>
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1 block truncate">Clearing Ledger</label>
                       <select 
                         value={paymentMethod}
                         onChange={(e: any) => setPaymentMethod(e.target.value as any)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none"
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none truncate"
                       >
                         <option value="UPI">Instant UPI (Tejas/BHIM)</option>
                         <option value="Card">Visa Signature Metallic</option>

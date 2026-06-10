@@ -134,12 +134,10 @@ export const Tables: React.FC = () => {
 
   // Adding item to order
   const addToTableOrder = (tableId: string, menuItem: MenuItem) => {
-    setTables(prev => prev.map(t => {
-      if (t.id === tableId && (t.status === 'Available' || t.status === 'Reserved' || t.status === 'Cleaning')) {
-        return { ...t, status: 'Occupied' };
-      }
-      return t;
-    }));
+    const table = tables.find(t => t.id === tableId);
+    if (table && (table.status === 'Available' || table.status === 'Reserved' || table.status === 'Cleaning')) {
+      updateTableMutation.mutate({ id: tableId, data: { status: 'Occupied' } });
+    }
 
     setTableOrders(prev => {
       const items = prev[tableId] || [];

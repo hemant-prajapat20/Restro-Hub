@@ -81,14 +81,14 @@ export const Inventory: React.FC = () => {
   const handleQuickAddStock = (id: string) => {
     const item = inventoryList.find(i => i.id === id || (i as any)._id === id);
     if (item) {
-      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: (item.quantity || (item as any).currentStock) + 10 } });
+      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: ((item as any).quantity || (item as any).currentStock) + 10 } });
     }
   };
 
   const handleQuickDispatch = (id: string) => {
     const item = inventoryList.find(i => i.id === id || (i as any)._id === id);
     if (item) {
-      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: Math.max(0, (item.quantity || (item as any).currentStock) - 5) } });
+      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: Math.max(0, ((item as any).quantity || (item as any).currentStock) - 5) } });
     }
   };
 

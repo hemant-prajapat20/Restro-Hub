@@ -192,7 +192,7 @@ export const Businesses: React.FC = () => {
       // Reset form silently
       setFormData({
         businessName: '', ownerFirstName: '', ownerLastName: '', ownerEmail: '', ownerPhone: '', ownerPassword: '',
-        address: '', state: '', district: '', subscriptionDurationMonths: 1, subscriptionExpiry: '', subscriptionAmountPaid: ''
+        address: '', state: '', district: '', subscriptionDurationMonths: 1, subscriptionExpiry: '', subscriptionAmountPaid: '', businessStatus: 'ACTIVE'
       });
       setSelectedPlatforms(['Restaurant']);
 
