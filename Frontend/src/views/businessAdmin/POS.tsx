@@ -91,11 +91,12 @@ export const POS: React.FC = () => {
 
   const addToCart = (item: MenuItem) => {
     setCart(prev => {
-      const existing = prev.find(i => i.itemId === item.id);
+      const currentId = item.id || item._id;
+      const existing = prev.find(i => i.itemId === currentId);
       if (existing) {
-        return prev.map(i => i.itemId === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map(i => i.itemId === currentId ? { ...i, quantity: i.quantity + 1 } : i);
       }
-      return [...prev, { itemId: item.id, name: item.name, price: item.price, quantity: 1 }];
+      return [...prev, { itemId: currentId as string, name: item.name, price: item.price, quantity: 1 }];
     });
   };
 
@@ -134,7 +135,7 @@ export const POS: React.FC = () => {
           {filteredItems.map((item) => (
             <motion.div
               layout
-              key={item.id}
+              key={item.id || item._id}
               onClick={() => addToCart(item)}
               className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col h-fit"
               whileTap={{ scale: 0.98 }}
