@@ -245,8 +245,8 @@ export const Tables: React.FC = () => {
 
   return (
     <div className="p-8 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
-      <div className="flex items-center justify-between bg-white p-4 rounded-3xl border border-slate-200 shadow-soft">
-        <div className="flex items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-4 rounded-3xl border border-slate-200 shadow-soft gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner w-full md:w-auto">
           <button 
             onClick={() => setActiveFloor(1)}
             className={`px-6 py-3 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
@@ -265,7 +265,7 @@ export const Tables: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
            <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-500 uppercase tracking-widest hover:bg-slate-50">
               <History size={16} />
               Waitlist
@@ -357,10 +357,10 @@ export const Tables: React.FC = () => {
                 className="relative bg-white h-full w-full max-w-lg shadow-2xl flex flex-col"
               >
                  {/* Modal Header */}
-                 <div className="p-8 border-b border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                       <div className="w-16 h-16 bg-brand-primary text-white rounded-3xl flex items-center justify-center shadow-xl">
-                          <h2 className="text-2xl font-semibold">#{selectedTable.number}</h2>
+                 <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                       <div className="w-14 h-14 sm:w-16 sm:h-16 bg-brand-primary text-white rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-xl flex-shrink-0">
+                          <h2 className="text-xl sm:text-2xl font-semibold">#{selectedTable.number}</h2>
                        </div>
                        <div>
                           <h3 className="text-xl font-semibold text-slate-900">Table Billing & POS</h3>
@@ -370,7 +370,7 @@ export const Tables: React.FC = () => {
                           </div>
                        </div>
                     </div>
-                    <button onClick={() => setSelectedTableId(null)} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-2xl transition-all">
+                    <button onClick={() => setSelectedTableId(null)} className="absolute top-6 right-6 sm:static sm:top-auto sm:right-auto p-2 sm:p-3 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-xl sm:rounded-2xl transition-all">
                        <X size={24} />
                     </button>
                  </div>
@@ -799,7 +799,7 @@ export const Tables: React.FC = () => {
       {/* Reservation & Waitlist Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          <div className="lg:col-span-2 bg-white rounded-[40px] border border-slate-200 shadow-soft p-8">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                <h4 className="text-xl font-semibold font-display uppercase tracking-tight text-slate-800">Advanced Reservations</h4>
                <button className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-2xl text-xs font-semibold border border-slate-100 hover:bg-slate-100 transition-all uppercase tracking-widest">View Archives</button>
             </div>
@@ -809,15 +809,17 @@ export const Tables: React.FC = () => {
                  { name: 'Priya Verma', guests: 2, time: '20:15', phone: '+91 88XXX XXX12', status: 'Awaiting' },
                  { name: 'Dr. Mehra', guests: 8, time: '21:00', phone: '+91 70XXX XXX99', status: 'Delayed' },
                ].map((res) => (
-                 <div key={res.name} className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-3xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all">
-                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center font-semibold text-brand-primary text-sm border border-slate-100">
+                 <div key={res.name} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-slate-50/50 p-4 rounded-3xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                       <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center font-semibold text-brand-primary text-sm border border-slate-100 flex-shrink-0">
                        {res.time}
                     </div>
                     <div className="flex-1">
                        <h6 className="font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">{res.name}</h6>
                        <p className="text-xs text-slate-500 font-medium">{res.phone} • {res.guests} Guests</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    </div>
+                    <div className="flex items-center justify-between w-full sm:w-auto gap-3 mt-2 sm:mt-0 sm:ml-auto">
                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-wider ${
                          res.status === 'Confirmed' ? 'bg-brand-success/10 text-brand-success' : 
                          res.status === 'Awaiting' ? 'bg-brand-warning/10 text-brand-warning' : 'bg-brand-danger/10 text-brand-danger'

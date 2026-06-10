@@ -30,7 +30,7 @@ export const Reports: React.FC = () => {
 
   const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices } = reports;
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">
+    <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
              <h3 className="text-2xl font-semibold font-display text-slate-900">Financial Audit & GST</h3>

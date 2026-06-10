@@ -272,7 +272,7 @@ export const BarLounge: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1700px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
+    <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1700px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       
       {/* Golden Luxury Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 via-stone-950 to-stone-900 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">

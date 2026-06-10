@@ -64,7 +64,7 @@ export const MenuManagement: React.FC = () => {
   }
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
+    <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <div>

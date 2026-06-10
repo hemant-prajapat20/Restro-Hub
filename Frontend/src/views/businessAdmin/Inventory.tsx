@@ -111,7 +111,7 @@ export const Inventory: React.FC = () => {
   const lowStockCount = inventoryList.filter(item => item.currentStock <= item.minStock).length;
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24 font-[Inter] font-semibold">
+    <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">

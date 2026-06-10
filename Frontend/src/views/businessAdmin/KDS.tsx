@@ -84,8 +84,8 @@ export const KDS: React.FC = () => {
 
   return (
     <div className="bg-[#020617] h-[calc(100vh-80px)] p-6 overflow-hidden flex flex-col gap-6 font-[Inter] font-semibold">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <h2 className="text-white text-2xl font-semibold font-display flex items-center gap-3">
             <ChefHat className="text-brand-accent fill-brand-accent/20" />
             Kitchen Display System (KDS)
@@ -103,7 +103,7 @@ export const KDS: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-2 p-1 bg-slate-900 border border-slate-800 rounded-xl">
+        <div className="flex flex-wrap gap-2 p-1 bg-slate-900 border border-slate-800 rounded-xl">
            <button className="px-4 py-2 bg-brand-accent text-white rounded-lg text-xs font-semibold uppercase tracking-widest shadow-lg shadow-brand-accent/20">Kitchen Feed</button>
            <button className="px-4 py-2 text-slate-500 rounded-lg text-xs font-semibold uppercase tracking-widest hover:text-slate-300 transition-all text-nowrap">History</button>
         </div>
@@ -118,7 +118,7 @@ export const KDS: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className={`w-[380px] flex-shrink-0 flex flex-col rounded-[32px] border transition-colors duration-500 ${getStatusColor(order.status)}`}
+              className={`w-[85vw] md:w-[380px] flex-shrink-0 flex flex-col rounded-[32px] border transition-colors duration-500 ${getStatusColor(order.status)}`}
             >
               {/* Ticket Header */}
               <div className="p-6 flex items-center justify-between border-b border-white/5">

@@ -41,7 +41,7 @@ export const Customers: React.FC = () => {
   );
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
+    <div className="px-8 pt-8 pb-0 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       <div className="flex justify-between items-end mb-8">
         <div>
           <h1 className="text-3xl font-bold font-display text-slate-900 mb-2">Customer CRM</h1>

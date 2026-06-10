@@ -67,7 +67,7 @@ export const Dashboard: React.FC = () => {
   const { dailyRevenue, totalOrders, activeCustomers, avgTableTurnTime, salesData, categoryData } = analytics;
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
+    <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 

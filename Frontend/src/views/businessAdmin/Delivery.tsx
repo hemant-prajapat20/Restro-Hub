@@ -101,8 +101,8 @@ export const Delivery: React.FC = () => {
 
   return (
     <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
-       <div className="flex items-center justify-between">
-          <div className="flex gap-4">
+       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
              <div className="px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm font-semibold flex items-center gap-2">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Zomato_logo.png" className="w-5 h-5 rounded" alt="Zomato" />
                 Zomato: <span className="text-brand-success font-semibold">Connected</span>
@@ -112,7 +112,7 @@ export const Delivery: React.FC = () => {
                 Swiggy: <span className="text-brand-success font-semibold">Connected</span>
              </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <button className="flex items-center gap-2 px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
                <RefreshCw size={18} />
                Sync Portals
@@ -204,8 +204,9 @@ export const Delivery: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     key={order.id} 
-                    className="bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100 flex items-center gap-6 hover:bg-slate-100/50 transition-colors"
+                    className="bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 hover:bg-slate-100/50 transition-colors"
                   >
+                     <div className="flex items-center gap-4 w-full sm:w-auto">
                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-semibold ${
                        order.source === 'Zomato' ? 'bg-red-50 text-red-600' : 
                        order.source === 'Swiggy' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'
@@ -219,7 +220,8 @@ export const Delivery: React.FC = () => {
                         </div>
                         <p className="text-sm font-medium text-slate-500 mt-1">{order.items}</p>
                      </div>
-                     <div className="text-right">
+                     </div>
+                     <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
                         <p className="text-lg font-semibold text-slate-900">{order.total}</p>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
                           order.status === 'Ready' || order.status === 'Completed' || order.status === 'Out for Delivery' ? 'bg-brand-success/10 text-brand-success' : 'bg-blue-50 text-blue-500'

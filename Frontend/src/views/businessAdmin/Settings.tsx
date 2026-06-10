@@ -66,7 +66,7 @@ export const Settings: React.FC = () => {
   };
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8 font-[Inter] h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-24">
+    <div className="px-8 pt-8 pb-0 max-w-[1600px] mx-auto space-y-8 font-[Inter] h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-slate-900 mb-2">Business Settings</h1>
