@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import authRoutes from './routes/auth.routes';
 import businessRoutes from './routes/business.routes';
 import subscriptionRoutes from './routes/subscription.routes';
@@ -19,8 +19,7 @@ import restroSignatureRoutes from './routes/restrosignature.routes';
 import barLoungeRoutes from './routes/barlounge.routes';
 import cafeBakeryRoutes from './routes/cafebakery.routes';
 import customerRoutes from './routes/customer.routes';
-
-dotenv.config();
+import uploadRoutes from './routes/upload.routes';
 
 const app = express();
 
@@ -57,6 +56,7 @@ app.use('/api/restro', restroSignatureRoutes);
 app.use('/api/barlounge', barLoungeRoutes);
 app.use('/api/cafebakery', cafeBakeryRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

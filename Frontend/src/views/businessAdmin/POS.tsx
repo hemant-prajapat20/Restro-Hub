@@ -21,6 +21,7 @@ import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { MenuItem, OrderItem } from '../../types';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
+import { FilterBar } from '../../components/FilterBar';
 
 export const POS: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -118,49 +119,24 @@ export const POS: React.FC = () => {
       {/* Menu Area */}
       <div className="flex-1 flex flex-col bg-slate-50 min-h-[60vh] lg:min-h-0">
         {/* Top Controls */}
-        <div className="p-4 bg-white border-b border-slate-200 space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-              <input 
-                type="text" 
-                placeholder="Search POS..."
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent transition-all truncate"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button className="flex items-center gap-2 px-4 py-3 border border-slate-200 rounded-xl font-medium text-slate-600 hover:bg-slate-50">
-              <Filter size={18} />
-              Filters
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-6 py-2.5 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all ${
-                  activeCategory === cat 
-                    ? 'bg-brand-accent text-white shadow-xl shadow-brand-accent/30' 
-                    : 'bg-white text-slate-500 border border-slate-200 hover:border-brand-accent hover:text-brand-accent'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        <div className="p-2 bg-white border-b border-slate-200">
+          <FilterBar
+            searchTerm={searchQuery}
+            onSearchChange={setSearchQuery}
+            category={activeCategory}
+            onCategoryChange={setActiveCategory}
+            categories={categories.filter(c => c !== 'All')}
+          />
         </div>
 
         {/* Menu Grid */}
-        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start content-start custom-scrollbar">
           {filteredItems.map((item) => (
             <motion.div
               layout
               key={item.id}
               onClick={() => addToCart(item)}
-              className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col h-fit"
               whileTap={{ scale: 0.98 }}
             >
               <div className="relative h-32 rounded-xl overflow-hidden mb-3">

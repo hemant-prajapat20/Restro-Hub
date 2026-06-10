@@ -23,6 +23,12 @@ import toast from 'react-hot-toast';
 export const MenuManagement: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [newItem, setNewItem] = useState({
+    name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5
+  });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -46,6 +52,51 @@ export const MenuManagement: React.FC = () => {
       toast.error('Failed to delete menu item');
     }
   });
+
+  const addMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/menu', data);
+    },
+    onSuccess: () => {
+      toast.success('Menu item added successfully');
+      queryClient.invalidateQueries({ queryKey: ['menuItems'] });
+      setIsAddModalOpen(false);
+      setNewItem({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5 });
+      setImageFile(null);
+    },
+    onError: () => {
+      toast.error('Failed to add menu item');
+    }
+  });
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItem.name || !newItem.price) return toast.error("Name and price required");
+    
+    setIsUploading(true);
+    let imageUrl = '';
+    
+    try {
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        const uploadRes = await api.post('/upload/image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        imageUrl = uploadRes.data.url;
+      }
+      
+      addMutation.mutate({
+        ...newItem,
+        price: Number(newItem.price),
+        image: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80'
+      });
+    } catch (error) {
+      toast.error('Image upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
 
@@ -76,7 +127,10 @@ export const MenuManagement: React.FC = () => {
             <Layers size={18} />
             Categories
           </button>
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-brand-accent text-white rounded-2xl text-sm font-semibold shadow-xl shadow-brand-accent/25 hover:scale-105 active:scale-95 transition-all">
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-brand-accent text-white rounded-2xl text-sm font-semibold shadow-xl shadow-brand-accent/25 hover:scale-105 active:scale-95 transition-all"
+          >
             <Plus size={18} strokeWidth={3} />
             ADD NEW DISH
           </button>
@@ -189,7 +243,10 @@ export const MenuManagement: React.FC = () => {
         ))}
 
         {/* Add New Placeholder Card */}
-        <div className="bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:border-brand-accent/50 transition-all">
+        <div 
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:border-brand-accent/50 transition-all"
+        >
            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
               <Plus className="text-slate-300 group-hover:text-brand-accent" size={32} />
            </div>
@@ -197,6 +254,67 @@ export const MenuManagement: React.FC = () => {
            <p className="text-[10px] text-slate-300 font-semibold uppercase tracking-widest mt-1">Industrial Menu System</p>
         </div>
       </div>
-    </div>
+
+      {/* Add Dish Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200/60"
+          >
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h3 className="text-lg font-bold text-slate-800">Add New Dish</h3>
+              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600"><XCircle size={24} /></button>
+            </div>
+            
+            <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dish Name</label>
+                <input type="text" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" required />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
+                  <input type="text" placeholder="e.g. Mains" value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" required />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Price (₹)</label>
+                  <input type="number" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" required />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Upload Image</label>
+                <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] || null)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Description</label>
+                <textarea value={newItem.description} onChange={e => setNewItem({...newItem, description: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" rows={3}></textarea>
+              </div>
+
+              <div className="flex items-center gap-4 pt-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                  <input type="checkbox" checked={newItem.isVeg} onChange={e => setNewItem({...newItem, isVeg: e.target.checked})} className="w-4 h-4 rounded text-brand-accent focus:ring-brand-accent" />
+                  Vegetarian
+                </label>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isUploading || addMutation.isPending}
+                className="w-full py-4 mt-4 bg-brand-primary text-white rounded-xl font-bold hover:bg-brand-primary/90 disabled:opacity-50 transition-all flex justify-center items-center gap-2"
+              >
+                {isUploading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <CheckCircle2 size={20} />}
+                {isUploading ? 'UPLOADING...' : 'SAVE DISH'}
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
+      </div>
+    
   );
 };

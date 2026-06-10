@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar, Header } from '../components/Navigation';
+import { DesignProvider } from '../components/DesignProvider';
 
 export const BusinessAdminLayout: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <div className="flex h-screen bg-brand-bg select-none font-sans font-semibold">
@@ -20,7 +22,9 @@ export const BusinessAdminLayout: React.FC = () => {
       <div className="flex-1 min-w-0">
         <Header onOpenSidebar={() => setIsMobileSidebarOpen(true)} />
         <main className="relative h-[calc(100vh-80px)] overflow-hidden lg:ml-64">
-          <Outlet />
+          <DesignProvider key={location.pathname}>
+            <Outlet />
+          </DesignProvider>
         </main>
       </div>
     </div>

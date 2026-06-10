@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   FileText, 
   Download, 
@@ -14,12 +14,17 @@ import {
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../utils/api';
+import { FilterBar } from '../../components/FilterBar';
+import { Button } from '../../components/Button';
 
 export const Reports: React.FC = () => {
+  const [month, setMonth] = useState('2026-04');
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { data: reports, isLoading } = useQuery({
-    queryKey: ['businessReports'],
+    queryKey: ['businessReports', month],
     queryFn: async () => {
-      const response = await api.get('/analytics/business/reports');
+      const response = await api.get('/analytics/business/reports', { params: { month } });
       return response.data.data;
     }
   });
@@ -37,16 +42,19 @@ export const Reports: React.FC = () => {
              <p className="text-slate-500 font-medium">Enterprise compliance and detailed profit analysis</p>
           </div>
           <div className="flex items-center gap-3">
-             <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all">
-                <Calendar size={18} />
-                April 2026
-             </button>
-             <button className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-sm font-semibold hover:opacity-90 transition-all shadow-lg shadow-brand-primary/10">
-                <Download size={18} />
+             <Button variant="primary">
+                <Download size={18} className="mr-2" />
                 Export Tally/Excel
-             </button>
+             </Button>
           </div>
        </div>
+
+       <FilterBar
+         searchTerm={searchTerm}
+         onSearchChange={setSearchTerm}
+         month={month}
+         onMonthChange={setMonth}
+       />
 
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
