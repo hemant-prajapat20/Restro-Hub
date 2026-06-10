@@ -18,6 +18,7 @@ import staffRoutes from './routes/staff.routes';
 import restroSignatureRoutes from './routes/restrosignature.routes';
 import barLoungeRoutes from './routes/barlounge.routes';
 import cafeBakeryRoutes from './routes/cafebakery.routes';
+import customerRoutes from './routes/customer.routes';
 
 dotenv.config();
 
@@ -55,6 +56,7 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/restro', restroSignatureRoutes);
 app.use('/api/barlounge', barLoungeRoutes);
 app.use('/api/cafebakery', cafeBakeryRoutes);
+app.use('/api/customers', customerRoutes);
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

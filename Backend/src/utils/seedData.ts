@@ -41,4 +41,14 @@ export const seedTemplateData = async (businessId: mongoose.Types.ObjectId, sess
     { businessId, firstName: 'Amit', lastName: 'Singh', role: 'Manager', email: 'amit@example.com', phone: '9876543212', status: 'Active', pin: '3456' }
   ];
   await Staff.insertMany(staffMembers, { session });
+
+  // 5. Seed Customers
+  const customers = [
+    { businessId, name: 'Ananya Patel', phone: '9876543333', email: 'ananya@example.com', totalVisits: 12, lifetimeSpent: 14500, lastVisit: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+    { businessId, name: 'Vikram Singh', phone: '9876544444', email: 'vikram@example.com', totalVisits: 5, lifetimeSpent: 6200, lastVisit: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
+    { businessId, name: 'Neha Gupta', phone: '9876545555', email: 'neha@example.com', totalVisits: 28, lifetimeSpent: 42000, lastVisit: new Date() },
+    { businessId, name: 'Rahul Desai', phone: '9876546666', email: 'rahul@example.com', totalVisits: 1, lifetimeSpent: 1200, lastVisit: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) }
+  ];
+  const Customer = (await import('../models/Customer')).default;
+  await Customer.insertMany(customers, { session });
 };

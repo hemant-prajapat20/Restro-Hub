@@ -28,11 +28,7 @@ import { StaffManagement } from './views/businessAdmin/StaffManagement';
 import { Reports } from './views/businessAdmin/Reports';
 import { Settings as BusinessSettings } from './views/businessAdmin/Settings';
 
-const CustomersPlaceholder = () => (
-  <div className="p-8 text-center">
-    <h2 className="text-2xl font-bold">Customer CRM Placeholder</h2>
-  </div>
-);
+import { Customers } from './views/businessAdmin/Customers';
 
 
 
@@ -91,7 +87,7 @@ export default function App() {
           <Route path="staff" element={<StaffManagement />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<BusinessSettings />} />
-          <Route path="customers" element={<CustomersPlaceholder />} />
+          <Route path="customers" element={<Customers />} />
         </Route>
 
         {/* Fallback */}
