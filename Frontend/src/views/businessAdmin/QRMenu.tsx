@@ -45,7 +45,7 @@ export const QRMenu: React.FC = () => {
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8 text-center">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-5 text-center">
         <motion.div 
           initial={{ scale: 0 }} 
           animate={{ scale: 1 }} 
@@ -53,9 +53,9 @@ export const QRMenu: React.FC = () => {
         >
           <CheckCircle2 className="text-white" size={48} />
         </motion.div>
-        <h2 className="text-3xl font-semibold text-slate-900 mb-2">Order Confirmed!</h2>
+        <h2 className="text-2xl font-semibold text-slate-900 mb-2">Order Confirmed!</h2>
         <p className="text-slate-500 font-medium mb-8">Chef is starting to prep your meal at Table #4.</p>
-        <div className="bg-slate-50 p-6 rounded-3xl w-full max-w-sm space-y-4 mb-8">
+        <div className="bg-slate-50 p-4 rounded-2xl w-full max-w-sm space-y-4 mb-8">
            <div className="flex justify-between items-center text-sm font-semibold">
               <span className="text-slate-400">Order ID</span>
               <span className="text-brand-primary">#QR-9921</span>
@@ -78,7 +78,7 @@ export const QRMenu: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-32 max-w-md mx-auto relative shadow-2xl">
       {/* Header */}
-      <div className="bg-white p-6 pb-8 rounded-b-[40px] shadow-sm sticky top-0 z-40">
+      <div className="bg-white p-4 pb-8 rounded-b-[40px] shadow-sm sticky top-0 z-40">
         <div className="flex items-center justify-between mb-6">
            <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center text-white">
@@ -104,7 +104,7 @@ export const QRMenu: React.FC = () => {
       </div>
 
       {/* Categories */}
-      <div className="p-6 flex gap-3 overflow-x-auto no-scrollbar">
+      <div className="p-4 flex gap-3 overflow-x-auto no-scrollbar">
          {['Recommends', 'Starters', 'Mains', 'Breads', 'Desserts'].map((cat, i) => (
            <button key={cat} className={`flex-shrink-0 px-6 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
              i === 0 ? 'bg-brand-accent text-white shadow-lg shadow-brand-accent/20' : 'bg-white text-slate-500'
@@ -122,7 +122,7 @@ export const QRMenu: React.FC = () => {
          </h3>
          <div className="grid gap-4">
             {MOCK_MENU.slice(0, 5).map((item) => (
-              <div key={item.id} className="bg-white p-4 rounded-3xl flex gap-4 shadow-sm group">
+              <div key={item.id} className="bg-white p-4 rounded-2xl flex gap-4 shadow-sm group">
                  <div className="w-24 h-24 rounded-2xl overflow-hidden relative">
                     <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
                     <div className="absolute top-1 right-1">
@@ -189,7 +189,7 @@ export const QRMenu: React.FC = () => {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="relative bg-white w-full max-w-md rounded-t-[40px] shadow-2xl p-8"
+                className="relative bg-white w-full max-w-md rounded-t-[40px] shadow-2xl p-5"
               >
                  <div className="flex items-center justify-between mb-8">
                     <h3 className="text-2xl font-semibold">Your Order</h3>

@@ -118,7 +118,7 @@ export const POS: React.FC = () => {
       {/* Menu Area */}
       <div className="flex-1 flex flex-col bg-slate-50 min-h-[60vh] lg:min-h-0">
         {/* Top Controls */}
-        <div className="p-6 bg-white border-b border-slate-200 space-y-4">
+        <div className="p-4 bg-white border-b border-slate-200 space-y-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -154,7 +154,7 @@ export const POS: React.FC = () => {
         </div>
 
         {/* Menu Grid */}
-        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 custom-scrollbar">
           {filteredItems.map((item) => (
             <motion.div
               layout
@@ -186,7 +186,7 @@ export const POS: React.FC = () => {
 
       {/* Cart Sidebar */}
       <div className="w-full lg:w-[400px] bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col">
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-lg font-display uppercase tracking-tight text-slate-800">Current Order</h4>
             <span className="bg-brand-accent text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">{cart.length}</span>
@@ -201,7 +201,7 @@ export const POS: React.FC = () => {
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8">
+            <div className="h-full flex flex-col items-center justify-center text-center p-5">
                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                   <ShoppingBag size={32} className="text-slate-300" />
                </div>
@@ -243,7 +243,7 @@ export const POS: React.FC = () => {
           )}
         </div>
 
-        <div className="p-6 bg-slate-50 border-t border-slate-200 space-y-3">
+        <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-slate-500 font-medium">
               <span>Subtotal</span>
@@ -299,7 +299,7 @@ export const POS: React.FC = () => {
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
-               className="absolute inset-0 z-[100] bg-white flex flex-col items-center justify-center p-8 text-center"
+               className="absolute inset-0 z-[100] bg-white flex flex-col items-center justify-center p-5 text-center"
              >
                 <motion.div
                   initial={{ scale: 0.5, opacity: 0 }}
@@ -337,9 +337,9 @@ export const POS: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
             >
-              <div className="p-8">
+              <div className="p-5">
                 <h3 className="text-2xl font-semibold font-display mb-6">Complete Payment</h3>
                 
                 <div className="grid grid-cols-2 gap-4 mb-8">
@@ -355,7 +355,7 @@ export const POS: React.FC = () => {
                       <button
                         key={method.id}
                         onClick={() => setPaymentMethod(method.id as any)}
-                        className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all ${
+                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${
                           isActive 
                             ? 'border-brand-accent bg-brand-accent/5 text-brand-accent' 
                             : 'border-slate-100 bg-slate-50 text-slate-500 hover:border-slate-300'
@@ -368,10 +368,10 @@ export const POS: React.FC = () => {
                   })}
                 </div>
 
-                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-8">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-slate-500 font-medium">Grand Total</span>
-                    <span className="text-3xl font-semibold text-brand-primary">₹{total.toFixed(2)}</span>
+                    <span className="text-2xl font-semibold text-brand-primary">₹{total.toFixed(2)}</span>
                   </div>
                   <div className="h-[1px] bg-slate-200 my-4" />
                   <div className="flex justify-between items-center">

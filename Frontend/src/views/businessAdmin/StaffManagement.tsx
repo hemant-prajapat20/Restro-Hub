@@ -171,13 +171,13 @@ export const StaffManagement: React.FC = () => {
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Golden Staff Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-stone-900 to-stone-950 rounded-2xl border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
           <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <Sparkles size={12} className="text-amber-500 animate-ping" />
             Vanguard Employee roster
           </div>
-          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Staff & Shift Directory</h3>
+          <h3 className="text-2xl font-semibold font-display text-white tracking-tight">Staff & Shift Directory</h3>
           <p className="text-sm text-stone-400 max-w-xl">
              Supervise active brigade attendance, adjust sommelier allocations, configure clock-ins, and recruit certified hospitality personnel.
           </p>
@@ -185,7 +185,7 @@ export const StaffManagement: React.FC = () => {
 
         {/* Attendance Summary */}
         <div className="relative z-10 flex flex-wrap gap-4">
-          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
+          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
              <Clock className="text-amber-500" size={24} />
              <div>
                 <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Active On-Duty Brigade</p>
@@ -194,7 +194,7 @@ export const StaffManagement: React.FC = () => {
                 </p>
              </div>
           </div>
-          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
+          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
              <TrendingUp className="text-amber-500" size={24} />
              <div>
                 <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Monthly Payroll projection</p>
@@ -208,7 +208,7 @@ export const StaffManagement: React.FC = () => {
       </div>
 
       {/* Roster actions search filter */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-3xl border border-stone-200/60 shadow-soft">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-stone-200/60 shadow-soft">
         <div className="relative flex-1 w-full xl:w-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
           <input 
@@ -246,7 +246,7 @@ export const StaffManagement: React.FC = () => {
       </div>
 
       {/* Staff Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
          <AnimatePresence>
             {filteredCrew.map((member) => (
                <motion.div
@@ -255,7 +255,7 @@ export const StaffManagement: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-[32px] p-8 border border-stone-200/80 shadow-soft hover:border-brand-accent group transition-all flex flex-col justify-between h-full"
+                  className="bg-white rounded-[32px] p-5 border border-stone-200/80 shadow-soft hover:border-brand-accent group transition-all flex flex-col justify-between h-full"
                >
                   <div>
                      <div className="flex items-start justify-between mb-6">
@@ -354,7 +354,7 @@ export const StaffManagement: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
               <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Recruit Team Member</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Onboard certified luxury hospitality brigade personnel</p>

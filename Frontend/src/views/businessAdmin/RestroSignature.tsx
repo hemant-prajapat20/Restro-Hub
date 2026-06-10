@@ -268,13 +268,13 @@ export const RestroSignature: React.FC = () => {
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Luxurious Restro Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-stone-900 to-stone-950 rounded-2xl border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
           <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <Crown size={12} className="animate-pulse" />
             Michelin-Inspired Fine Dining Terminal
           </div>
-          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Restro Signature & Suites</h3>
+          <h3 className="text-2xl font-semibold font-display text-white tracking-tight">Restro Signature & Suites</h3>
           <p className="text-sm text-stone-400 max-w-xl">
             Settle royal VIP rooms, manage custom multi-course chef tasting menus, and showcase curated signature preparations.
           </p>
@@ -300,14 +300,14 @@ export const RestroSignature: React.FC = () => {
 
         {/* Dynamic Restro Stats */}
         <div className="relative z-10 flex flex-wrap gap-4">
-          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
+          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
             <Users className="text-amber-500" size={24} />
             <div>
               <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Active Executive Covers</p>
               <p className="text-lg font-semibold text-white font-mono">18 / 26 VIPs</p>
             </div>
           </div>
-          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
+          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
             <Sparkles className="text-amber-500 animate-spin-slow" size={24} />
             <div>
               <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Master Tasting Sessions</p>
@@ -326,7 +326,7 @@ export const RestroSignature: React.FC = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
-            className="grid grid-cols-1 xl:grid-cols-3 gap-8"
+            className="grid grid-cols-1 xl:grid-cols-3 gap-5"
           >
             {/* Left Hand: Chef Signatures and VIP Suites */}
             <div className="xl:col-span-2 space-y-8">
@@ -341,12 +341,12 @@ export const RestroSignature: React.FC = () => {
                   <span className="text-stone-400 font-semibold text-xs uppercase">Ground Floor West Wing</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {pdrs.map((room) => (
                     <div 
                       key={room.id} 
                       onClick={() => setSelectedRoom(room)}
-                      className={`aria-interactive bg-white p-6 rounded-[32px] border-2 transition-all cursor-pointer shadow-soft group hover:scale-[1.02] ${
+                      className={`aria-interactive bg-white p-4 rounded-[32px] border-2 transition-all cursor-pointer shadow-soft group hover:scale-[1.02] ${
                         room.status === 'Occupied' ? 'border-amber-500/20 card-occupied' : 
                         room.status === 'Reserved' ? 'border-stone-200' : 'border-stone-100 hover:border-brand-accent'
                       }`}
@@ -399,13 +399,13 @@ export const RestroSignature: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {signatures.map((dish) => (
                     <div key={dish.id} className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/50 transition-all flex flex-col md:flex-row">
                       <div className="w-full md:w-36 h-48 md:h-full relative overflow-hidden flex-shrink-0">
                         <img src={dish.image} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" alt={dish.name} />
                       </div>
-                      <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                         <div>
                           <div className="flex items-center justify-between">
                             <span className={`px-2 py-0.5 rounded text-[8px] font-semibold uppercase tracking-widest border ${
@@ -439,11 +439,11 @@ export const RestroSignature: React.FC = () => {
 
             {/* Right Hand Sidebar: Master Chef Active Tasting session */}
             <div className="space-y-6">
-              <div className="bg-stone-950 p-8 rounded-[40px] border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
+              <div className="bg-stone-950 p-5 rounded-2xl border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
                 <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Chef Tasting Session Log</h5>
                 
                 <div className="space-y-4">
-                   <div className="bg-stone-900/60 p-5 rounded-3xl border border-stone-800">
+                   <div className="bg-stone-900/60 p-5 rounded-2xl border border-stone-800">
                       <span className="text-[9px] font-semibold text-brand-accent uppercase tracking-widest block mb-2">Live Session #05</span>
                       <h6 className="text-sm font-semibold text-white uppercase tracking-tight">Royals Tasting Plate</h6>
                       <p className="text-xs text-stone-400 font-medium leading-relaxed mt-1">
@@ -455,7 +455,7 @@ export const RestroSignature: React.FC = () => {
                       </div>
                    </div>
                    
-                   <div className="bg-stone-900/60 p-5 rounded-3xl border border-stone-800">
+                   <div className="bg-stone-900/60 p-5 rounded-2xl border border-stone-800">
                       <span className="text-[9px] font-semibold text-stone-500 uppercase tracking-widest block mb-2">Upcoming - 8:30 PM</span>
                       <h6 className="text-sm font-semibold text-stone-400 uppercase tracking-tight">Ambassador Gala Plate</h6>
                       <p className="text-xs text-stone-500 font-medium leading-relaxed mt-1">
@@ -466,14 +466,14 @@ export const RestroSignature: React.FC = () => {
 
                 <div className="pt-6 border-t border-stone-900 text-center">
                    <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest leading-none mb-1">Weekly Booking Revenue</p>
-                   <p className="text-4xl font-display font-semibold text-brand-accent">₹248,500</p>
+                   <p className="text-3xl font-display font-semibold text-brand-accent">₹248,500</p>
                    <p className="text-[8px] text-stone-500 mt-2 uppercase font-mono tracking-wider">Generated from 14 PDR groups</p>
                 </div>
               </div>
 
-              <div className="bg-white p-8 rounded-[40px] border border-stone-200/60 shadow-soft space-y-6">
+              <div className="bg-white p-5 rounded-2xl border border-stone-200/60 shadow-soft space-y-6">
                 <h5 className="text-xs font-semibold text-stone-400 uppercase tracking-[0.25em]">Signature Kitchen Protocols</h5>
-                <div className="p-5 bg-amber-50 rounded-3xl border border-amber-100">
+                <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100">
                   <p className="text-[11px] text-stone-500 leading-relaxed font-semibold">
                     Gold elements are kept under high security lockbox key #03. Heavy tandoori prawns are strictly organic supply from Kochi docks.
                   </p>
@@ -487,11 +487,11 @@ export const RestroSignature: React.FC = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
-            className="grid grid-cols-1 xl:grid-cols-12 gap-8"
+            className="grid grid-cols-1 xl:grid-cols-12 gap-5"
           >
             {/* Left Column: Menu Selector for POS (7 columns) */}
             <div className="xl:col-span-7 space-y-6">
-              <div className="flex items-center justify-between p-4 bg-white rounded-3xl border border-stone-200/80">
+              <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-stone-200/80">
                 <span className="text-xs font-semibold text-stone-500 uppercase tracking-widest">Imperial Menu Offerings</span>
                 <span className="text-xs font-semibold text-brand-primary uppercase tracking-wider">{signatures.length} chef creations</span>
               </div>
@@ -503,7 +503,7 @@ export const RestroSignature: React.FC = () => {
                     onClick={() => addToCart(dish)}
                     className="p-4 bg-white rounded-[32px] border border-stone-200/80 hover:border-brand-accent text-left group flex items-start gap-4 transition-all relative cursor-pointer"
                   >
-                    <div className="w-20 h-20 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0">
+                    <div className="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0">
                       <img src={dish.image} alt={dish.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
@@ -529,7 +529,7 @@ export const RestroSignature: React.FC = () => {
 
             {/* Right Column: Docket Cart State, Taxes & Custom Receipt (5 columns) */}
             <div className="xl:col-span-5 space-y-6">
-              <div className="bg-white rounded-[40px] border border-stone-200/80 shadow-soft p-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-stone-200/80 shadow-soft p-5 space-y-6">
                 <div className="flex items-center justify-between border-b border-stone-100 pb-4">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="text-brand-accent" size={18} />
@@ -546,7 +546,7 @@ export const RestroSignature: React.FC = () => {
 
                 {/* Cart Body */}
                 {cart.length === 0 ? (
-                  <div className="py-12 text-center rounded-3xl bg-stone-50/50 border border-dashed border-stone-150 p-6 flex flex-col items-center gap-3">
+                  <div className="py-12 text-center rounded-2xl bg-stone-50/50 border border-dashed border-stone-150 p-4 flex flex-col items-center gap-3">
                     <UtensilsCrossed className="text-stone-300 animate-pulse" size={40} />
                     <div>
                       <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest">Docket is empty</p>
@@ -647,7 +647,7 @@ export const RestroSignature: React.FC = () => {
                 </div>
 
                 {/* Ledger Breakdown */}
-                <div className="p-4 bg-stone-50 rounded-3xl border border-stone-150 space-y-2">
+                <div className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-2">
                   <div className="flex justify-between items-center text-xs text-stone-500 font-semibold">
                     <span>Subtotal</span>
                     <span className="font-mono">₹{cartSubtotal.toLocaleString()}</span>
@@ -692,7 +692,7 @@ export const RestroSignature: React.FC = () => {
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-stone-50 p-6 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden text-stone-800"
+                  className="bg-stone-50 p-4 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden text-stone-800"
                 >
                   {/* Decorative physical cutouts */}
                   <div className="absolute top-0 left-0 right-0 flex justify-between px-4 -translate-y-1">
@@ -833,7 +833,7 @@ export const RestroSignature: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 border border-amber-900/15 overflow-hidden"
+              className="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl p-5 border border-amber-900/15 overflow-hidden"
             >
               <h3 className="text-2xl font-semibold text-stone-900 font-display mb-1">{selectedRoom.name}</h3>
               <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest mb-6 border-b border-stone-100 pb-3">{selectedRoom.notes}</p>
@@ -892,7 +892,7 @@ export const RestroSignature: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
               <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Propose Chef Signature</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Introduce high-end recipes to VIP menus</p>

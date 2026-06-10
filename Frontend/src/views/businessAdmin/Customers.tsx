@@ -44,14 +44,14 @@ export const Customers: React.FC = () => {
     <div className="px-8 pt-8 pb-0 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-display text-slate-900 mb-2">Customer CRM</h1>
+          <h1 className="text-2xl font-bold font-display text-slate-900 mb-2">Customer CRM</h1>
           <p className="text-slate-500">Manage loyalty, track visits, and view customer history</p>
         </div>
       </div>
 
       {/* Top Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white p-4 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
           <div className="p-4 bg-brand-accent/10 rounded-2xl text-brand-accent">
             <Users size={28} />
           </div>
@@ -60,7 +60,7 @@ export const Customers: React.FC = () => {
             <h3 className="text-2xl font-bold text-slate-900">{customers.length}</h3>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
+        <div className="bg-white p-4 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
           <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600">
             <Star size={28} />
           </div>
@@ -69,7 +69,7 @@ export const Customers: React.FC = () => {
             <h3 className="text-2xl font-bold text-slate-900">{customers.filter(c => c.lifetimeSpent > 20000).length}</h3>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
+        <div className="bg-white p-4 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
           <div className="p-4 bg-blue-50 rounded-2xl text-blue-600">
             <TrendingUp size={28} />
           </div>
@@ -84,7 +84,7 @@ export const Customers: React.FC = () => {
 
       {/* CRM List */}
       <div className="bg-white rounded-[32px] shadow-soft border border-stone-200/80 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <div className="relative w-[350px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input 

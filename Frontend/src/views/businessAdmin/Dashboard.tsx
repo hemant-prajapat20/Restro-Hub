@@ -31,7 +31,7 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../../utils/api';
 
 const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => (
-  <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-start justify-between h-full">
+  <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 flex items-start justify-between h-full">
     <div>
       <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
       <h3 className="text-2xl font-semibold font-display text-slate-900">{value}</h3>
@@ -61,7 +61,7 @@ export const Dashboard: React.FC = () => {
   });
 
   if (isLoading) {
-    return <div className="p-8 flex justify-center items-center h-[calc(100vh-80px)]">Loading Dashboard...</div>;
+    return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Dashboard...</div>;
   }
 
   const { dailyRevenue, totalOrders, activeCustomers, avgTableTurnTime, salesData, categoryData } = analytics;
@@ -69,7 +69,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
       {/* KPI Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Daily Revenue" 
           value={`₹${dailyRevenue.toLocaleString()}`} 
@@ -104,9 +104,9 @@ export const Dashboard: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
+        <div className="lg:col-span-2 bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h4 className="text-lg font-semibold font-display">Revenue Velocity</h4>
@@ -157,7 +157,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* AI Insights & Alerts */}
-        <div className="bg-brand-sidebar p-8 rounded-[32px] shadow-soft text-white relative overflow-hidden h-full flex flex-col">
+        <div className="bg-brand-sidebar p-5 rounded-[32px] shadow-soft text-white relative overflow-hidden h-full flex flex-col">
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-6">
               <Zap className="text-brand-accent fill-brand-accent" size={20} />
@@ -183,11 +183,11 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Category Breakdown */}
-        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
-           <div className="flex flex-col lg:flex-row items-center gap-8 h-auto lg:h-[250px] min-w-0">
+           <div className="flex flex-col lg:flex-row items-center gap-5 h-auto lg:h-[250px] min-w-0">
              <div className="w-full lg:w-1/2 h-[250px] lg:h-full min-w-0 flex items-center justify-center">
                <ResponsiveContainer width="99%" height={250}>
                  <PieChart>
@@ -221,7 +221,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Top Selling Items */}
-        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Top Performing Items</h4>
            <div className="space-y-4">
               {[

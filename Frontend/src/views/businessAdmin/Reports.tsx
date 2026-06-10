@@ -25,13 +25,13 @@ export const Reports: React.FC = () => {
   });
 
   if (isLoading) {
-    return <div className="p-8 flex justify-center items-center h-[calc(100vh-80px)]">Loading Reports...</div>;
+    return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Reports...</div>;
   }
 
   const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices } = reports;
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
-       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
              <h3 className="text-2xl font-semibold font-display text-slate-900">Financial Audit & GST</h3>
              <p className="text-slate-500 font-medium">Enterprise compliance and detailed profit analysis</p>
@@ -48,14 +48,14 @@ export const Reports: React.FC = () => {
           </div>
        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Net Revenue', value: `₹${netRevenue.toLocaleString()}`, trend: 15.2, icon: BarChart3, color: 'blue' },
             { label: 'Total GST (5%)', value: `₹${totalGst.toLocaleString()}`, trend: 12.8, icon: Calculator, color: 'emerald' },
             { label: 'Operating Cost', value: `₹${operatingCost.toLocaleString()}`, trend: -4.2, icon: ArrowDownRight, color: 'orange' },
             { label: 'Net Profit', value: `₹${netProfit.toLocaleString()}`, trend: 22.4, icon: ArrowUpRight, color: 'brand-accent' },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex flex-col gap-4 h-full justify-between">
+            <div key={stat.label} className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 flex flex-col gap-4 h-full justify-between">
                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-${stat.color}-50 text-${stat.color}-600`}>
                   <stat.icon size={24} />
                </div>
@@ -71,9 +71,9 @@ export const Reports: React.FC = () => {
           ))}
        </div>
 
-       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden h-full flex flex-col">
-             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                 <h5 className="font-semibold font-display text-slate-900">Recent Invoices</h5>
                 <div className="relative">
                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -123,8 +123,8 @@ export const Reports: React.FC = () => {
           </div>
 
           <div className="space-y-8">
-             <div className="bg-brand-primary p-8 rounded-[32px] text-white relative overflow-hidden h-full flex flex-col">
-                <div className="relative z-10 flex flex-col h-full gap-8">
+             <div className="bg-brand-primary p-5 rounded-[32px] text-white relative overflow-hidden h-full flex flex-col">
+                <div className="relative z-10 flex flex-col h-full gap-5">
                    <div className="flex items-center gap-3">
                       <Lock className="text-brand-accent fill-brand-accent" size={20} />
                       <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Security Vault</h4>

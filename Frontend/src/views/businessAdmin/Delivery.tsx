@@ -100,7 +100,7 @@ export const Delivery: React.FC = () => {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
+    <div className="p-5 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
              <div className="px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm font-semibold flex items-center gap-2">
@@ -134,9 +134,9 @@ export const Delivery: React.FC = () => {
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="relative bg-white w-full max-w-2xl rounded-[40px] shadow-2xl p-10"
+              className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-4"
             >
-               <h3 className="text-3xl font-semibold text-slate-900 mb-8">Create Delivery Order</h3>
+               <h3 className="text-2xl font-semibold text-slate-900 mb-8">Create Delivery Order</h3>
                <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-2">
@@ -150,7 +150,7 @@ export const Delivery: React.FC = () => {
                   </div>
                   <div className="space-y-4">
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-2">Select Items from Menu</label>
-                    <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 max-h-60 overflow-y-auto custom-scrollbar space-y-2">
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 max-h-60 overflow-y-auto custom-scrollbar space-y-2">
                        {menu.map((item: any) => (
                          <div key={item._id} className="flex items-center justify-between bg-white p-3 rounded-2xl border border-slate-100">
                             <div className="flex items-center gap-3">
@@ -189,22 +189,22 @@ export const Delivery: React.FC = () => {
          </div>
        )}
 
-       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2">
-             <div className="bg-white border border-stone-200/80 rounded-[32px] p-8 lg:p-10 shadow-soft h-full flex flex-col">
+             <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
                  <h4 className="text-xl font-semibold font-display flex items-center gap-2 text-slate-900 mb-6">
                     <ShoppingBag className="text-brand-accent" />
                     Live Feed
                  </h4>
                  <div className="space-y-4">
                  {deliveryOrders.length === 0 ? (
-                    <div className="p-8 text-center text-slate-500 font-medium">No live delivery orders</div>
+                    <div className="p-5 text-center text-slate-500 font-medium">No live delivery orders</div>
                  ) : deliveryOrders.map((order: any) => (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     key={order.id} 
-                    className="bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 hover:bg-slate-100/50 transition-colors"
+                    className="bg-slate-50 p-4 md:p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-4 hover:bg-slate-100/50 transition-colors"
                   >
                      <div className="flex items-center gap-4 w-full sm:w-auto">
                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-semibold ${
@@ -239,13 +239,13 @@ export const Delivery: React.FC = () => {
           </div>
 
           <div className="lg:col-span-1">
-             <div className="bg-brand-primary p-8 rounded-[32px] text-white space-y-8 overflow-hidden relative shadow-2xl h-full flex flex-col justify-between">
+             <div className="bg-brand-primary p-5 rounded-[32px] text-white space-y-8 overflow-hidden relative shadow-2xl h-full flex flex-col justify-between">
                 <div className="relative z-10 space-y-8">
                    <div>
                       <h4 className="text-2xl font-semibold font-display">Daily Delivery Heatmap</h4>
                       <p className="text-slate-400 text-sm mt-1">High traffic zones for riders</p>
                    </div>
-                   <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center italic text-slate-500 font-semibold">
+                   <div className="aspect-square bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center italic text-slate-500 font-semibold">
                       Map Visualization Placeholder
                    </div>
                    <div className="space-y-4">

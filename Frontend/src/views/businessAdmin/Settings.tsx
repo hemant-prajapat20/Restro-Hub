@@ -69,18 +69,18 @@ export const Settings: React.FC = () => {
     <div className="px-8 pt-8 pb-0 max-w-[1600px] mx-auto space-y-8 font-[Inter] h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-slate-900 mb-2">Business Settings</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 mb-2">Business Settings</h1>
           <p className="text-slate-500 font-medium">Manage your profile, branch details, and active modules.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
         {/* Profile Card */}
         <div className="lg:col-span-1">
-          <div className="bg-white border border-stone-200/80 rounded-[32px] p-8 lg:p-10 shadow-soft h-full flex flex-col">
+          <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
             <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
-              <div className="w-24 h-24 bg-brand-accent/10 rounded-full flex items-center justify-center text-brand-accent text-3xl font-semibold mb-4 border-4 border-white shadow-lg">
+              <div className="w-24 h-24 bg-brand-accent/10 rounded-full flex items-center justify-center text-brand-accent text-2xl font-semibold mb-4 border-4 border-white shadow-lg">
                 {user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'G'}
               </div>
               <h2 className="text-xl font-semibold text-slate-900">{user ? `${user.firstName} ${user.lastName}` : 'Guest User'}</h2>
@@ -159,7 +159,7 @@ export const Settings: React.FC = () => {
 
         {/* Feature Toggles */}
         <div className="lg:col-span-2">
-          <div className="bg-white border border-stone-200/80 rounded-[32px] p-8 lg:p-10 shadow-soft h-full flex flex-col">
+          <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
             <div className="mb-6">
               <h3 className="text-xl font-semibold text-slate-900">Active Modules & Features</h3>
               <p className="text-slate-500 font-medium mt-1">Enable or disable specific features for your business based on your current plan.</p>

@@ -66,7 +66,7 @@ export const MenuManagement: React.FC = () => {
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Header Actions */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <h3 className="text-2xl font-semibold font-display text-slate-900">Menu Catalog</h3>
           <p className="text-slate-500 font-medium font-sans">Manage dishes, pricing, and availability across all digital platforms.</p>
@@ -84,7 +84,7 @@ export const MenuManagement: React.FC = () => {
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white p-6 lg:p-8 rounded-[32px] border border-stone-200/80 shadow-soft flex flex-col lg:flex-row items-center gap-4">
+      <div className="bg-white p-4 lg:p-5 rounded-[32px] border border-stone-200/80 shadow-soft flex flex-col lg:flex-row items-center gap-4">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input 
@@ -113,7 +113,7 @@ export const MenuManagement: React.FC = () => {
       </div>
 
       {/* Grid View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredItems.map((item) => (
           <motion.div 
             layout
@@ -122,7 +122,7 @@ export const MenuManagement: React.FC = () => {
           >
              <div className="relative h-48">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                    <button className="bg-white text-brand-primary p-2 rounded-xl flex items-center gap-2 text-xs font-semibold shadow-xl">
                       <ImageIcon size={14} />
                       UPDATE PHOTO
@@ -143,7 +143,7 @@ export const MenuManagement: React.FC = () => {
                 </div>
              </div>
 
-             <div className="p-6 space-y-4">
+             <div className="p-4 space-y-4">
                 <div className="flex items-start justify-between">
                    <div className="flex-1">
                       <h4 className="text-xl font-semibold text-brand-primary leading-tight hover:text-brand-accent transition-colors cursor-pointer">{item.name}</h4>
@@ -190,7 +190,7 @@ export const MenuManagement: React.FC = () => {
 
         {/* Add New Placeholder Card */}
         <div className="bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:border-brand-accent/50 transition-all">
-           <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
+           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
               <Plus className="text-slate-300 group-hover:text-brand-accent" size={32} />
            </div>
            <p className="font-semibold text-slate-400 group-hover:text-brand-primary transition-colors">Add New Catalog Item</p>

@@ -297,13 +297,13 @@ export const CafeBakery: React.FC = () => {
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Luxury Cafe Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 bg-gradient-to-r from-stone-900 to-stone-950 rounded-[40px] border border-amber-900/40 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gradient-to-r from-stone-900 to-stone-950 rounded-2xl border border-amber-900/40 relative overflow-hidden shadow-2xl">
         <div className="relative z-10 space-y-2">
           <div className="flex items-center gap-2 text-brand-accent font-semibold text-xs uppercase tracking-[0.25em]">
             <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-ping" />
             Specialty Extraction & Patisserie Console
           </div>
-          <h3 className="text-3xl font-semibold font-display text-white tracking-tight">Cafe & Patisserie</h3>
+          <h3 className="text-2xl font-semibold font-display text-white tracking-tight">Cafe & Patisserie</h3>
           <p className="text-sm text-stone-400 max-w-xl">
             Monitor real-time espresso extraction cycles, schedule craft pastry batches, and bill guests at the express barista POS.
           </p>
@@ -329,14 +329,14 @@ export const CafeBakery: React.FC = () => {
 
         {/* Status Indicators */}
         <div className="relative z-10 flex flex-wrap gap-4">
-          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
+          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
             <Timer className="text-amber-500" size={24} />
             <div>
               <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Espresso Boiler Pressure</p>
               <p className="text-lg font-semibold text-white font-mono">9.2 Bar</p>
             </div>
           </div>
-          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-3xl flex items-center gap-3">
+          <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
             <Flame className="text-amber-500 animate-bounce" size={24} />
             <div>
               <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Patisserie Oven Temp</p>
@@ -357,7 +357,7 @@ export const CafeBakery: React.FC = () => {
             className="space-y-8"
           >
             {/* Control Actions & Search */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-3xl border border-stone-200/60 shadow-soft">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-stone-200/60 shadow-soft">
               <div className="relative flex-1 w-full xl:w-auto">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
                 <input 
@@ -395,10 +395,10 @@ export const CafeBakery: React.FC = () => {
             </div>
 
             {/* Main Content Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
               {/* Specialty Listing */}
               <div className="xl:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredItems.map((item) => (
                     <div
                       key={item.id}
@@ -424,7 +424,7 @@ export const CafeBakery: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                         <div>
                           <p className="text-[10.5px] font-semibold text-stone-500 uppercase tracking-wide leading-relaxed mb-4">
                             {item.originOrType}
@@ -475,7 +475,7 @@ export const CafeBakery: React.FC = () => {
 
               {/* Live Brewing Timers & Lab Equipment status */}
               <div className="space-y-6">
-                <div className="bg-stone-950 p-8 rounded-[40px] border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
+                <div className="bg-stone-950 p-5 rounded-2xl border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
                   <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Gourmet Extraction Lab</h5>
                   
                   {activeBrew.isBrewing ? (
@@ -501,7 +501,7 @@ export const CafeBakery: React.FC = () => {
                        </div>
                     </div>
                   ) : (
-                    <div className="py-6 text-center border-2 border-dashed border-stone-800 rounded-3xl text-xs text-stone-500 italic">
+                    <div className="py-6 text-center border-2 border-dashed border-stone-800 rounded-2xl text-xs text-stone-500 italic">
                        Espresso group heads calibrated & idle. Ready to extract micro-lot coffees.
                     </div>
                   )}
@@ -528,12 +528,12 @@ export const CafeBakery: React.FC = () => {
                 </div>
 
                 {/* Luxury Quality Seal */}
-                <div className="bg-white p-8 rounded-[40px] border border-stone-200/60 shadow-soft space-y-6">
+                <div className="bg-white p-5 rounded-2xl border border-stone-200/60 shadow-soft space-y-6">
                   <h5 className="text-xs font-semibold text-stone-400 uppercase tracking-[0.25em] flex items-center gap-1">
                     <Sparkles size={14} className="text-amber-500" />
                     SCA Certified Workspace
                   </h5>
-                  <div className="p-5 bg-stone-50 rounded-3xl border border-stone-100">
+                  <div className="p-5 bg-stone-50 rounded-2xl border border-stone-100">
                     <p className="text-[11px] text-stone-500 leading-relaxed font-medium">
                       The water filter configuration must be manually flushed. Water mineral count is currently optimized at <span className="text-brand-accent font-semibold">140 ppm</span> to perfectly complement Geisha fruity notes.
                     </p>
@@ -548,7 +548,7 @@ export const CafeBakery: React.FC = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
-            className="grid grid-cols-1 xl:grid-cols-12 gap-8"
+            className="grid grid-cols-1 xl:grid-cols-12 gap-5"
           >
             {/* Left Column: Premium Cafe Menu items layout for POS selection (7 cols) */}
             <div className="xl:col-span-7 space-y-6">
@@ -563,9 +563,9 @@ export const CafeBakery: React.FC = () => {
                     key={item.id}
                     onClick={() => addToCart(item)}
                     disabled={item.stockCount <= 0}
-                    className="p-4 bg-white rounded-3xl border border-stone-200/80 hover:border-brand-accent text-left group flex items-start gap-4 transition-all disabled:opacity-55 cursor-pointer relative"
+                    className="p-4 bg-white rounded-2xl border border-stone-200/80 hover:border-brand-accent text-left group flex items-start gap-4 transition-all disabled:opacity-55 cursor-pointer relative"
                   >
-                    <div className="w-20 h-20 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0 relative">
+                    <div className="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0 relative">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
                       {item.stockCount <= 5 && item.stockCount > 0 && (
                         <span className="absolute bottom-1 left-1 right-1 text-center text-[7px] font-semibold bg-rose-500 text-white rounded uppercase tracking-wider">
@@ -592,7 +592,7 @@ export const CafeBakery: React.FC = () => {
 
             {/* Right Column: Dynamic Order Station Cart, modifiers and elegant receipt generator (5 cols) */}
             <div className="xl:col-span-5 space-y-6">
-              <div className="bg-white rounded-[40px] border border-stone-200/80 shadow-soft p-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-stone-200/80 shadow-soft p-5 space-y-6">
                 <div className="flex items-center justify-between border-b border-stone-100 pb-4">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="text-brand-accent" size={18} />
@@ -609,7 +609,7 @@ export const CafeBakery: React.FC = () => {
 
                 {/* Cart Body */}
                 {cart.length === 0 ? (
-                  <div className="py-12 text-center rounded-3xl bg-stone-50/50 border border-dashed border-stone-150 p-6 flex flex-col items-center gap-3">
+                  <div className="py-12 text-center rounded-2xl bg-stone-50/50 border border-dashed border-stone-150 p-4 flex flex-col items-center gap-3">
                     <Coffee className="text-stone-300 animate-pulse" size={40} />
                     <div>
                       <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest">No Active Brews or Patisseries</p>
@@ -746,7 +746,7 @@ export const CafeBakery: React.FC = () => {
                 </div>
 
                 {/* Ledger Details */}
-                <div className="p-4 bg-stone-50 rounded-3xl border border-stone-150 space-y-2">
+                <div className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-2">
                   <div className="flex justify-between items-center text-xs text-stone-500 font-semibold">
                     <span>Subtotal</span>
                     <span className="font-mono">₹{cartSubtotal.toLocaleString()}</span>
@@ -791,7 +791,7 @@ export const CafeBakery: React.FC = () => {
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-stone-50 p-6 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden"
+                  className="bg-stone-50 p-4 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden"
                 >
                   {/* Circle cutouts for receipt effect */}
                   <div className="absolute top-0 left-0 right-0 flex justify-between px-4 -translate-y-1">
@@ -939,7 +939,7 @@ export const CafeBakery: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
               <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Bake or Roast Item</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Catalog hand-roasted coffee beans or fresh-baked patisseries</p>

@@ -83,7 +83,7 @@ export const KDS: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#020617] h-[calc(100vh-80px)] p-6 overflow-hidden flex flex-col gap-6 font-[Inter] font-semibold">
+    <div className="bg-[#020617] h-[calc(100vh-80px)] p-4 overflow-hidden flex flex-col gap-4 font-[Inter] font-semibold">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <h2 className="text-white text-2xl font-semibold font-display flex items-center gap-3">
@@ -91,7 +91,7 @@ export const KDS: React.FC = () => {
             Kitchen Display System (KDS)
           </h2>
           <div className="h-6 w-[1px] bg-slate-800" />
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <div className="text-center">
               <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest leading-none mb-1">Queue</p>
               <p className="text-brand-accent font-semibold leading-none">{orders.length} Orders</p>
@@ -109,7 +109,7 @@ export const KDS: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-x-auto pb-4 flex gap-6 custom-scrollbar items-start">
+      <div className="flex-1 overflow-x-auto pb-4 flex gap-4 custom-scrollbar items-start">
         <AnimatePresence>
           {orders.map((order, idx) => (
             <motion.div
@@ -121,7 +121,7 @@ export const KDS: React.FC = () => {
               className={`w-[85vw] md:w-[380px] flex-shrink-0 flex flex-col rounded-[32px] border transition-colors duration-500 ${getStatusColor(order.status)}`}
             >
               {/* Ticket Header */}
-              <div className="p-6 flex items-center justify-between border-b border-white/5">
+              <div className="p-4 flex items-center justify-between border-b border-white/5">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider ${
@@ -148,7 +148,7 @@ export const KDS: React.FC = () => {
               </div>
 
               {/* Ticket Body */}
-              <div className="flex-1 max-h-[400px] overflow-y-auto p-6 space-y-4 custom-scrollbar">
+              <div className="flex-1 max-h-[400px] overflow-y-auto p-4 space-y-4 custom-scrollbar">
                 {order.items.map((item, itemIdx) => {
                   const isCompleted = order.completedItems.includes(item.itemId);
                   return (
@@ -178,7 +178,7 @@ export const KDS: React.FC = () => {
               </div>
 
               {/* Ticket Footer Actions */}
-               <div className="p-6 bg-black/30 rounded-b-[32px] border-t border-white/5 flex gap-3">
+               <div className="p-4 bg-black/30 rounded-b-[32px] border-t border-white/5 flex gap-3">
                  {order.status === 'New' ? (
                    <button 
                      onClick={() => updateOrderStatus(order.dbId, 'Preparing')}
@@ -219,7 +219,7 @@ export const KDS: React.FC = () => {
 
         {/* Status Legends */}
         <div className="w-[300px] flex-shrink-0 space-y-6">
-           <div className="bg-slate-900/50 p-8 rounded-[40px] border border-slate-800">
+           <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800">
               <h5 className="text-white font-semibold uppercase text-xs tracking-[0.2em] mb-6">Kitchen Pulse</h5>
               <div className="space-y-6">
                  <div>

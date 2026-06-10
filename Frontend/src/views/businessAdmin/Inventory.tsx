@@ -113,11 +113,11 @@ export const Inventory: React.FC = () => {
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
               <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-2 font-display">Total Cellar SKU Valuation</p>
-              <h4 className="text-3xl font-semibold text-stone-900">₹{(totalSkuValue / 100000).toFixed(2)}L</h4>
+              <h4 className="text-2xl font-semibold text-stone-900">₹{(totalSkuValue / 100000).toFixed(2)}L</h4>
               <p className="text-xs text-brand-success font-semibold mt-2 flex items-center gap-1">
                  <ClipboardCheck size={14} />
                  Ledger synced: Just now
@@ -128,10 +128,10 @@ export const Inventory: React.FC = () => {
            </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
               <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-2 font-display">Depleted ingredients alerts</p>
-              <h4 className="text-3xl font-semibold text-rose-800">{lowStockCount} Items</h4>
+              <h4 className="text-2xl font-semibold text-rose-800">{lowStockCount} Items</h4>
               <p className="text-xs text-brand-danger font-semibold mt-2 flex items-center gap-1 uppercase tracking-widest font-mono">
                  <AlertCircle size={14} className="animate-pulse" />
                  REORDER PROTOCOL REQ.
@@ -142,10 +142,10 @@ export const Inventory: React.FC = () => {
            </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 flex items-center justify-between hover:border-brand-accent transition-all group">
            <div>
               <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-2 font-display">Active Merchant Consignments</p>
-              <h4 className="text-3xl font-semibold text-stone-900">03 Cargo</h4>
+              <h4 className="text-2xl font-semibold text-stone-900">03 Cargo</h4>
               <p className="text-xs text-stone-500 font-semibold mt-2 flex items-center gap-1">
                  <Truck size={14} className="text-brand-accent" />
                  Verified luxury importers
@@ -158,7 +158,7 @@ export const Inventory: React.FC = () => {
       </div>
 
       {/* Actions & Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-3xl border border-stone-150 shadow-soft">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-stone-150 shadow-soft">
         <div className="relative flex-1 w-full xl:w-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
           <input 
@@ -274,7 +274,7 @@ export const Inventory: React.FC = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-brand-primary rounded-[40px] p-8 text-white flex flex-col md:flex-row items-center gap-8 relative overflow-hidden shadow-xl"
+        className="bg-brand-primary rounded-2xl p-5 text-white flex flex-col md:flex-row items-center gap-5 relative overflow-hidden shadow-xl"
       >
         <div className="relative z-10 flex-1">
            <h4 className="text-xl font-semibold font-display mb-1 flex items-center gap-2 text-brand-accent uppercase tracking-wide">
@@ -308,7 +308,7 @@ export const Inventory: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-10 border border-amber-900/10 overflow-hidden"
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
               <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Catalog Raw Ingredient</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Incorporate prime raw supplies into warehouse ledgers</p>
