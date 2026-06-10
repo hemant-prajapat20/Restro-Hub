@@ -951,6 +951,7 @@ export const RestroSignature: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Base Price (₹)</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="e.g. 2400" 
                       value={newPrice}

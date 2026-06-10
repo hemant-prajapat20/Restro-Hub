@@ -10,7 +10,9 @@ import {
   ClipboardCheck,
   Package,
   X,
-  Sparkles
+  Sparkles,
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_INVENTORY } from '../../mockData';
@@ -24,6 +26,7 @@ export const Inventory: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form states for stock
   const [newName, setNewName] = useState('');
@@ -79,36 +82,46 @@ export const Inventory: React.FC = () => {
   });
 
   const handleQuickAddStock = (id: string) => {
-    const item = inventoryList.find(i => i.id === id || (i as any)._id === id);
+    const item = inventoryList.find(i => i.id === id || i._id === id);
     if (item) {
-      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: ((item as any).quantity || (item as any).currentStock) + 10 } });
+      const current = item.quantityInStock ?? item.currentStock ?? 0;
+      updateInventoryMutation.mutate({ id: item.id || item._id, data: { quantityInStock: current + 10 } });
     }
   };
 
   const handleQuickDispatch = (id: string) => {
-    const item = inventoryList.find(i => i.id === id || (i as any)._id === id);
+    const item = inventoryList.find(i => i.id === id || i._id === id);
     if (item) {
-      updateInventoryMutation.mutate({ id: item.id || (item as any)._id, data: { quantity: Math.max(0, ((item as any).quantity || (item as any).currentStock) - 5) } });
+      const current = item.quantityInStock ?? item.currentStock ?? 0;
+      updateInventoryMutation.mutate({ id: item.id || item._id, data: { quantityInStock: Math.max(0, current - 5) } });
     }
   };
 
-  const handleCreateInventoryItem = (e: React.FormEvent) => {
+  const handleSaveInventoryItem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newStock || !newMinStock) return;
 
-    addInventoryMutation.mutate({
+    const payload = {
       name: newName,
       unit: newUnit,
-      quantity: Number(newStock),
-      minThreshold: Number(newMinStock),
+      quantityInStock: Number(newStock),
+      reorderThreshold: Number(newMinStock),
       category: newCategory,
-      vendor: 'Local Vendor' // Default vendor since we don't have an input for it
-    });
+      supplier: 'Local Vendor' // Default vendor since we don't have an input for it
+    };
+
+    if (editingId) {
+      updateInventoryMutation.mutate({ id: editingId, data: payload }, {
+        onSuccess: () => setShowAddModal(false)
+      });
+    } else {
+      addInventoryMutation.mutate(payload);
+    }
   };
 
   // Luxury Inventory KPI metrics
   const totalSkuValue = inventoryList.length * 48500; // Simulating luxury batching valuation
-  const lowStockCount = inventoryList.filter(item => item.currentStock <= item.minStock).length;
+  const lowStockCount = inventoryList.filter(item => (item.quantityInStock ?? item.currentStock ?? 0) <= (item.reorderThreshold ?? item.minStock ?? 0)).length;
 
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
@@ -185,7 +198,15 @@ export const Inventory: React.FC = () => {
            ))}
            <div className="h-6 w-[1px] bg-stone-200 mx-1 hidden xl:block" />
            <button 
-             onClick={() => setShowAddModal(true)}
+             onClick={() => {
+               setEditingId(null);
+               setNewName('');
+               setNewCategory('Essentials');
+               setNewUnit('kg');
+               setNewStock('');
+               setNewMinStock('');
+               setShowAddModal(true);
+             }}
              className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/20"
            >
               <Plus size={16} strokeWidth={3} />
@@ -209,9 +230,12 @@ export const Inventory: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-stone-100">
                {filteredInventory.map((item) => {
-                 const isLow = item.currentStock <= item.minStock;
+                 const currentStock = item.quantityInStock ?? item.currentStock ?? 0;
+                 const minStock = item.reorderThreshold ?? item.minStock ?? 0;
+                 const isLow = currentStock <= minStock;
+                 const displayId = (item.id || item._id || '').slice(-6);
                  return (
-                   <tr key={item.id} className="hover:bg-amber-500/[0.02]/50 transition-all group">
+                   <tr key={item.id || item._id} className="hover:bg-amber-500/[0.02]/50 transition-all group">
                       <td className="px-6 py-5">
                          <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-stone-50 border border-stone-200/60 flex items-center justify-center text-stone-400 group-hover:bg-brand-primary group-hover:text-brand-accent transition-all shadow-sm">
@@ -219,7 +243,7 @@ export const Inventory: React.FC = () => {
                             </div>
                             <div>
                                <p className="text-sm font-semibold text-stone-900">{item.name}</p>
-                               <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest font-mono">SKU: MAISON-ING-{item.id}</p>
+                               <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest font-mono">SKU: MAISON-ING-{displayId}</p>
                             </div>
                          </div>
                       </td>
@@ -229,32 +253,46 @@ export const Inventory: React.FC = () => {
                          </span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                         <span className={`px-3 py-1 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
+                         <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-[9px] font-semibold uppercase tracking-wider border ${
                             isLow ? 'bg-red-50 text-red-700 border-red-200/40' : 'bg-green-50 text-green-700 border-green-200/40'
                          }`}>
                             {isLow ? 'Critical Limit' : 'Stocked'}
                          </span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                         <span className={`text-sm font-semibold ${isLow ? 'text-rose-700 animate-pulse' : 'text-stone-950'}`}>{item.currentStock} {item.unit}</span>
+                         <span className={`text-sm font-semibold ${isLow ? 'text-rose-700 animate-pulse' : 'text-stone-950'}`}>{currentStock} {item.unit}</span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                         <span className="text-sm font-semibold text-stone-400 font-mono">{item.minStock} {item.unit}</span>
+                         <span className="text-sm font-semibold text-stone-400 font-mono">{minStock} {item.unit}</span>
                       </td>
                       <td className="px-6 py-5">
                          <div className="flex items-center justify-end gap-1.5">
                             <button 
-                              onClick={() => handleQuickAddStock(item.id)}
+                              onClick={() => handleQuickAddStock(item.id || item._id)}
                               className="px-3 py-1.5 bg-stone-50 border border-stone-200 hover:bg-stone-900 hover:text-white rounded-lg text-[9px] font-semibold uppercase tracking-widest transition-all"
                             >
                                Receive +10
                             </button>
                             <button 
-                              onClick={() => handleQuickDispatch(item.id)}
-                              disabled={item.currentStock <= 0}
-                              className="px-3 py-1.5 bg-amber-50 border border-amber-200 hover:bg-amber-150 text-stone-700 disabled:opacity-40 rounded-lg text-[9px] font-semibold uppercase tracking-widest transition-all"
+                               onClick={() => handleQuickDispatch(item.id || item._id)}
+                               className="px-3 py-1.5 bg-brand-primary text-white border border-brand-primary hover:bg-brand-accent hover:border-brand-accent rounded-lg text-[9px] font-semibold uppercase tracking-widest transition-all"
+                             >
+                                Dispatch -5
+                             </button>
+                            <button 
+                              onClick={() => {
+                                 setEditingId(item.id || item._id);
+                                 setNewName(item.name);
+                                 setNewCategory(item.category);
+                                 setNewUnit(item.unit);
+                                 setNewStock(String(currentStock));
+                                 setNewMinStock(String(minStock));
+                                 setShowAddModal(true);
+                              }}
+                              className="px-2 py-1.5 bg-stone-50 text-stone-500 border border-stone-200 hover:bg-brand-primary hover:text-brand-accent rounded-lg transition-all"
+                              title="Edit Ledger Item"
                             >
-                               Dispatch -5
+                              <Edit3 size={12} />
                             </button>
                          </div>
                       </td>
@@ -310,10 +348,10 @@ export const Inventory: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Catalog Raw Ingredient</h3>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">{editingId ? 'Edit Raw Ingredient' : 'Catalog Raw Ingredient'}</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Incorporate prime raw supplies into warehouse ledgers</p>
 
-              <form onSubmit={handleCreateInventoryItem} className="space-y-4">
+              <form onSubmit={handleSaveInventoryItem} className="space-y-4">
                 <div className="space-y-1">
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Raw Ingredient Name</label>
                   <input 
@@ -339,6 +377,8 @@ export const Inventory: React.FC = () => {
                       <option value="Meat">Meat & Seafood</option>
                       <option value="Dairy">Ghee, Butter & Dairy</option>
                       <option value="Vegetables">Vegetables & Herbs</option>
+                      <option value="Cafeteria Items">Cafeteria Items</option>
+                      <option value="Drinks">Drinks & Beverages</option>
                     </select>
                   </div>
                   <div className="space-y-1">
@@ -362,6 +402,7 @@ export const Inventory: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Starting Stock</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="e.g. 100" 
                       value={newStock}
@@ -373,6 +414,7 @@ export const Inventory: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Minimum Reorder Limit</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="e.g. 15" 
                       value={newMinStock}
@@ -383,8 +425,25 @@ export const Inventory: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4 pt-4">
+                  {editingId && (
+                     <button 
+                       type="button" 
+                       onClick={() => { 
+                         if(confirm('Are you sure you want to permanently discard this item?')) { 
+                           deleteInventoryMutation.mutate(editingId); 
+                           setShowAddModal(false); 
+                         } 
+                       }} 
+                       className="px-4 py-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center border border-red-100 hover:border-red-500"
+                       title="Delete Item"
+                     >
+                       <Trash2 size={18} />
+                     </button>
+                  )}
                   <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20 font-sans">SET ITEM SECURE</button>
+                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20 font-sans">
+                     {editingId ? 'UPDATE SECURE' : 'SET ITEM SECURE'}
+                  </button>
                 </div>
               </form>
             </motion.div>

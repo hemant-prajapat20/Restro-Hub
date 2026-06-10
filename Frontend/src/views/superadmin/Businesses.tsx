@@ -794,7 +794,7 @@ export const Businesses: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Amount Paid (₹)</label>
-                      <input type="number" name="subscriptionAmountPaid" value={formData.subscriptionAmountPaid} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                      <input type="number" min="0" name="subscriptionAmountPaid" value={formData.subscriptionAmountPaid} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
                     </div>
                   </div>
                 </div>

@@ -1022,6 +1022,7 @@ export const BarLounge: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Bottle Size (Ml)</label>
                     <input 
                       type="number" 
+                      min="0"
                       placeholder="750" 
                       value={newCapacity}
                       onChange={(e) => setNewCapacity(e.target.value)}
@@ -1035,6 +1036,7 @@ export const BarLounge: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Glass Price (₹)</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="3500" 
                       value={newPrice}
@@ -1046,6 +1048,7 @@ export const BarLounge: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock Bottles</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="6" 
                       value={newStock}

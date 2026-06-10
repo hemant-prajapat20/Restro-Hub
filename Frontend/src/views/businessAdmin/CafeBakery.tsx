@@ -988,6 +988,7 @@ export const CafeBakery: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Unit Price (₹)</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="e.g. 550" 
                       value={newPrice}
@@ -999,6 +1000,7 @@ export const CafeBakery: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Starting Stock</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="e.g. 10" 
                       value={newStock}

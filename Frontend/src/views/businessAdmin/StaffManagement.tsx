@@ -408,6 +408,7 @@ export const StaffManagement: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Monthly Base Salary (₹)</label>
                     <input 
                       type="number" 
+                      min="0"
                       required
                       placeholder="e.g. 85000" 
                       value={newSalary}
