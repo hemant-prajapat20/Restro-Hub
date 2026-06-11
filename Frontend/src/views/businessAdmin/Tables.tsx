@@ -103,7 +103,7 @@ export const Tables: React.FC = () => {
     queryKey: ['settings'],
     queryFn: async () => {
       const res = await api.get('/settings');
-      return res.data;
+      return res.data.data || res.data;
     }
   });
 
@@ -157,7 +157,7 @@ export const Tables: React.FC = () => {
       return res.data;
     },
     onSuccess: (_, variables) => {
-      toast.success('Order sent to kitchen!');
+      toast.success(settingsData?.kdsWebhook === false ? 'Order Confirmed!' : 'Order sent to kitchen!');
       setTableOrders(prev => {
         const copy = { ...prev };
         delete copy[variables.tableId];
@@ -378,10 +378,7 @@ export const Tables: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-           <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-500 uppercase tracking-widest hover:bg-slate-50">
-              <History size={16} />
-              Waitlist
-           </button>
+
            <button 
              onClick={() => setShowAddTableModal(true)}
              className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-xs font-semibold uppercase tracking-widest shadow-lg shadow-brand-primary/10 hover:scale-105 transition-all"
@@ -863,7 +860,7 @@ export const Tables: React.FC = () => {
                       className="flex-1 bg-brand-accent text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-accent/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                        <ChefHat size={18} strokeWidth={3} />
-                       SEND TO KITCHEN
+                       {settingsData?.kdsWebhook === false ? 'CONFIRM ORDER' : 'SEND TO KITCHEN'}
                     </button>
                     <button 
                       onClick={() => {
@@ -1086,15 +1083,22 @@ export const Tables: React.FC = () => {
                        </div>
                      </div>
                      <div className="flex gap-4">
-                       <div className="flex-1">
-                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Number</label>
-                          <select value={newResTableId} onChange={e => setNewResTableId(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg">
-                             <option value="">Select Available Table</option>
-                             {tables.filter(t => t.floor === newResFloor && t.status === 'Available').map(t => (
-                               <option key={t._id} value={t._id}>Table {t.number} ({t.capacity} Seats)</option>
-                             ))}
-                          </select>
-                       </div>
+                        {settingsData?.smartMapping ? (
+                           <div className="flex-1 bg-brand-primary/5 rounded-2xl border border-brand-primary/20 p-4 flex flex-col justify-center items-center">
+                              <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest text-center">Smart Mapping Active</span>
+                              <span className="text-[10px] text-brand-primary/70 font-semibold text-center mt-1">Table Auto-Allocated</span>
+                           </div>
+                        ) : (
+                           <div className="flex-1">
+                              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Number</label>
+                              <select value={newResTableId} onChange={e => setNewResTableId(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg">
+                                 <option value="">Select Available Table</option>
+                                 {tables.filter(t => t.floor === newResFloor && t.status === 'Available').map(t => (
+                                   <option key={t._id} value={t._id}>Table {t.number} ({t.capacity} Seats)</option>
+                                 ))}
+                              </select>
+                           </div>
+                        )}
                        <div className="flex-1">
                           <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Time</label>
                           <input type="time" value={newResTime} onChange={e => setNewResTime(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />

@@ -5,7 +5,7 @@ import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { 
   Clock, ChevronRight, CheckCircle2, ChefHat, AlertTriangle,
-  Flame, Wind, Plus as PlusIcon, RotateCcw, Timer
+  Flame, Wind, Plus as PlusIcon, RotateCcw, Timer, MonitorOff
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -82,6 +82,36 @@ export const KDS: React.FC = () => {
     }
     updateOrderStatusMutation.mutate({ id: orderId, status, prepTime });
   };
+
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      const res = await api.get('/settings');
+      return res.data.data || res.data;
+    }
+  });
+
+  const getUrgencyColor = (createdAt: string) => {
+    const mins = (new Date().getTime() - new Date(createdAt).getTime()) / 60000;
+    if (mins > 30) return 'bg-red-50 border-red-200';
+    if (mins > 15) return 'bg-orange-50 border-orange-200';
+    return 'bg-white border-slate-200';
+  };
+
+  if (settingsData && settingsData.kdsWebhook === false) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 text-center p-8">
+        <div className="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center mb-6">
+          <MonitorOff size={48} className="text-slate-400" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">KDS Disabled</h2>
+        <p className="text-slate-500 max-w-md">
+          The Kitchen Display System has been deactivated via System Controls. 
+          Please use physical tickets or re-enable the KDS Webhook in the Tables dashboard.
+        </p>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {

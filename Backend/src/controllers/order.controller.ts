@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Order from '../models/Order';
+import SystemSettings from '../models/SystemSettings';
 
 // Get all orders for a business
 export const getOrders = async (req: Request, res: Response) => {
@@ -47,9 +48,10 @@ export const createOrder = async (req: Request, res: Response) => {
     const savedOrder = await newOrder.save();
     const populatedOrder = await Order.findById(savedOrder._id).populate('tableId');
 
-    // Emit socket event for KDS
+    // Emit socket event for KDS if webhook is enabled
+    const settings = await SystemSettings.findOne();
     const io = req.app.get('io');
-    if (io) {
+    if (io && settings?.kdsWebhook !== false) {
       io.emit('newOrder', populatedOrder);
     }
 

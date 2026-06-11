@@ -11,10 +11,29 @@ export const getReservations = async (req: Request, res: Response): Promise<void
 };
 
 import Table from '../models/Table';
+import SystemSettings from '../models/SystemSettings';
 
 export const createReservation = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, phone, guests, time, floor, seats, tableNumber, tableId } = req.body;
+    
+    let finalTableId = tableId;
+    let finalTableNumber = tableNumber;
+
+    const settings = await SystemSettings.findOne();
+    if (settings?.smartMapping && !finalTableId && !finalTableNumber) {
+      const optimalTable = await Table.findOne({
+        floor: floor,
+        status: 'Available',
+        capacity: { $gte: guests || seats || 1 }
+      }).sort({ capacity: 1 });
+
+      if (optimalTable) {
+        finalTableId = optimalTable._id;
+        finalTableNumber = optimalTable.number;
+      }
+    }
+
     const newReservation = await Reservation.create({
       name,
       phone,
@@ -22,16 +41,16 @@ export const createReservation = async (req: Request, res: Response): Promise<vo
       time,
       floor,
       seats,
-      tableNumber,
+      tableNumber: finalTableNumber,
       status: 'Awaiting'
     });
     
     // Auto-lock the table to prevent double booking
-    if (tableId) {
-      await Table.findByIdAndUpdate(tableId, { status: 'Reserved' });
-    } else if (tableNumber) {
+    if (finalTableId) {
+      await Table.findByIdAndUpdate(finalTableId, { status: 'Reserved' });
+    } else if (finalTableNumber) {
       await Table.findOneAndUpdate(
-        { number: tableNumber, floor: floor }, 
+        { number: finalTableNumber, floor: floor }, 
         { status: 'Reserved' }
       );
     }
