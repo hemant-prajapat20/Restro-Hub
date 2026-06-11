@@ -501,38 +501,78 @@ export const RestroSignature: React.FC = () => {
                   {pdrs.map((room) => (
                     <div 
                       key={room.id} 
-                      onClick={() => setSelectedRoom(room)}
-                      className={`aria-interactive bg-white p-4 rounded-[32px] border-2 transition-all cursor-pointer shadow-soft group hover:scale-[1.02] ${
+                      className={`bg-white rounded-[32px] border-2 transition-all shadow-soft group flex flex-col ${
                         room.status === 'Occupied' ? 'border-amber-500/20 card-occupied' : 
                         room.status === 'Reserved' ? 'border-stone-200' : 'border-stone-100 hover:border-brand-accent'
                       }`}
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="px-3 py-1 bg-stone-50 rounded-xl text-[9px] font-semibold uppercase text-stone-400 tracking-widest">
+                      <div className="h-32 relative overflow-hidden rounded-t-[30px] cursor-pointer" onClick={() => setSelectedRoom(room)}>
+                        <img 
+                          src={room.image || 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop'} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
+                          alt={room.name}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="absolute top-3 left-3 px-2 py-1 bg-stone-900/60 backdrop-blur-md rounded-xl text-[9px] font-semibold uppercase text-white tracking-widest border border-stone-700">
                           Cap: {room.capacity} VIPs
                         </div>
-                        <span className={`w-3 h-3 rounded-full ${
-                          room.status === 'Occupied' ? 'bg-red-500 animate-pulse' : 
-                          room.status === 'Reserved' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`} />
+                        <div className="absolute top-3 right-3 flex items-center gap-2">
+                           {room.isActive === false && (
+                             <span className="px-2 py-1 bg-rose-500 text-white rounded-xl text-[9px] font-semibold uppercase tracking-widest">Inactive</span>
+                           )}
+                           <span className={`w-3 h-3 rounded-full border-2 border-white ${
+                             room.status === 'Occupied' ? 'bg-red-500 animate-pulse' : 
+                             room.status === 'Reserved' ? 'bg-yellow-500' : 'bg-green-500'
+                           }`} />
+                        </div>
+                        <h5 className="absolute bottom-3 left-3 text-base font-semibold text-white truncate right-3 shadow-sm">{room.name}</h5>
                       </div>
 
-                      <h5 className="text-base font-semibold text-stone-900 group-hover:text-brand-accent transition-colors">{room.name}</h5>
-                      <p className="text-[10px] text-stone-400 font-semibold uppercase mt-1 tracking-widest leading-relaxed">
-                         {room.notes}
-                      </p>
+                      <div className="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                          <p className="text-[10px] text-stone-500 font-medium leading-relaxed italic line-clamp-2">
+                             "{room.notes}"
+                          </p>
+                          {room.benefits && room.benefits.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-1">
+                              {room.benefits.map((benefit, idx) => (
+                                <span key={idx} className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[8px] font-semibold uppercase tracking-widest">
+                                  {benefit}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-stone-100">
-                         <div>
-                            <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Min. Spend</p>
-                            <p className="text-sm font-semibold text-brand-primary">₹{room.minSpend.toLocaleString()}</p>
-                         </div>
-                         <div>
-                            <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Active bill</p>
-                            <p className="text-sm font-semibold text-brand-success">
-                              {room.activeBill > 0 ? `₹${room.activeBill.toLocaleString()}` : 'No Active Bill'}
-                            </p>
-                         </div>
+                        <div className="mt-4">
+                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-stone-100 cursor-pointer" onClick={() => setSelectedRoom(room)}>
+                             <div>
+                                <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Min. Spend</p>
+                                <p className="text-sm font-semibold text-brand-primary">₹{room.minSpend.toLocaleString()}</p>
+                             </div>
+                             <div>
+                                <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Active bill</p>
+                                <p className="text-sm font-semibold text-brand-success">
+                                  {room.activeBill > 0 ? `₹${room.activeBill.toLocaleString()}` : 'No Active Bill'}
+                                </p>
+                             </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-stone-100">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); openEditPdrModal(room); }}
+                              className="flex-1 py-2 bg-stone-50 text-stone-600 hover:bg-stone-100 border border-stone-200 text-[10px] font-semibold uppercase tracking-widest rounded-xl transition-all"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setDeletingPdr(room.id); }}
+                              className="flex-1 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 text-[10px] font-semibold uppercase tracking-widest rounded-xl transition-all"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}

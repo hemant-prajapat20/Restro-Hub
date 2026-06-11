@@ -203,22 +203,22 @@ content = content.replace(
 const provisionBtnStr = `<button onClick={() => setShowAddTableModal(false)} className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20">PROVISION TABLE</button>`;
 
 const newProvisionBtnStr = `<button 
-                        onClick={() => {
-                           if (!newTableIdentifier) return toast.error('Table Identifier is required');
-                           addTableMutation.mutate({
-                               number: newTableIdentifier,
-                               capacity: newTableCapacity,
-                               floor: newTableFloor,
-                               status: 'Available'
-                           });
-                           setShowAddTableModal(false);
-                           setNewTableIdentifier('');
-                        }}
-                        disabled={addTableMutation.isPending}
-                        className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
-                     >
-                        {addTableMutation.isPending ? 'PROVISIONING...' : 'PROVISION TABLE'}
-                     </button>`;
+          onClick={() => {
+            if (!newTableIdentifier) return toast.error('Table Identifier is required');
+             addTableMutation.mutate({
+              number: newTableIdentifier,
+                capacity: newTableCapacity,
+               floor: newTableFloor,
+                status: 'Available'
+              });
+             setShowAddTableModal(false);
+             setNewTableIdentifier('');
+               }}
+                  disabled={addTableMutation.isPending}
+                className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
+              >
+                 {addTableMutation.isPending ? 'PROVISIONING...' : 'PROVISION TABLE'}
+              </button>`;
 
 content = content.replace(provisionBtnStr, newProvisionBtnStr);
 
