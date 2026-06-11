@@ -346,7 +346,7 @@ export const Tables: React.FC = () => {
     setDiscountCode('');
   };
 
-  const categories = ['All', ...Array.from(new Set(menuItems.map((item: any) => item.category)))];
+  const categories = ['All', ...Array.from(new Set(menuItems.map((item: any) => item.category))) as string[]];
 
   const filteredMenuItems = (menuItems || []).filter((item: any) => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;

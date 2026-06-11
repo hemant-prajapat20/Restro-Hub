@@ -1,32 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  Coffee, 
-  Plus, 
-  Search, 
-  Flame, 
-  Timer, 
-  Utensils, 
-  TrendingUp, 
-  Sliders, 
-  Loader2,
-  SlidersHorizontal,
-  X,
-  PlusCircle,
-  TrendingDown,
-  Sparkles,
-  Award,
-  ShoppingCart,
-  Receipt,
-  Printer,
-  CreditCard,
-  CheckCircle,
-  ChevronRight,
-  FileText
-} from 'lucide-react';
+import { Coffee, Plus, Search, Flame, Timer, Utensils, TrendingUp, Sliders, Loader2, SlidersHorizontal, X, PlusCircle, TrendingDown, Sparkles, Award, ShoppingCart, Receipt, Printer, CreditCard, CheckCircle, ChevronRight, FileText, Edit2, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
 interface CafeItem {
+  _id?: string;
   id: string;
   name: string;
   category: 'Specialty Beans' | 'Artisan Patisserie' | 'Cold Brew' | 'Signature Beverage';
@@ -121,8 +99,9 @@ export const CafeBakery: React.FC = () => {
 
   // Form states
   const [newName, setNewName] = useState('');
-  const [newCategory, setNewCategory] = useState<'Specialty Beans' | 'Artisan Patisserie' | 'Cold Brew' | 'Signature Beverage'>('Specialty Beans');
+  const [newCategory, setNewCategory] = useState<string>('Specialty Beans');
   const [newOrigin, setNewOrigin] = useState('');
+  const [newRoastTime, setNewRoastTime] = useState('');
   const [newPrice, setNewPrice] = useState('');
   const [newImage, setNewImage] = useState('');
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
@@ -185,6 +164,11 @@ export const CafeBakery: React.FC = () => {
 
   const [editingItem, setEditingItem] = useState<CafeItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<string | null>(null);
+  const handleDeleteItem = (id: string) => {
+    if(confirm('Are you sure you want to delete this item?')) {
+       deleteCafeItemMutation.mutate(id);
+    }
+  };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -509,9 +493,29 @@ export const CafeBakery: React.FC = () => {
 
                       <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                         <div>
-                          <p className="text-[10.5px] font-semibold text-stone-500 uppercase tracking-wide leading-relaxed mb-4">
-                            {item.originOrType}
-                          </p>
+                          <div className="flex justify-between items-start mb-4">
+
+                            <p className="text-[10.5px] font-semibold text-stone-500 uppercase tracking-wide leading-relaxed">
+
+                              {item.originOrType}
+
+                            </p>
+
+                            <button 
+
+                              onClick={(e) => { e.stopPropagation(); openEditModal(item); }}
+
+                              className="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-400 hover:text-amber-600 flex items-center justify-center transition-all flex-shrink-0 ml-2 z-10"
+
+                              title="Edit Item"
+
+                            >
+
+                              <Edit2 size={12} />
+
+                            </button>
+
+                          </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="p-3 bg-stone-50 rounded-2xl text-center">
                               <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">Stock Level</p>
@@ -1209,6 +1213,95 @@ export const CafeBakery: React.FC = () => {
                 <div className="flex gap-4 pt-4">
                   <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
                   <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">PROVISION ARTISAN BATCH</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editingItem && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm"
+              onClick={() => setEditingItem(null)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-y-auto max-h-[90vh] custom-scrollbar text-stone-800"
+            >
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Edit Catalog Item</h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Update bakery or coffee details</p>
+
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Item Name</label>
+                  <input type="text" required value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                
+                <div className="space-y-1 pb-4">
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-2">Image Preview</label>
+                  {newImage && <img src={newImage} alt="Preview" className="h-24 w-36 object-cover rounded-xl mb-3 shadow-sm border border-stone-200" />}
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Upload Image</label>
+                  <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewImageFile(file);
+                      setNewImage(URL.createObjectURL(file));
+                    }
+                  }} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Item Category</label>
+                    <input 
+                      list="cafeCategoriesList"
+                      type="text"
+                      required
+                      value={newCategory} 
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      placeholder="Type or select category"
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Score / Rating</label>
+                    <input type="text" value={newScore} onChange={(e) => setNewScore(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Price (₹)</label>
+                    <input type="number" min="0" required value={newPrice} onChange={(e) => setNewPrice(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock Level</label>
+                    <input type="number" min="0" required value={newStock} onChange={(e) => setNewStock(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Origin / Bean Type / Region</label>
+                  <input type="text" value={newOrigin} onChange={(e) => setNewOrigin(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Roast Profile / Bake Time</label>
+                  <input type="text" value={newRoastTime} onChange={(e) => setNewRoastTime(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button type="button" onClick={() => handleDeleteItem(editingItem.id || editingItem._id)} className="flex-[0.5] flex items-center justify-center py-4 bg-red-50 text-red-600 font-semibold rounded-2xl text-xs hover:bg-red-100 transition-all"><Trash2 size={18} /></button>
+                  <button type="button" onClick={() => setEditingItem(null)} className="flex-1 py-4 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200 transition-all">Cancel</button>
+                  <button type="submit" className="flex-[2] py-4 bg-stone-900 border border-amber-500/20 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl cursor-pointer hover:opacity-90">Save</button>
                 </div>
               </form>
             </motion.div>

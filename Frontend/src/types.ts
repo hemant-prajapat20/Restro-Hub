@@ -10,6 +10,7 @@ export interface User {
 
 export interface MenuItem {
   id: string;
+  _id?: string;
   name: string;
   description: string;
   price: number;
@@ -57,10 +58,13 @@ export interface Table {
 
 export interface InventoryItem {
   id: string;
+  _id?: string;
   name: string;
   unit: string;
   currentStock: number;
   minStock: number;
+  quantityInStock?: number;
+  reorderThreshold?: number;
   category: string;
   lastUpdated: Date;
 }

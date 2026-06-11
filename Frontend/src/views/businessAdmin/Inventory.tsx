@@ -72,6 +72,18 @@ export const Inventory: React.FC = () => {
     }
   });
 
+  const deleteInventoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/inventory/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Inventory item deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      setEditingId(null);
+    },
+    onError: () => toast.error('Failed to delete inventory item')
+  });
+
   const categories = ['All', ...Array.from(new Set(inventoryList.map(item => item.category)))];
 
   const filteredInventory = inventoryList.filter(item => {

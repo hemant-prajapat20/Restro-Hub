@@ -137,7 +137,7 @@ export const BarLounge: React.FC = () => {
   const [dispenseLog, setDispenseLog] = useState<{name: string, timestamp: string, tables: string}[]>([]);
 
   // Tab View state
-  const [activeTab, setActiveTab] = useState<'display' | 'billing' | 'suites'>('display');
+  const [activeTab, setActiveTab] = useState<'display' | 'billing'>('display');
 
   // Billing states
   const [cart, setCart] = useState<{ item: LiquorItem; quantity: number; mixer: string; pourSize: string; notes: string }[]>([]);
