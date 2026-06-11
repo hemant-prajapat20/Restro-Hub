@@ -120,8 +120,24 @@ export const RestroSignature: React.FC = () => {
 
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Maison Guild Tab'>('UPI');
   const [discountCode, setDiscountCode] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any | null>(null);
+  const [invoiceHistory, setInvoiceHistory] = useState<any[]>(() => {
+    const saved = localStorage.getItem('restroInvoiceHistory');
+    if (saved) return JSON.parse(saved);
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('restroInvoiceHistory', JSON.stringify(invoiceHistory));
+  }, [invoiceHistory]);
+
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const currentBusiness = JSON.parse(localStorage.getItem('business') || '{}');
+  const hotelName = currentBusiness?.name || currentUser?.businessName || 'THE IMPERIAL CHAMBERS';
+  const hotelLocation = currentBusiness?.address || currentUser?.address || '{checkoutReceipt.hotelLocation}';
 
   const addToCart = (dish: SignatureItem) => {
     setCart(prev => {
@@ -397,6 +413,7 @@ export const RestroSignature: React.FC = () => {
 
   const checkoutPdrMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
+
       await api.post(`/restro/pdrs/${id}/checkout`, data);
     },
     onSuccess: () => {
@@ -410,6 +427,11 @@ export const RestroSignature: React.FC = () => {
   const handleRestroCheckout = () => {
     if (cart.length === 0) return;
 
+    if (!customerName.trim() || !customerPhone.trim()) {
+      toast.error('Guest Name and Contact are required for billing.');
+      return;
+    }
+
     // Checkout API
     checkoutPdrMutation.mutate({ id: targetRoomId, data: { totalBill: cartTotal } });
 
@@ -417,20 +439,16 @@ export const RestroSignature: React.FC = () => {
     const invoiceNum = 'ROYAL-POS-' + Math.floor(100000 + Math.random() * 900000);
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
 
-    setCheckoutReceipt({
-      invoiceNumber: invoiceNum,
-      timestamp: dateStr,
-      roomName: pdrs.find(r => r.id === targetRoomId)?.name || 'Royal Suite',
-      items: [...cart],
-      subtotal: cartSubtotal,
-      discount: discountAmount,
-      serviceCharge,
-      cgst,
-      sgst,
-      total: cartTotal,
-      payment: paymentMethod,
+    const newReceipt = {
       chef: 'Ranveer Brar (Executive Chef)'
-    });
+    ,
+      customerName: customerName || 'Walk-in VIP',
+      customerPhone: customerPhone || 'N/A',
+      hotelName,
+      hotelLocation
+    };
+    setCheckoutReceipt(newReceipt);
+    setInvoiceHistory(prev => [newReceipt, ...prev]);
   };
 
   const handleCreateSignature = async (e: React.FormEvent) => {
@@ -900,6 +918,31 @@ export const RestroSignature: React.FC = () => {
                     </div>
                   </div>
 
+                  
+                  {/* Guest Demographics */}
+                  <div className="flex gap-4 border-b border-stone-100 pb-4">
+                    <div className="flex-1 space-y-1">
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Guest Name</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Mr. James Bond"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-brand-accent/30"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Guest Contact</label>
+                      <input 
+                        type="text" 
+                        placeholder="Phone Number"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-brand-accent/30"
+                      />
+                    </div>
+                  </div>
+                  
                   {/* Privilege Promo Code */}
                   <div className="flex items-center gap-2">
                     <input 
@@ -975,22 +1018,25 @@ export const RestroSignature: React.FC = () => {
       
               {/* Imperial Thermal Receipt view */}
               {checkoutReceipt && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-stone-50 p-4 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden text-stone-800"
-                >
-                  {/* Decorative physical cutouts */}
-                  <div className="absolute top-0 left-0 right-0 flex justify-between px-4 -translate-y-1">
-                    {Array.from({ length: 15 }).map((_, i) => (
-                      <div key={i} className="w-3 h-3 bg-white rounded-full" />
-                    ))}
-                  </div>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setCheckoutReceipt(null)} />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="bg-stone-50 p-6 rounded-[32px] border border-dashed border-stone-300 shadow-2xl relative overflow-hidden text-stone-800 w-full max-w-md z-10"
+                  >
+                    {/* Decorative physical cutouts */}
+                    <div className="absolute top-0 left-0 right-0 flex justify-between px-4 -translate-y-1">
+                      {Array.from({ length: 15 }).map((_, i) => (
+                        <div key={i} className="w-3 h-3 bg-white rounded-full" />
+                      ))}
+                    </div>
+                    <button onClick={() => setCheckoutReceipt(null)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-stone-200 text-stone-500 hover:bg-stone-300 hover:text-stone-800 transition-colors z-20">✕</button>
 
-                  <div className="pt-4 text-center">
-                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.25em] font-display">★ THE IMPERIAL CHAMBERS ★</p>
+                    <div className="pt-4 text-center">
+                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.25em] font-display">★ {(checkoutReceipt.hotelName || 'THE IMPERIAL CHAMBERS').toUpperCase()} ★</p>
                      <p className="text-[7.5px] text-stone-400 uppercase tracking-widest font-semibold font-mono">Elite Signature Tasting Lounge</p>
-                     <p className="text-[9px] text-stone-400 font-medium mt-1">Taj-Maison Cellar Wing #03, New Delhi</p>
+                     <p className="text-[9px] text-stone-400 font-medium mt-1">{checkoutReceipt.hotelLocation || 'Taj-Maison Cellar Wing #03, New Delhi'}</p>
                   </div>
 
                   <div className="space-y-4 pt-6 border-b border-dashed border-stone-200 pb-4 text-xs font-mono">
@@ -1073,7 +1119,7 @@ export const RestroSignature: React.FC = () => {
                           <button 
                             onClick={() => {
                               generateReceiptPDF({
-                                title: "Imperial Chambers Tasting Room",
+                                title: checkoutReceipt.hotelName,
                                 invoiceNumber: checkoutReceipt.invoiceNumber,
                                 timestamp: checkoutReceipt.timestamp,
                                 tableName: checkoutReceipt.roomName,
@@ -1086,7 +1132,9 @@ export const RestroSignature: React.FC = () => {
                                 tax: checkoutReceipt.cgst + checkoutReceipt.sgst,
                                 discount: checkoutReceipt.discount,
                                 total: checkoutReceipt.total,
-                                paymentMethod: checkoutReceipt.payment
+                                paymentMethod: checkoutReceipt.payment,
+                                customerName: checkoutReceipt.customerName,
+                                customerPhone: checkoutReceipt.customerPhone
                               });
                             }}
                             className="px-3 py-2.5 bg-stone-900 border border-amber-900/40 text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg hover:scale-102 active:scale-98 transition-all"
@@ -1098,8 +1146,31 @@ export const RestroSignature: React.FC = () => {
                      </div>
                   </div>
                 </motion.div>
+                </div>
               )}
             </div>
+
+            {/* Invoice History Box */}
+            {invoiceHistory.length > 0 && (
+              <div className="mt-8 col-span-1 xl:col-span-12">
+                <h4 className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 mb-3">Session Invoice History</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                  {invoiceHistory.map((inv, idx) => (
+                    <div key={idx} className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex justify-between items-center cursor-pointer hover:border-brand-accent/50 hover:shadow-md transition-all" onClick={() => setCheckoutReceipt(inv)}>
+                      <div>
+                        <p className="text-xs font-semibold text-stone-800 font-mono">{inv.invoiceNumber}</p>
+                        <p className="text-[9px] text-stone-500 font-medium">{inv.roomName} • {inv.timestamp}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-brand-primary font-display">₹{inv.total.toLocaleString()}</p>
+                        <p className="text-[8px] font-semibold text-stone-400 uppercase">{inv.payment}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
           </motion.div>
         )}
       </AnimatePresence>

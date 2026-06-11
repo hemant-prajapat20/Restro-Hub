@@ -19,6 +19,8 @@ export interface PDFReceiptData {
   discountCode?: string;
   total: number;
   paymentMethod: string;
+  customerName?: string;
+  customerPhone?: string;
 }
 
 export const generateReceiptPDF = (data: PDFReceiptData) => {
@@ -30,6 +32,8 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
 
   const logo = data.title || "INDULGE RETRO";
   const sublogo = "FINE DINING & LOUNGE";
+  const custText = data.customerName ? `Guest: ${data.customerName}` : '';
+  const custPhone = data.customerPhone ? `Phone: ${data.customerPhone}` : '';
 
   // Margins & Dimensions
   const margin = 12;
@@ -77,6 +81,11 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   }
 
   // Middle Border
+  if (custText) {
+    y += 5;
+    doc.text(custText, margin, y);
+    doc.text(custPhone, width - margin, y, { align: 'right' });
+  }
   y += 5;
   doc.line(margin, y, width - margin, y);
 

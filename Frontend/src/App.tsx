@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './views/auth/Login';
 import { Register } from './views/auth/Register';
