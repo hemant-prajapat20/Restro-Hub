@@ -12,7 +12,7 @@ export const getOrders = async (req: Request, res: Response) => {
     if (status) query.status = status;
     if (type) query.type = type;
 
-    const orders = await Order.find(query).sort({ createdAt: -1 });
+    const orders = await Order.find(query).populate('tableId').sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: 'Server error fetching orders' });
@@ -45,14 +45,15 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     const savedOrder = await newOrder.save();
+    const populatedOrder = await Order.findById(savedOrder._id).populate('tableId');
 
     // Emit socket event for KDS
     const io = req.app.get('io');
     if (io) {
-      io.emit('newOrder', savedOrder);
+      io.emit('newOrder', populatedOrder);
     }
 
-    res.status(201).json(savedOrder);
+    res.status(201).json(populatedOrder);
   } catch (error) {
     res.status(500).json({ message: 'Server error creating order' });
   }

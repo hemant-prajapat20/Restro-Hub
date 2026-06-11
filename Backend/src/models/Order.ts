@@ -25,6 +25,7 @@ export interface IOrder extends Document {
     phone: string;
     address?: string;
   };
+  estimatedPrepTime?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -51,7 +52,8 @@ const OrderSchema = new Schema({
     name: { type: String },
     phone: { type: String },
     address: { type: String }
-  }
+  },
+  estimatedPrepTime: { type: Number }
 }, { timestamps: true });
 
 export default mongoose.model<IOrder>('Order', OrderSchema);

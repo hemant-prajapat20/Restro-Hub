@@ -23,7 +23,8 @@ import {
   PlusCircle,
   Printer,
   UtensilsCrossed,
-  FileText
+  FileText,
+  ChefHat
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Table, TableStatus, MenuItem } from '../../types';
@@ -69,7 +70,7 @@ export const Tables: React.FC = () => {
     queryKey: ['tables'],
     queryFn: async () => {
       const res = await api.get('/tables');
-      return res.data;
+      return res.data.map((t: any) => ({ ...t, id: t._id || t.id }));
     }
   });
 
@@ -84,8 +85,8 @@ export const Tables: React.FC = () => {
   const { data: menuItems = [] } = useQuery({
     queryKey: ['menuItems'],
     queryFn: async () => {
-      const res = await api.get('/cafebakery/items');
-      return res.data;
+      const res = await api.get('/menu');
+      return res.data.data || res.data;
     }
   });
 
@@ -138,6 +139,19 @@ export const Tables: React.FC = () => {
     mutationFn: async ({ id, status }: { id: string, status: string }) => await api.put(`/tables/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
+    }
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData: any) => {
+      const res = await api.post('/orders', orderData);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Order sent to kitchen!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to send order');
     }
   });
 
@@ -203,12 +217,13 @@ export const Tables: React.FC = () => {
 
     setTableOrders(prev => {
       const items = prev[tableId] || [];
-      const existing = items.find(item => item.itemId === menuItem.id);
+      const mItemId = (menuItem as any)._id || menuItem.id;
+      const existing = items.find(item => item.itemId === mItemId);
       let updated;
       if (existing) {
-        updated = items.map(item => item.itemId === menuItem.id ? { ...item, quantity: item.quantity + 1 } : item);
+        updated = items.map(item => item.itemId === mItemId ? { ...item, quantity: item.quantity + 1 } : item);
       } else {
-        updated = [...items, { itemId: menuItem.id, name: menuItem.name, price: menuItem.price, quantity: 1 }];
+        updated = [...items, { itemId: mItemId, name: menuItem.name, price: menuItem.price, quantity: 1 }];
       }
       return { ...prev, [tableId]: updated };
     });
@@ -291,7 +306,7 @@ export const Tables: React.FC = () => {
     setDiscountCode('');
   };
 
-  const categories = ['All', 'Main Course', 'South Indian', 'Rice & Biryani', 'Starters', 'Desserts', 'Beverages'];
+  const categories = ['All', ...Array.from(new Set(menuItems.map((item: any) => item.category)))];
 
   const filteredMenuItems = (menuItems || []).filter((item: any) => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
@@ -370,6 +385,21 @@ export const Tables: React.FC = () => {
                     </span>
                     <span className="font-mono text-slate-900 font-extrabold">₹{computeTableTotal(table._id).toLocaleString()}</span>
                  </div>
+                 
+                 {tableOrders[table._id] && tableOrders[table._id].length > 0 && (
+                   <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                     <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Active Order</p>
+                     <div className="space-y-1.5 max-h-24 overflow-y-auto custom-scrollbar">
+                       {tableOrders[table._id].map(item => (
+                         <div key={item.itemId} className="flex justify-between items-start text-xs">
+                           <span className="text-slate-700 font-medium truncate pr-2"><span className="text-slate-400">{item.quantity}x</span> {item.name}</span>
+                           <span className="text-slate-500 font-mono">₹{item.price * item.quantity}</span>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+
                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-brand-danger w-3/4 rounded-full animate-pulse" />
                  </div>
@@ -713,9 +743,10 @@ export const Tables: React.FC = () => {
                        {/* Menu Selection List */}
                        <div className="space-y-3 max-h-[365px] overflow-y-auto custom-scrollbar pr-1">
                          {filteredMenuItems.map(dish => {
-                           const quantity = tableOrders[selectedTable.id]?.find(i => i.itemId === dish.id)?.quantity || 0;
+                           const itemId = dish._id || dish.id;
+                           const quantity = tableOrders[selectedTable.id]?.find(i => i.itemId === itemId)?.quantity || 0;
                            return (
-                             <div key={dish.id} className="p-3 bg-white border border-slate-150 rounded-2xl flex items-center gap-4 hover:border-brand-accent/40 transition-all">
+                             <div key={itemId} className="p-3 bg-white border border-slate-150 rounded-2xl flex items-center gap-4 hover:border-brand-accent/40 transition-all">
                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 flex-shrink-0">
                                  <img src={dish.image} className="w-full h-full object-cover animate-fade-in" alt={dish.name} />
                                </div>
@@ -730,7 +761,7 @@ export const Tables: React.FC = () => {
                                  {quantity > 0 ? (
                                    <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
                                      <button
-                                       onClick={() => removeFromTableOrder(selectedTable.id, dish.id)}
+                                       onClick={() => removeFromTableOrder(selectedTable.id, itemId)}
                                        className="px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
                                      >
                                        -
@@ -761,18 +792,53 @@ export const Tables: React.FC = () => {
                  </div>
 
                  {/* Modal Footer */}
-                 <div className="p-8 border-t border-slate-100 flex gap-4">
+                 <div className="p-6 border-t border-slate-100 flex gap-4">
                     <button 
-                      onClick={() => handleSettleAndClear(selectedTable.id)}
-                      disabled={(tableOrders[selectedTable.id]?.length || 0) === 0}
-                      className="flex-1 bg-brand-success text-white py-5 rounded-[24px] font-semibold text-sm shadow-xl shadow-brand-success/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                      onClick={() => {
+                        const items = tableOrders[selectedTable.id] || [];
+                        if (items.length === 0) return;
+                        
+                        createOrderMutation.mutate({
+                          type: 'POS',
+                          tableId: selectedTable.id,
+                          items: items.map(i => ({
+                            menuItem: i.itemId,
+                            name: i.name,
+                            quantity: i.quantity,
+                            price: i.price,
+                            status: 'Pending'
+                          })),
+                          subtotal: computeTableSubtotal(selectedTable.id),
+                          tax: computeTableTax(selectedTable.id),
+                          total: computeTableTotal(selectedTable.id),
+                          paymentMethod,
+                          source: 'Direct',
+                          status: 'Pending'
+                        });
+                      }}
+                      disabled={(tableOrders[selectedTable.id]?.length || 0) === 0 || createOrderMutation.isPending}
+                      className="flex-1 bg-brand-accent text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-accent/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                     >
-                       <CheckCircle2 size={20} strokeWidth={3} />
-                       SETTLE & PRINT RECEIPT
+                       <ChefHat size={18} strokeWidth={3} />
+                       SEND TO KITCHEN
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (modalTab === 'add_items') {
+                          setModalTab('checkout');
+                        } else {
+                          handleSettleAndClear(selectedTable.id);
+                        }
+                      }}
+                      disabled={(tableOrders[selectedTable.id]?.length || 0) === 0}
+                      className="flex-1 bg-brand-success text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-success/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                    >
+                       <CheckCircle2 size={18} strokeWidth={3} />
+                       {modalTab === 'add_items' ? 'CHECKOUT / BILLING' : 'COMPLETE BILLING'}
                     </button>
                     <button 
                       onClick={() => setSelectedTableId(null)}
-                      className="w-20 bg-slate-100 text-slate-400 rounded-[24px] flex items-center justify-center hover:bg-slate-200 transition-all"
+                      className="w-16 bg-slate-100 text-slate-400 rounded-[20px] flex items-center justify-center hover:bg-slate-200 transition-all"
                     >
                        <X size={20} />
                     </button>
