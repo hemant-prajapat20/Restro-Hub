@@ -26,12 +26,11 @@ import {
   FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Table, TableStatus, MenuItem } from '../../types';
+import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { MOCK_MENU } from '../../mockData';
-import { Table, TableStatus, MenuItem } from '../../types';
-import { generateReceiptPDF } from '../../utils/pdfGenerator';
 
 const StatusBadge = ({ status }: { status: TableStatus }) => {
   const styles: Record<TableStatus, string> = {
@@ -42,52 +41,110 @@ const StatusBadge = ({ status }: { status: TableStatus }) => {
     'Billing': 'bg-blue-100 text-blue-600',
   };
   return (
-    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${styles[status]}`}>
+    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${styles[status]}`}>
       {status}
     </span>
   );
 };
 
 export const Tables: React.FC = () => {
-  const queryClient = useQueryClient();
   const [activeFloor, setActiveFloor] = useState(1);
-  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
-  const [showAddTableModal, setShowAddTableModal] = useState(false);
 
-  // Form states for new table
-  const [newTableIdentifier, setNewTableIdentifier] = useState('');
-  const [newTableCapacity, setNewTableCapacity] = useState(4);
-  const [newTableFloor, setNewTableFloor] = useState(1);
+  
+  const [showAddReservationModal, setShowAddReservationModal] = useState(false);
+  const [newResName, setNewResName] = useState('');
+  const [newResPhone, setNewResPhone] = useState('');
+  const [newResGuests, setNewResGuests] = useState(2);
+  const [newResTime, setNewResTime] = useState('19:00');
+  const [newResFloor, setNewResFloor] = useState(1);
+  const [newResTableNum, setNewResTableNum] = useState('');
 
-  const { data: tables = [], isLoading } = useQuery<Table[]>({
+  const queryClient = useQueryClient();
+
+  const { data: tables = [] } = useQuery({
     queryKey: ['tables'],
     queryFn: async () => {
-      const response = await api.get('/tables');
-      return response.data;
+      const res = await api.get('/tables');
+      return res.data;
     }
   });
 
-  const updateTableMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string, data: any }) => {
-      await api.put(`/tables/${id}`, data);
-    },
+  const { data: reservations = [] } = useQuery({
+    queryKey: ['reservations'],
+    queryFn: async () => {
+      const res = await api.get('/reservations');
+      return res.data;
+    }
+  });
+
+  const { data: menuItems = [] } = useQuery({
+    queryKey: ['menuItems'],
+    queryFn: async () => {
+      const res = await api.get('/cafebakery/items');
+      return res.data;
+    }
+  });
+
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      const res = await api.get('/settings');
+      return res.data;
+    }
+  });
+
+  const createReservationMutation = useMutation({
+    mutationFn: async (data: any) => await api.post('/reservations', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      setShowAddReservationModal(false);
+      setNewResName('');
+      setNewResPhone('');
+      toast.success('Reservation Added');
+    }
+  });
+
+  const updateReservationMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => await api.patch(`/reservations/${id}/status`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      toast.success('Reservation Updated');
+    }
+  });
+
+  const updateSettingsMutation = useMutation({
+    mutationFn: async (data: any) => await api.put('/settings', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
+      toast.success('Settings Updated');
     }
   });
 
   const addTableMutation = useMutation({
-    mutationFn: async (data: any) => {
-      await api.post('/tables', data);
-    },
+    mutationFn: async (data: any) => await api.post('/tables', data),
     onSuccess: () => {
-      toast.success('Table added successfully');
       queryClient.invalidateQueries({ queryKey: ['tables'] });
-      setShowAddTableModal(false);
-      setNewTableIdentifier('');
-    },
-    onError: () => toast.error('Failed to add table')
+      toast.success('Table Added');
+    }
   });
+
+  const updateTableStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => await api.put(`/tables/${id}/status`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+    }
+  });
+
+  const clearTableMutation = useMutation({
+    mutationFn: async (id: string) => await api.post(`/tables/${id}/clear`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      toast.success('Table Cleared');
+      setSelectedTable(null);
+    }
+  });
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [showAddTableModal, setShowAddTableModal] = useState(false);
 
   // Dynamic table billing state
   const [tableOrders, setTableOrders] = useState<Record<string, { itemId: string; name: string; price: number; quantity: number }[]>>({
@@ -111,7 +168,7 @@ export const Tables: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Cash'>('UPI');
   const [settledReceipt, setSettledReceipt] = useState<any | null>(null);
 
-  const selectedTable = tables.find(t => t.id === selectedTableId) || null;
+  const selectedTable = tables.find(t => t._id === selectedTableId) || null;
   const floorTables = tables.filter(t => t.floor === activeFloor);
 
   // Helper calculations
@@ -134,10 +191,12 @@ export const Tables: React.FC = () => {
 
   // Adding item to order
   const addToTableOrder = (tableId: string, menuItem: MenuItem) => {
-    const table = tables.find(t => t.id === tableId);
-    if (table && (table.status === 'Available' || table.status === 'Reserved' || table.status === 'Cleaning')) {
-      updateTableMutation.mutate({ id: tableId, data: { status: 'Occupied' } });
-    }
+    setTables(prev => prev.map(t => {
+      if (t._id === tableId && (t.status === 'Available' || t.status === 'Reserved' || t.status === 'Cleaning')) {
+        return { ...t, status: 'Occupied' };
+      }
+      return t;
+    }));
 
     setTableOrders(prev => {
       const items = prev[tableId] || [];
@@ -178,7 +237,7 @@ export const Tables: React.FC = () => {
   };
 
   const setTableStatus = (tableId: string, status: TableStatus) => {
-    updateTableMutation.mutate({ id: tableId, data: { status } });
+    setTables(prev => prev.map(t => t._id === tableId ? { ...t, status } : t));
   };
 
   const verifyDiscount = () => {
@@ -216,7 +275,7 @@ export const Tables: React.FC = () => {
     });
 
     // Reset table order and mark table as 'Cleaning'
-    updateTableMutation.mutate({ id: tableId, data: { status: 'Cleaning' } });
+    setTables(prev => prev.map(t => t._id === tableId ? { ...t, status: 'Cleaning' } : t));
     setTableOrders(prev => {
       const copy = { ...prev };
       delete copy[tableId];
@@ -230,21 +289,17 @@ export const Tables: React.FC = () => {
 
   const categories = ['All', 'Main Course', 'South Indian', 'Rice & Biryani', 'Starters', 'Desserts', 'Beverages'];
 
-  const filteredMenuItems = MOCK_MENU.filter(item => {
+  const filteredMenuItems = (menuItems || []).filter((item: any) => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           item.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div></div>;
-  }
-
   return (
-    <div className="p-5 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-soft gap-4">
-        <div className="flex flex-col sm:flex-row items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner w-full md:w-auto">
+    <div className="p-8 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+      <div className="flex items-center justify-between bg-white p-4 rounded-3xl border border-slate-200 shadow-soft">
+        <div className="flex items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
           <button 
             onClick={() => setActiveFloor(1)}
             className={`px-6 py-3 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
@@ -263,7 +318,7 @@ export const Tables: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        <div className="flex items-center gap-3">
            <button className="flex items-center gap-2 px-6 py-3 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-500 uppercase tracking-widest hover:bg-slate-50">
               <History size={16} />
               Waitlist
@@ -278,7 +333,7 @@ export const Tables: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {floorTables.map((table) => (
           <motion.div
             layout
@@ -287,14 +342,14 @@ export const Tables: React.FC = () => {
               setSelectedTableId(table.id);
               setModalTab('checkout');
             }}
-            className={`bg-white rounded-2xl p-4 border transition-all duration-300 relative overflow-hidden group cursor-pointer ${
+            className={`bg-white rounded-3xl p-6 border transition-all duration-300 relative overflow-hidden group cursor-pointer ${
               selectedTableId === table.id ? 'border-brand-accent ring-2 ring-brand-accent/10 scale-[1.02] z-10' : 'border-slate-200 shadow-soft hover:border-brand-accent/50'
             }`}
           >
             <div className="flex items-start justify-between mb-8">
               <div>
-                <h3 className="text-2xl font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">#{table.number}</h3>
-                <p className="text-xs font-semibold text-slate-400 mt-1 uppercase flex items-center gap-1">
+                <h3 className="text-3xl font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">#{table.number}</h3>
+                <p className="text-xs font-bold text-slate-400 mt-1 uppercase flex items-center gap-1">
                   <Users size={12} />
                   {table.capacity} Seater
                 </p>
@@ -304,7 +359,7 @@ export const Tables: React.FC = () => {
 
             {table.status === 'Occupied' || table.status === 'Billing' ? (
               <div className="space-y-4">
-                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                 <div className="flex items-center justify-between text-xs font-bold text-slate-600">
                     <span className="flex items-center gap-1">
                       <Clock size={12} />
                       Dine Sessions
@@ -322,7 +377,7 @@ export const Tables: React.FC = () => {
               </div>
             ) : (
               <div className="h-14 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
-                 <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest">Available</p>
+                 <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">Available</p>
               </div>
             )}
 
@@ -355,20 +410,20 @@ export const Tables: React.FC = () => {
                 className="relative bg-white h-full w-full max-w-lg shadow-2xl flex flex-col"
               >
                  {/* Modal Header */}
-                 <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
-                       <div className="w-14 h-14 sm:w-16 sm:h-16 bg-brand-primary text-white rounded-2xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
-                          <h2 className="text-xl sm:text-2xl font-semibold">#{selectedTable.number}</h2>
+                 <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                       <div className="w-16 h-16 bg-brand-primary text-white rounded-3xl flex items-center justify-center shadow-xl">
+                          <h2 className="text-2xl font-semibold">#{selectedTable.number}</h2>
                        </div>
                        <div>
                           <h3 className="text-xl font-semibold text-slate-900">Table Billing & POS</h3>
                           <div className="flex items-center gap-2 mt-1">
                              <StatusBadge status={selectedTable.status} />
-                             <span className="text-xs font-semibold text-slate-400 uppercase">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
+                             <span className="text-xs font-bold text-slate-400 uppercase">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
                           </div>
                        </div>
                     </div>
-                    <button onClick={() => setSelectedTableId(null)} className="absolute top-6 right-6 sm:static sm:top-auto sm:right-auto p-2 sm:p-3 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-xl sm:rounded-2xl transition-all">
+                    <button onClick={() => setSelectedTableId(null)} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-2xl transition-all">
                        <X size={24} />
                     </button>
                  </div>
@@ -390,12 +445,12 @@ export const Tables: React.FC = () => {
                  </div>
 
                  {/* Modal Content */}
-                 <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+                 <div className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar">
                    {modalTab === 'checkout' ? (
                      <div className="space-y-6">
                        {/* Table current status state messages */}
                        {selectedTable.status === 'Cleaning' && (
-                         <div className="p-4 bg-brand-warning/10 border border-brand-warning/20 text-brand-warning rounded-2xl text-center space-y-3">
+                         <div className="p-6 bg-brand-warning/10 border border-brand-warning/20 text-brand-warning rounded-3xl text-center space-y-3">
                            <RefreshCw className="mx-auto animate-spin" size={28} />
                            <p className="text-xs font-semibold uppercase tracking-wider">Sanitization In Progress</p>
                            <p className="text-xs font-medium text-slate-500">Waiters are preparing and wiping table #{selectedTable.number}. Click 'Complete Reset' below to clear.</p>
@@ -410,7 +465,7 @@ export const Tables: React.FC = () => {
 
                        {/* Receipt summary if settled */}
                        {settledReceipt && settledReceipt.tableNumber === selectedTable.number && (
-                         <div className="p-4 bg-slate-50 rounded-[32px] border border-dashed border-slate-300 space-y-4">
+                         <div className="p-6 bg-slate-50 rounded-[32px] border border-dashed border-slate-300 space-y-4">
                            <div className="text-center pb-2 border-b border-dashed border-slate-200">
                              <Receipt size={24} className="mx-auto text-brand-success mb-1" />
                              <p className="text-xs font-semibold uppercase tracking-wider text-slate-900">Settled Receipt Summary</p>
@@ -424,7 +479,7 @@ export const Tables: React.FC = () => {
                                  <span>₹{(item.price * item.quantity).toLocaleString()}</span>
                                </div>
                              ))}
-                             <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between font-semibold text-slate-900">
+                             <div className="border-t border-dashed border-slate-200 pt-2 flex justify-between font-bold text-slate-900">
                                <span>Grand Total Paid ({settledReceipt.payment})</span>
                                <span>₹{settledReceipt.total.toLocaleString()}</span>
                              </div>
@@ -482,13 +537,13 @@ export const Tables: React.FC = () => {
                                    setTableStatus(selectedTable.id, 'Available');
                                  }
                                }}
-                               className="text-[10px] font-semibold text-red-500 hover:underline uppercase"
+                               className="text-[10px] font-bold text-red-500 hover:underline uppercase"
                              >
                                Reset Order
                              </button>
                            </div>
 
-                           <div className="bg-white border-2 border-slate-100 rounded-[32px] p-4 space-y-4">
+                           <div className="bg-white border-2 border-slate-100 rounded-[32px] p-6 space-y-4">
                              <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
                                {tableOrders[selectedTable.id]?.map(item => (
                                  <div key={item.itemId} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-xl hover:bg-slate-50/80">
@@ -503,7 +558,7 @@ export const Tables: React.FC = () => {
                                      >
                                        -
                                      </button>
-                                     <span className="text-xs font-semibold text-slate-950 font-mono min-w-[14px] text-center">{item.quantity}</span>
+                                     <span className="text-xs font-bold text-slate-950 font-mono min-w-[14px] text-center">{item.quantity}</span>
                                      <button 
                                        onClick={() => addToTableOrder(selectedTable.id, { id: item.itemId, name: item.name, price: item.price } as MenuItem)}
                                        className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-semibold text-xs"
@@ -552,7 +607,7 @@ export const Tables: React.FC = () => {
                                    placeholder="Try VIP25, WELCOME20, TASTY10"
                                    value={discountCode}
                                    onChange={e => setDiscountCode(e.target.value)}
-                                   className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold uppercase tracking-widest placeholder-slate-300"
+                                   className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest placeholder-slate-300"
                                  />
                                  <button
                                    onClick={verifyDiscount}
@@ -571,7 +626,7 @@ export const Tables: React.FC = () => {
                                    <button
                                      key={mode}
                                      onClick={() => setPaymentMethod(mode)}
-                                     className={`py-2 px-3 border rounded-xl text-xs font-semibold uppercase tracking-wider transition-all ${paymentMethod === mode ? 'border-brand-accent text-brand-accent bg-brand-accent/5' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                                     className={`py-2 px-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${paymentMethod === mode ? 'border-brand-accent text-brand-accent bg-brand-accent/5' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                                    >
                                      {mode}
                                    </button>
@@ -581,7 +636,7 @@ export const Tables: React.FC = () => {
                            </div>
                          </div>
                        ) : (
-                         <div className="py-12 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 text-center flex flex-col items-center gap-3">
+                         <div className="py-12 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 text-center flex flex-col items-center gap-3">
                            <UtensilsCrossed size={36} className="text-slate-400" />
                            <div>
                              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">No Active Billing</p>
@@ -604,7 +659,7 @@ export const Tables: React.FC = () => {
                              <button
                                key={status}
                                onClick={() => setTableStatus(selectedTable.id, status)}
-                               className={`py-2 text-[10px] font-semibold uppercase rounded-lg border text-center transition-all ${selectedTable.status === status ? 'bg-slate-900 border-slate-900 text-white' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                               className={`py-2 text-[10px] font-bold uppercase rounded-lg border text-center transition-all ${selectedTable.status === status ? 'bg-slate-900 border-slate-900 text-white' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                              >
                                {status}
                              </button>
@@ -619,10 +674,10 @@ export const Tables: React.FC = () => {
                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                          <input
                            type="text"
-                           placeholder="Search recipes..."
+                           placeholder="Search recipe catalog..."
                            value={searchQuery}
                            onChange={e => setSearchQuery(e.target.value)}
-                           className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold leading-relaxed placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/10"
+                           className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold leading-relaxed placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-accent/10"
                          />
                        </div>
 
@@ -649,7 +704,7 @@ export const Tables: React.FC = () => {
                                  <img src={dish.image} className="w-full h-full object-cover animate-fade-in" alt={dish.name} />
                                </div>
                                <div className="flex-1 min-w-0">
-                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold uppercase tracking-wider ${dish.isVeg ? 'bg-green-50 text-green-600 border border-green-200/50' : 'bg-red-50 text-red-600 border border-red-200/50'}`}>
+                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${dish.isVeg ? 'bg-green-50 text-green-600 border border-green-200/50' : 'bg-red-50 text-red-600 border border-red-200/50'}`}>
                                    {dish.category}
                                  </span>
                                  <h5 className="text-xs font-semibold text-slate-800 truncate mt-1">{dish.name}</h5>
@@ -690,7 +745,7 @@ export const Tables: React.FC = () => {
                  </div>
 
                  {/* Modal Footer */}
-                 <div className="p-5 border-t border-slate-100 flex gap-4">
+                 <div className="p-8 border-t border-slate-100 flex gap-4">
                     <button 
                       onClick={() => handleSettleAndClear(selectedTable.id)}
                       disabled={(tableOrders[selectedTable.id]?.length || 0) === 0}
@@ -726,68 +781,34 @@ export const Tables: React.FC = () => {
                  initial={{ scale: 0.9, opacity: 0 }}
                  animate={{ scale: 1, opacity: 1 }}
                  exit={{ scale: 0.9, opacity: 0 }}
-                 className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-4"
+                 className="relative bg-white w-full max-w-md rounded-[40px] shadow-2xl p-10"
                >
-                  <h3 className="text-2xl font-semibold text-slate-900 mb-8">New Table Entity</h3>
+                  <h3 className="text-3xl font-semibold text-slate-900 mb-8">New Table Entity</h3>
                   <div className="space-y-6">
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Identifier</label>
-                        <input 
-                           type="text" 
-                           placeholder="e.g. 15, V1, T10" 
-                           value={newTableIdentifier}
-                           onChange={e => setNewTableIdentifier(e.target.value)}
-                           className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-xl" 
-                        />
+                        <input type="text" placeholder="e.g. 15, V1, T10" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl" />
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Guest Capacity</label>
-                        <select 
-                           value={newTableCapacity}
-                           onChange={e => setNewTableCapacity(Number(e.target.value))}
-                           className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-xl"
-                        >
-                           <option value={2}>2 Seater</option>
-                           <option value={4}>4 Seater</option>
-                           <option value={6}>6 Seater</option>
-                           <option value={8}>8 Seater (Royal)</option>
+                        <select className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl">
+                           <option>2 Seater</option>
+                           <option>4 Seater</option>
+                           <option>6 Seater</option>
+                           <option>8 Seater (Royal)</option>
                         </select>
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Floor Assignment</label>
                         <div className="flex gap-2">
-                           <button 
-                              onClick={() => setNewTableFloor(1)}
-                              className={`flex-1 py-4 rounded-2xl font-semibold text-xs uppercase tracking-widest ${newTableFloor === 1 ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400'}`}
-                           >
-                              Ground
-                           </button>
-                           <button 
-                              onClick={() => setNewTableFloor(2)}
-                              className={`flex-1 py-4 rounded-2xl font-semibold text-xs uppercase tracking-widest ${newTableFloor === 2 ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400'}`}
-                           >
-                              Terrace
-                           </button>
+                           <button className="flex-1 py-4 bg-brand-primary text-white rounded-2xl font-semibold text-xs uppercase tracking-widest">Ground</button>
+                           <button className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-semibold text-xs uppercase tracking-widest">Terrace</button>
                         </div>
                      </div>
                   </div>
                   <div className="flex gap-4 mt-10">
                      <button onClick={() => setShowAddTableModal(false)} className="flex-1 py-4 font-semibold text-slate-400">DISCARD</button>
-                     <button 
-                        onClick={() => {
-                           if (!newTableIdentifier) return toast.error('Table Identifier is required');
-                           addTableMutation.mutate({
-                              number: newTableIdentifier,
-                              capacity: newTableCapacity,
-                              floor: newTableFloor,
-                              status: 'Available'
-                           });
-                        }}
-                        disabled={addTableMutation.isPending}
-                        className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
-                     >
-                        {addTableMutation.isPending ? 'PROVISIONING...' : 'PROVISION TABLE'}
-                     </button>
+                     <button onClick={() => setShowAddTableModal(false)} className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20">PROVISION TABLE</button>
                   </div>
                </motion.div>
             </div>
@@ -795,45 +816,47 @@ export const Tables: React.FC = () => {
       </AnimatePresence>
 
       {/* Reservation & Waitlist Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-soft p-5">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+         <div className="lg:col-span-2 bg-white rounded-[40px] border border-slate-200 shadow-soft p-8">
+            <div className="flex items-center justify-between mb-8">
                <h4 className="text-xl font-semibold font-display uppercase tracking-tight text-slate-800">Advanced Reservations</h4>
-               <button className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-2xl text-xs font-semibold border border-slate-100 hover:bg-slate-100 transition-all uppercase tracking-widest">View Archives</button>
+               <div className="flex gap-2">
+                 <button onClick={() => setShowAddReservationModal(true)} className="px-6 py-2.5 bg-brand-accent text-white rounded-2xl text-xs font-semibold hover:bg-brand-accent/90 transition-all uppercase tracking-widest">Add Reservation</button>
+                 <button className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-2xl text-xs font-semibold border border-slate-100 hover:bg-slate-100 transition-all uppercase tracking-widest">View Archives</button>
+               </div>
             </div>
             <div className="space-y-4">
-               {[
-                 { name: 'Amit Sharma', guests: 4, time: '19:30', phone: '+91 98XXX XXX54', status: 'Confirmed' },
-                 { name: 'Priya Verma', guests: 2, time: '20:15', phone: '+91 88XXX XXX12', status: 'Awaiting' },
-                 { name: 'Dr. Mehra', guests: 8, time: '21:00', phone: '+91 70XXX XXX99', status: 'Delayed' },
-               ].map((res) => (
-                 <div key={res.name} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all">
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
-                       <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center font-semibold text-brand-primary text-sm border border-slate-100 flex-shrink-0">
+               {(reservations.length > 0 ? reservations : []).map((res: any) => (
+                 <div key={res._id || res.name} className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-3xl border border-slate-100 group hover:bg-white hover:shadow-md transition-all">
+                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center font-semibold text-brand-primary text-sm border border-slate-100">
                        {res.time}
                     </div>
                     <div className="flex-1">
-                       <h6 className="font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">{res.name}</h6>
-                       <p className="text-xs text-slate-500 font-medium">{res.phone} • {res.guests} Guests</p>
+                       <h6 className="font-bold text-slate-900 group-hover:text-brand-accent transition-colors">{res.name}</h6>
+                       <p className="text-xs text-slate-500 font-medium">{res.phone} • {res.guests} Guests {res.tableNumber ? `• Table ${res.tableNumber}` : ''} {res.floor ? `• Floor ${res.floor}` : ''}</p>
                     </div>
-                    </div>
-                    <div className="flex items-center justify-between w-full sm:w-auto gap-3 mt-2 sm:mt-0 sm:ml-auto">
+                    <div className="flex items-center gap-3">
                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-wider ${
                          res.status === 'Confirmed' ? 'bg-brand-success/10 text-brand-success' : 
                          res.status === 'Awaiting' ? 'bg-brand-warning/10 text-brand-warning' : 'bg-brand-danger/10 text-brand-danger'
                        }`}>
                           {res.status}
                        </span>
-                       <button className="p-3 bg-white text-slate-400 hover:text-brand-success rounded-xl shadow-sm border border-slate-100 transition-all">
-                          <CheckCircle2 size={20} />
-                       </button>
+                       {res.status !== 'Confirmed' && (
+                         <button onClick={() => updateReservationMutation.mutate({ id: res._id, status: 'Confirmed' })} className="p-3 bg-white text-slate-400 hover:text-brand-success rounded-xl shadow-sm border border-slate-100 transition-all">
+                            <CheckCircle2 size={20} />
+                         </button>
+                       )}
                     </div>
                  </div>
                ))}
+               {reservations.length === 0 && (
+                 <div className="text-center py-8 text-slate-400 font-semibold text-sm">No reservations found.</div>
+               )}
             </div>
          </div>
 
-         <div className="bg-brand-sidebar rounded-2xl p-5 text-white relative overflow-hidden shadow-xl-deep">
+         <div className="bg-brand-sidebar rounded-[40px] p-8 text-white relative overflow-hidden shadow-xl-deep">
             <div className="relative z-10">
                <div className="flex items-center gap-3 mb-8">
                   <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10">
@@ -842,35 +865,35 @@ export const Tables: React.FC = () => {
                   <h4 className="text-xl font-semibold font-display uppercase tracking-tight text-white">System Controls</h4>
                </div>
                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+                  <div onClick={() => updateSettingsMutation.mutate({ smartMapping: !settingsData?.smartMapping })} className="flex items-center justify-between p-5 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                      <div>
                         <p className="text-sm font-semibold uppercase tracking-widest text-slate-200">Smart Mapping</p>
-                        <p className="text-[10px] text-slate-400 font-semibold">Auto-allocate sessions</p>
+                        <p className="text-[10px] text-slate-400 font-bold">Auto-allocate sessions</p>
                      </div>
-                     <div className="w-12 h-6 bg-brand-accent rounded-full relative">
-                        <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-lg" />
+                     <div className={`w-12 h-6 rounded-full relative transition-colors ${settingsData?.smartMapping ? 'bg-brand-accent' : 'bg-white/10 border border-white/10'}`}>
+                        <div className={`absolute top-1 w-4 h-4 rounded-full shadow-lg transition-all ${settingsData?.smartMapping ? 'right-1 bg-white' : 'left-1 bg-slate-400'}`} />
                      </div>
                   </div>
-                  <div className="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
+                  <div onClick={() => updateSettingsMutation.mutate({ kdsWebhook: !settingsData?.kdsWebhook })} className="flex items-center justify-between p-5 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer">
                      <div>
                         <p className="text-sm font-semibold uppercase tracking-widest text-slate-200">KDS Webhook</p>
-                        <p className="text-[10px] text-slate-400 font-semibold">Push updates to kitchen</p>
+                        <p className="text-[10px] text-slate-400 font-bold">Push updates to kitchen</p>
                      </div>
-                     <div className="w-12 h-6 bg-slate-700 rounded-full relative">
-                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-lg" />
+                     <div className={`w-12 h-6 rounded-full relative transition-colors ${settingsData?.kdsWebhook ? 'bg-brand-accent' : 'bg-white/10 border border-white/10'}`}>
+                        <div className={`absolute top-1 w-4 h-4 rounded-full shadow-lg transition-all ${settingsData?.kdsWebhook ? 'right-1 bg-white' : 'left-1 bg-slate-400'}`} />
                      </div>
                   </div>
                   
-                  <div className="pt-8 text-center bg-white/5 rounded-[32px] p-4 border border-white/5">
+                  <div className="pt-8 text-center bg-white/5 rounded-[32px] p-6 border border-white/5">
                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-4">Floor Utilization</p>
                      <div className="flex items-center justify-between px-4">
                         <div className="text-center">
-                           <p className="text-3xl font-semibold text-brand-accent font-display">82</p>
+                           <p className="text-4xl font-semibold text-brand-accent font-display">82</p>
                            <p className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Active %</p>
                         </div>
                         <div className="w-[1px] h-12 bg-white/10" />
                         <div className="text-center">
-                           <p className="text-3xl font-semibold text-brand-success font-display">18</p>
+                           <p className="text-4xl font-semibold text-brand-success font-display">18</p>
                            <p className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Available %</p>
                         </div>
                         <div className="w-[1px] h-12 bg-white/10" />
@@ -880,6 +903,85 @@ export const Tables: React.FC = () => {
             </div>
          </div>
       </div>
+      
+
+
+      <AnimatePresence>
+         {showAddReservationModal && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+               <motion.div 
+                 initial={{ opacity: 0 }} 
+                 animate={{ opacity: 1 }} 
+                 exit={{ opacity: 0 }}
+                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                 onClick={() => setShowAddReservationModal(false)}
+               />
+               <motion.div 
+                 initial={{ scale: 0.9, opacity: 0 }}
+                 animate={{ scale: 1, opacity: 1 }}
+                 exit={{ scale: 0.9, opacity: 0 }}
+                 className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto custom-scrollbar"
+               >
+                  <h3 className="text-2xl font-semibold text-slate-900 mb-8">New Reservation</h3>
+                  <div className="space-y-4">
+                     <div>
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Customer Name</label>
+                        <input type="text" value={newResName} onChange={e => setNewResName(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                     </div>
+                     <div>
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Phone</label>
+                        <input type="text" value={newResPhone} onChange={e => setNewResPhone(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                     </div>
+                     <div className="flex gap-4">
+                       <div className="flex-1">
+                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Floor</label>
+                          <select value={newResFloor} onChange={e => setNewResFloor(Number(e.target.value))} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg">
+                             <option value={1}>Ground</option>
+                             <option value={2}>Terrace</option>
+                          </select>
+                       </div>
+                       <div className="flex-1">
+                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Seats</label>
+                          <input type="number" min={1} value={newResGuests} onChange={e => setNewResGuests(Number(e.target.value))} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                       </div>
+                     </div>
+                     <div className="flex gap-4">
+                       <div className="flex-1">
+                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Number</label>
+                          <input type="text" value={newResTableNum} onChange={e => setNewResTableNum(e.target.value)} placeholder="e.g. T4" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                       </div>
+                       <div className="flex-1">
+                          <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Time</label>
+                          <input type="time" value={newResTime} onChange={e => setNewResTime(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                       </div>
+                     </div>
+                  </div>
+                  <div className="flex gap-4 mt-8">
+                     <button onClick={() => setShowAddReservationModal(false)} className="flex-1 py-4 font-semibold text-slate-400">DISCARD</button>
+                     <button 
+                        onClick={() => {
+                           if (!newResName || !newResPhone) return toast.error('Name and phone required');
+                           createReservationMutation.mutate({ 
+                             name: newResName, 
+                             phone: newResPhone, 
+                             guests: newResGuests, 
+                             time: newResTime,
+                             floor: newResFloor,
+                             seats: newResGuests,
+                             tableNumber: newResTableNum
+                           });
+                        }}
+                        disabled={createReservationMutation.isPending}
+                        className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
+                     >
+                        {createReservationMutation.isPending ? 'ADDING...' : 'CONFIRM SEATING'}
+                     </button>
+                  </div>
+               </motion.div>
+            </div>
+         )}
+      </AnimatePresence>
+
     </div>
   );
 };

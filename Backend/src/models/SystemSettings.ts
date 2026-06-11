@@ -5,6 +5,8 @@ export interface ISystemSettings extends Document {
   maintenanceMode: boolean;
   jwtExpirationTime: string;
   masterSecretKey: string;
+  smartMapping: boolean;
+  kdsWebhook: boolean;
 }
 
 const systemSettingsSchema = new Schema<ISystemSettings>(
@@ -13,6 +15,8 @@ const systemSettingsSchema = new Schema<ISystemSettings>(
     maintenanceMode: { type: Boolean, default: false, required: true },
     jwtExpirationTime: { type: String, default: '30 Days', required: true },
     masterSecretKey: { type: String, default: 'restrohub_owner_777', required: true },
+    smartMapping: { type: Boolean, default: false },
+    kdsWebhook: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

@@ -45,6 +45,13 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     const savedOrder = await newOrder.save();
+
+    // Emit socket event for KDS
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('newOrder', savedOrder);
+    }
+
     res.status(201).json(savedOrder);
   } catch (error) {
     res.status(500).json({ message: 'Server error creating order' });
@@ -68,8 +75,42 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
+    // Emit socket event for KDS
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('orderUpdated', updatedOrder);
+    }
+
     res.json(updatedOrder);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating order' });
+  }
+};
+
+export const updateOrder = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { id } = req.params;
+    
+    // We can update items, subtotal, tax, total, etc.
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: id, businessId },
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Emit socket event for KDS
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('orderUpdated', updatedOrder);
+    }
+
+    res.json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error updating order details' });
   }
 };

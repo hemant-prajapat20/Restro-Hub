@@ -6,7 +6,7 @@ import { Role } from '../models/User';
 const router = express.Router();
 
 router.route('/')
-  .get(protect, authorize(Role.SUPER_ADMIN), getSettings)
-  .put(protect, authorize(Role.SUPER_ADMIN), updateSettings);
+  .get(protect, authorize(Role.SUPER_ADMIN, Role.BUSINESS_ADMIN), getSettings)
+  .put(protect, authorize(Role.SUPER_ADMIN, Role.BUSINESS_ADMIN), updateSettings);
 
 export default router;

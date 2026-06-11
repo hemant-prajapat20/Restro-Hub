@@ -67,3 +67,37 @@ export const deleteTable = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error deleting table' });
   }
 };
+
+export const mergeTables = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { primaryTableId, secondaryTableIds } = req.body;
+
+    if (!primaryTableId || !secondaryTableIds || !Array.isArray(secondaryTableIds)) {
+      return res.status(400).json({ message: 'Invalid data for merging tables' });
+    }
+
+    // Update primary table to include linked tables
+    const primaryTable = await Table.findOneAndUpdate(
+      { _id: primaryTableId, businessId },
+      { $addToSet: { linkedTables: { $each: secondaryTableIds } } },
+      { new: true }
+    );
+
+    // Update secondary tables to status 'Merged'
+    await Table.updateMany(
+      { _id: { $in: secondaryTableIds }, businessId },
+      { $set: { status: 'Merged' } }
+    );
+
+    // Emit event
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('tablesMerged', { primaryTableId, secondaryTableIds });
+    }
+
+    res.json(primaryTable);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error merging tables' });
+  }
+};

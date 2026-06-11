@@ -26,7 +26,7 @@ export const getSettings = async (req: Request, res: Response): Promise<void> =>
 // @access  Private/SuperAdmin
 export const updateSettings = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { platformName, maintenanceMode, jwtExpirationTime } = req.body;
+    const { platformName, maintenanceMode, jwtExpirationTime, smartMapping, kdsWebhook } = req.body;
 
     let settings = await SystemSettings.findOne();
     if (!settings) {
@@ -36,6 +36,8 @@ export const updateSettings = async (req: Request, res: Response): Promise<void>
     if (platformName !== undefined) settings.platformName = platformName;
     if (maintenanceMode !== undefined) settings.maintenanceMode = maintenanceMode;
     if (jwtExpirationTime !== undefined) settings.jwtExpirationTime = jwtExpirationTime;
+    if (smartMapping !== undefined) settings.smartMapping = smartMapping;
+    if (kdsWebhook !== undefined) settings.kdsWebhook = kdsWebhook;
 
     const updatedSettings = await settings.save();
 

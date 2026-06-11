@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getOrders, createOrder, updateOrderStatus } from '../controllers/order.controller';
+import { getOrders, createOrder, updateOrderStatus, updateOrder } from '../controllers/order.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -12,7 +12,11 @@ router.route('/')
   .get(getOrders)
   .post(createOrder);
 
+router.route('/:id')
+  .put(updateOrder);
+
 router.route('/:id/status')
-  .patch(updateOrderStatus);
+  .patch(updateOrderStatus)
+  .put(updateOrderStatus); // Support both PATCH and PUT
 
 export default router;

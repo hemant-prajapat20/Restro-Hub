@@ -10,9 +10,12 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*', // To be restricted in production
-    methods: ['GET', 'POST']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
+
+// Attach io to the app so controllers can use it
+app.set('io', io);
 
 io.on('connection', (socket) => {
   console.log(`New client connected: ${socket.id}`);
