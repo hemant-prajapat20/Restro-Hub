@@ -901,6 +901,137 @@ export const RestroSignature: React.FC = () => {
 
               
       
+              {/* Imperial Thermal Receipt view */}
+              {checkoutReceipt && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-stone-50 p-4 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden text-stone-800"
+                >
+                  {/* Decorative physical cutouts */}
+                  <div className="absolute top-0 left-0 right-0 flex justify-between px-4 -translate-y-1">
+                    {Array.from({ length: 15 }).map((_, i) => (
+                      <div key={i} className="w-3 h-3 bg-white rounded-full" />
+                    ))}
+                  </div>
+
+                  <div className="pt-4 text-center">
+                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.25em] font-display">★ THE IMPERIAL CHAMBERS ★</p>
+                     <p className="text-[7.5px] text-stone-400 uppercase tracking-widest font-semibold font-mono">Elite Signature Tasting Lounge</p>
+                     <p className="text-[9px] text-stone-400 font-medium mt-1">Taj-Maison Cellar Wing #03, New Delhi</p>
+                  </div>
+
+                  <div className="space-y-4 pt-6 border-b border-dashed border-stone-200 pb-4 text-xs font-mono">
+                    <div className="flex justify-between text-[9.5px]">
+                      <span className="text-stone-400 font-semibold uppercase">Docket Id:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.invoiceNumber}</span>
+                    </div>
+                    <div className="flex justify-between text-[9.5px]">
+                      <span className="text-stone-400 font-semibold uppercase">Timestamp:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.timestamp}</span>
+                    </div>
+                    <div className="flex justify-between text-[9.5px]">
+                      <span className="text-stone-400 font-semibold uppercase">Assigned Cabin:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.roomName}</span>
+                    </div>
+                    <div className="flex justify-between text-[9.5px]">
+                      <span className="text-stone-400 font-semibold uppercase">Sommelier:</span>
+                      <span className="text-stone-800 font-semibold">{checkoutReceipt.chef}</span>
+                    </div>
+                  </div>
+
+                  {/* Items List */}
+                  <div className="py-4 border-b border-dashed border-stone-200 font-mono text-xs space-y-3">
+                    {checkoutReceipt.items.map((cartItem: any, idx: number) => (
+                      <div key={idx} className="space-y-0.5">
+                        <div className="flex justify-between text-[11px] font-semibold text-stone-900">
+                          <span>{cartItem.dish.name} (x{cartItem.quantity})</span>
+                          <span>₹{(cartItem.dish.price * cartItem.quantity).toLocaleString()}</span>
+                        </div>
+                        {cartItem.directive && (
+                          <p className="text-[8px] text-stone-500 font-medium pl-2">↳ Cooking: "{cartItem.directive}"</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Receipt pricing details */}
+                  <div className="py-4 font-mono text-xs space-y-1.5 text-stone-600 border-b border-dashed border-stone-200">
+                     <div className="flex justify-between text-[10px]">
+                        <span>DOCKET SUB-TOTAL</span>
+                        <span>₹{checkoutReceipt.subtotal.toLocaleString()}</span>
+                     </div>
+                     {checkoutReceipt.discount > 0 && (
+                       <div className="flex justify-between text-[10px] text-red-600">
+                          <span>PRIVILEGE REBATE</span>
+                          <span>-₹{checkoutReceipt.discount.toLocaleString()}</span>
+                       </div>
+                     )}
+                     <div className="flex justify-between text-[10px]">
+                        <span>SILVER SERVICE (15%)</span>
+                        <span>₹{checkoutReceipt.serviceCharge.toLocaleString()}</span>
+                     </div>
+                     <div className="flex justify-between text-[10px]">
+                        <span>CGST (9%)</span>
+                        <span>₹{checkoutReceipt.cgst.toLocaleString()}</span>
+                     </div>
+                     <div className="flex justify-between text-[10px]">
+                        <span>SGST (9%)</span>
+                        <span>₹{checkoutReceipt.sgst.toLocaleString()}</span>
+                     </div>
+                  </div>
+
+                  <div className="pt-4 flex justify-between font-mono font-semibold text-stone-950 text-sm">
+                     <span>IMPERIAL GRAND TOTAL</span>
+                     <span className="text-base font-display">₹{checkoutReceipt.total.toLocaleString()}</span>
+                  </div>
+
+                  <div className="mt-8 pt-4 border-t border-stone-200 text-center font-mono">
+                     <p className="text-[9px] text-stone-400 font-semibold tracking-widest uppercase">Thank you for dining in luxury</p>
+                     <p className="text-[7.5px] text-stone-300 mt-1 uppercase">SCA Certified Kitchen Registry</p>
+                     <div className="flex justify-center mt-4">
+                        <div className="grid grid-cols-2 gap-2 w-full max-w-sm mx-auto">
+                          <button 
+                            onClick={() => window.print()}
+                            className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
+                          >
+                            <Printer size={12} />
+                            Print Ticket
+                          </button>
+                          <button 
+                            onClick={() => {
+                              generateReceiptPDF({
+                                title: "Imperial Chambers Tasting Room",
+                                invoiceNumber: checkoutReceipt.invoiceNumber,
+                                timestamp: checkoutReceipt.timestamp,
+                                tableName: checkoutReceipt.roomName,
+                                items: checkoutReceipt.items.map((cartItem: any) => ({
+                                  name: cartItem.dish.name,
+                                  price: cartItem.dish.price,
+                                  quantity: cartItem.quantity
+                                })),
+                                subtotal: checkoutReceipt.subtotal,
+                                tax: checkoutReceipt.cgst + checkoutReceipt.sgst,
+                                discount: checkoutReceipt.discount,
+                                total: checkoutReceipt.total,
+                                paymentMethod: checkoutReceipt.payment
+                              });
+                            }}
+                            className="px-3 py-2.5 bg-stone-900 border border-amber-900/40 text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg hover:scale-102 active:scale-98 transition-all"
+                          >
+                            <FileText size={12} />
+                            Download PDF
+                          </button>
+                        </div>
+                     </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* PDR Add/Edit Modal */}
       <AnimatePresence>
         {(showAddPdrModal || editingPdr) && (
@@ -1038,137 +1169,6 @@ export const RestroSignature: React.FC = () => {
         )}
       </AnimatePresence>
 
-              {/* Imperial Thermal Receipt view */}
-              {checkoutReceipt && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-stone-50 p-4 rounded-[32px] border border-dashed border-stone-300 shadow-soft relative overflow-hidden text-stone-800"
-                >
-                  {/* Decorative physical cutouts */}
-                  <div className="absolute top-0 left-0 right-0 flex justify-between px-4 -translate-y-1">
-                    {Array.from({ length: 15 }).map((_, i) => (
-                      <div key={i} className="w-3 h-3 bg-white rounded-full" />
-                    ))}
-                  </div>
-
-                  <div className="pt-4 text-center">
-                     <p className="text-xs font-semibold text-stone-900 uppercase tracking-[0.25em] font-display">★ THE IMPERIAL CHAMBERS ★</p>
-                     <p className="text-[7.5px] text-stone-400 uppercase tracking-widest font-semibold font-mono">Elite Signature Tasting Lounge</p>
-                     <p className="text-[9px] text-stone-400 font-medium mt-1">Taj-Maison Cellar Wing #03, New Delhi</p>
-                  </div>
-
-                  <div className="space-y-4 pt-6 border-b border-dashed border-stone-200 pb-4 text-xs font-mono">
-                    <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-semibold uppercase">Docket Id:</span>
-                      <span className="text-stone-800 font-semibold">{checkoutReceipt.invoiceNumber}</span>
-                    </div>
-                    <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-semibold uppercase">Timestamp:</span>
-                      <span className="text-stone-800 font-semibold">{checkoutReceipt.timestamp}</span>
-                    </div>
-                    <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-semibold uppercase">Assigned Cabin:</span>
-                      <span className="text-stone-800 font-semibold">{checkoutReceipt.roomName}</span>
-                    </div>
-                    <div className="flex justify-between text-[9.5px]">
-                      <span className="text-stone-400 font-semibold uppercase">Sommelier:</span>
-                      <span className="text-stone-800 font-semibold">{checkoutReceipt.chef}</span>
-                    </div>
-                  </div>
-
-                  {/* Items List */}
-                  <div className="py-4 border-b border-dashed border-stone-200 font-mono text-xs space-y-3">
-                    {checkoutReceipt.items.map((cartItem: any, idx: number) => (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="flex justify-between text-[11px] font-semibold text-stone-900">
-                          <span>{cartItem.dish.name} (x{cartItem.quantity})</span>
-                          <span>₹{(cartItem.dish.price * cartItem.quantity).toLocaleString()}</span>
-                        </div>
-                        {cartItem.directive && (
-                          <p className="text-[8px] text-stone-500 font-medium pl-2">↳ Cooking: "{cartItem.directive}"</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Receipt pricing details */}
-                  <div className="py-4 font-mono text-xs space-y-1.5 text-stone-600 border-b border-dashed border-stone-200">
-                     <div className="flex justify-between text-[10px]">
-                        <span>DOCKET SUB-TOTAL</span>
-                        <span>₹{checkoutReceipt.subtotal.toLocaleString()}</span>
-                     </div>
-                     {checkoutReceipt.discount > 0 && (
-                       <div className="flex justify-between text-[10px] text-red-600">
-                          <span>PRIVILEGE REBATE</span>
-                          <span>-₹{checkoutReceipt.discount.toLocaleString()}</span>
-                       </div>
-                     )}
-                     <div className="flex justify-between text-[10px]">
-                        <span>SILVER SERVICE (15%)</span>
-                        <span>₹{checkoutReceipt.serviceCharge.toLocaleString()}</span>
-                     </div>
-                     <div className="flex justify-between text-[10px]">
-                        <span>CGST (9%)</span>
-                        <span>₹{checkoutReceipt.cgst.toLocaleString()}</span>
-                     </div>
-                     <div className="flex justify-between text-[10px]">
-                        <span>SGST (9%)</span>
-                        <span>₹{checkoutReceipt.sgst.toLocaleString()}</span>
-                     </div>
-                  </div>
-
-                  <div className="pt-4 flex justify-between font-mono font-semibold text-stone-950 text-sm">
-                     <span>IMPERIAL GRAND TOTAL</span>
-                     <span className="text-base font-display">₹{checkoutReceipt.total.toLocaleString()}</span>
-                  </div>
-
-                  <div className="mt-8 pt-4 border-t border-stone-200 text-center font-mono">
-                     <p className="text-[9px] text-stone-400 font-semibold tracking-widest uppercase">Thank you for dining in luxury</p>
-                     <p className="text-[7.5px] text-stone-300 mt-1 uppercase">SCA Certified Kitchen Registry</p>
-                     <div className="flex justify-center mt-4">
-                        <div className="grid grid-cols-2 gap-2 w-full max-w-sm mx-auto">
-                          <button 
-                            onClick={() => window.print()}
-                            className="px-3 py-2.5 bg-stone-200 border border-stone-300 text-stone-600 hover:text-stone-900 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 active:scale-98 transition-all"
-                          >
-                            <Printer size={12} />
-                            Print Ticket
-                          </button>
-                          <button 
-                            onClick={() => {
-                              generateReceiptPDF({
-                                title: "Imperial Chambers Tasting Room",
-                                invoiceNumber: checkoutReceipt.invoiceNumber,
-                                timestamp: checkoutReceipt.timestamp,
-                                tableName: checkoutReceipt.roomName,
-                                items: checkoutReceipt.items.map((cartItem: any) => ({
-                                  name: cartItem.dish.name,
-                                  price: cartItem.dish.price,
-                                  quantity: cartItem.quantity
-                                })),
-                                subtotal: checkoutReceipt.subtotal,
-                                tax: checkoutReceipt.cgst + checkoutReceipt.sgst,
-                                discount: checkoutReceipt.discount,
-                                total: checkoutReceipt.total,
-                                paymentMethod: checkoutReceipt.payment
-                              });
-                            }}
-                            className="px-3 py-2.5 bg-stone-900 border border-amber-900/40 text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg hover:scale-102 active:scale-98 transition-all"
-                          >
-                            <FileText size={12} />
-                            Download PDF
-                          </button>
-                        </div>
-                     </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* PDR Session State Selector Modal */}
       <AnimatePresence>
         {selectedRoom && (
@@ -1228,6 +1228,8 @@ export const RestroSignature: React.FC = () => {
         )}
       </AnimatePresence>
 
+      
+      
       {/* Propose Signature Dish Modal */}
       <AnimatePresence>
         {showAddDishModal && (
