@@ -90,6 +90,15 @@ export const Tables: React.FC = () => {
     }
   });
 
+  
+  const { data: dbOrders = [] } = useQuery({
+    queryKey: ['activeOrders'],
+    queryFn: async () => {
+      const res = await api.get('/orders');
+      return res.data.filter((o: any) => o.status !== 'Completed' && o.status !== 'Cancelled' && o.type !== 'Delivery');
+    }
+  });
+
   const { data: settingsData } = useQuery({
     queryKey: ['settings'],
     queryFn: async () => {
@@ -147,8 +156,14 @@ export const Tables: React.FC = () => {
       const res = await api.post('/orders', orderData);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success('Order sent to kitchen!');
+      setTableOrders(prev => {
+        const copy = { ...prev };
+        delete copy[variables.tableId];
+        return copy;
+      });
+      queryClient.invalidateQueries({ queryKey: ['activeOrders'] });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to send order');
@@ -161,6 +176,7 @@ export const Tables: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       toast.success('Table Cleared & Set to Cleaning');
       setSelectedTableId(null);
+      setSettledReceipt(null);
     }
   });
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
@@ -190,10 +206,34 @@ export const Tables: React.FC = () => {
   const selectedTable = tables.find(t => t._id === selectedTableId) || null;
   const floorTables = tables.filter(t => t.floor === activeFloor);
 
+  
+  const getCombinedTableItems = (tableId: string) => {
+    const localItems = tableOrders[tableId] || [];
+    const tableDbOrders = dbOrders.filter((o: any) => o.tableId?._id === tableId || o.tableId === tableId);
+    
+    const dbItems = tableDbOrders.flatMap((o: any) => o.items.map((i: any) => ({
+      itemId: i.menuItem?._id || i.menuItem || i._id,
+      name: i.name,
+      price: i.price,
+      quantity: i.quantity,
+      isSent: true
+    })));
+
+    const merged: Record<string, any> = {};
+    [...dbItems, ...localItems.map(i => ({...i, isSent: false}))].forEach(item => {
+      if (!merged[item.itemId]) {
+        merged[item.itemId] = { ...item };
+      } else {
+        merged[item.itemId].quantity += item.quantity;
+      }
+    });
+    return Object.values(merged);
+  };
+
   // Helper calculations
   const computeTableSubtotal = (tableId: string) => {
-    const items = tableOrders[tableId] || [];
-    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const items = getCombinedTableItems(tableId);
+    return items.reduce((sum, item: any) => sum + (item.price * item.quantity), 0);
   };
 
   const computeTableTax = (tableId: string) => {
@@ -360,6 +400,7 @@ export const Tables: React.FC = () => {
             onClick={() => {
               setSelectedTableId(table._id);
               setModalTab('checkout');
+              setSettledReceipt(null);
             }}
             className={`bg-white rounded-3xl p-6 border transition-all duration-300 relative overflow-hidden group cursor-pointer ${
               selectedTableId === table._id ? 'border-brand-accent ring-2 ring-brand-accent/10 scale-[1.02] z-10' : 'border-slate-200 shadow-soft hover:border-brand-accent/50'
@@ -386,11 +427,11 @@ export const Tables: React.FC = () => {
                     <span className="font-mono text-slate-900 font-extrabold">₹{computeTableTotal(table._id).toLocaleString()}</span>
                  </div>
                  
-                 {tableOrders[table._id] && tableOrders[table._id].length > 0 && (
+                 {getCombinedTableItems(table._id).length > 0 && getCombinedTableItems(table._id).length > 0 && (
                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Active Order</p>
                      <div className="space-y-1.5 max-h-24 overflow-y-auto custom-scrollbar">
-                       {tableOrders[table._id].map(item => (
+                       {getCombinedTableItems(table._id).map(item => (
                          <div key={item.itemId} className="flex justify-between items-start text-xs">
                            <span className="text-slate-700 font-medium truncate pr-2"><span className="text-slate-400">{item.quantity}x</span> {item.name}</span>
                            <span className="text-slate-500 font-mono">₹{item.price * item.quantity}</span>
@@ -438,7 +479,7 @@ export const Tables: React.FC = () => {
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                onClick={() => setSelectedTableId(null)}
+                onClick={() => { setSelectedTableId(null); setSettledReceipt(null); }}
               />
               <motion.div 
                 initial={{ x: '100%' }}
@@ -461,8 +502,10 @@ export const Tables: React.FC = () => {
                           </div>
                        </div>
                     </div>
-                    <button onClick={() => setSelectedTableId(null)} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-2xl transition-all">
-                       <X size={24} />
+                    <button 
+                      onClick={() => { setSelectedTableId(null); setSettledReceipt(null); }}
+                      className="p-4 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-[20px] transition-all"
+                    >   <X size={24} />
                     </button>
                  </div>
 
@@ -565,7 +608,7 @@ export const Tables: React.FC = () => {
                        )}
 
                        {/* Active Order Summary */}
-                       {(tableOrders[selectedTable.id]?.length || 0) > 0 ? (
+                       {(getCombinedTableItems(selectedTable.id).length || 0) > 0 ? (
                          <div className="space-y-4">
                            <div className="flex items-center justify-between px-2">
                              <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-1">
@@ -591,7 +634,7 @@ export const Tables: React.FC = () => {
 
                            <div className="bg-white border-2 border-slate-100 rounded-[32px] p-6 space-y-4">
                              <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-                               {tableOrders[selectedTable.id]?.map(item => (
+                               {getCombinedTableItems(selectedTable.id).map(item => (
                                  <div key={item.itemId} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-xl hover:bg-slate-50/80">
                                    <div className="truncate flex-1">
                                      <p className="text-xs font-semibold text-slate-800 truncate">{item.name}</p>
@@ -744,7 +787,7 @@ export const Tables: React.FC = () => {
                        <div className="space-y-3 max-h-[365px] overflow-y-auto custom-scrollbar pr-1">
                          {filteredMenuItems.map(dish => {
                            const itemId = dish._id || dish.id;
-                           const quantity = tableOrders[selectedTable.id]?.find(i => i.itemId === itemId)?.quantity || 0;
+                           const quantity = getCombinedTableItems(selectedTable.id).find(i => i.itemId === itemId)?.quantity || 0;
                            return (
                              <div key={itemId} className="p-3 bg-white border border-slate-150 rounded-2xl flex items-center gap-4 hover:border-brand-accent/40 transition-all">
                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 flex-shrink-0">
@@ -799,7 +842,7 @@ export const Tables: React.FC = () => {
                         if (items.length === 0) return;
                         
                         createOrderMutation.mutate({
-                          type: 'POS',
+                          type: 'Dine-In',
                           tableId: selectedTable.id,
                           items: items.map(i => ({
                             menuItem: i.itemId,
@@ -816,7 +859,7 @@ export const Tables: React.FC = () => {
                           status: 'Pending'
                         });
                       }}
-                      disabled={(tableOrders[selectedTable.id]?.length || 0) === 0 || createOrderMutation.isPending}
+                      disabled={(getCombinedTableItems(selectedTable.id).length || 0) === 0 || createOrderMutation.isPending}
                       className="flex-1 bg-brand-accent text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-accent/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                        <ChefHat size={18} strokeWidth={3} />
@@ -830,7 +873,7 @@ export const Tables: React.FC = () => {
                           handleSettleAndClear(selectedTable.id);
                         }
                       }}
-                      disabled={(tableOrders[selectedTable.id]?.length || 0) === 0}
+                      disabled={(getCombinedTableItems(selectedTable.id).length || 0) === 0}
                       className="flex-1 bg-brand-success text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-success/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                        <CheckCircle2 size={18} strokeWidth={3} />
