@@ -216,6 +216,63 @@ export const BarLounge: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
+  
+  const updateBarItemMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.put(`/barlounge/liquor/${data.id}`, data);
+    },
+    onSuccess: () => {
+      toast.success('Liquor item updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['liquorItems'] });
+      setEditingItem(null);
+    },
+    onError: () => toast.error('Failed to update liquor item')
+  });
+
+  const deleteBarItemMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/barlounge/liquor/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Liquor item deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['liquorItems'] });
+      setDeletingItem(null);
+    },
+    onError: () => toast.error('Failed to delete liquor item')
+  });
+
+  const [editingItem, setEditingItem] = useState<LiquorItem | null>(null);
+  const [deletingItem, setDeletingItem] = useState<string | null>(null);
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    updateBarItemMutation.mutate({
+      id: editingItem.id,
+      name: newName,
+      vintage: newVintage,
+      category: newCategory,
+      alcoholContent: newAbv,
+      pricePerGlass: Number(newPrice),
+      stockBottles: Number(newStock),
+      capacityMl: Number(newCapacity),
+      origin: newOrigin,
+      image: editingItem.image
+    });
+  };
+
+  const openEditModal = (item: LiquorItem) => {
+    setEditingItem(item);
+    setNewName(item.name);
+    setNewVintage(item.vintage);
+    setNewCategory(item.category);
+    setNewAbv(item.alcoholContent);
+    setNewPrice(item.pricePerGlass.toString());
+    setNewStock(item.stockBottles.toString());
+    setNewCapacity(item.capacityMl.toString());
+    setNewOrigin(item.origin);
+  };
+
   const addLiquorMutation = useMutation({
     mutationFn: async (data: any) => {
       await api.post('/barlounge/liquor', data);

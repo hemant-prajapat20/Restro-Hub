@@ -8,6 +8,9 @@ export interface IPrivateDiningRoom extends Document {
   activeBill: number;
   minSpend: number;
   notes: string;
+  image?: string;
+  benefits?: string[];
+  isActive?: boolean;
 }
 
 const PrivateDiningRoomSchema = new Schema({
@@ -17,7 +20,10 @@ const PrivateDiningRoomSchema = new Schema({
   status: { type: String, enum: ['Available', 'Occupied', 'Reserved'], default: 'Available' },
   activeBill: { type: Number, default: 0 },
   minSpend: { type: Number, required: true },
-  notes: { type: String }
+  notes: { type: String },
+  image: { type: String },
+  benefits: { type: [String], default: [] },
+  isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
 export default mongoose.model<IPrivateDiningRoom>('PrivateDiningRoom', PrivateDiningRoomSchema);

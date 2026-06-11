@@ -156,6 +156,60 @@ export const CafeBakery: React.FC = () => {
     }, 1000);
   };
 
+  
+  const updateCafeItemMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.put(`/cafebakery/items/${data.id}`, data);
+    },
+    onSuccess: () => {
+      toast.success('Cafe item updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['cafeItems'] });
+      setEditingItem(null);
+    },
+    onError: () => toast.error('Failed to update cafe item')
+  });
+
+  const deleteCafeItemMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/cafebakery/items/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Cafe item deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['cafeItems'] });
+      setDeletingItem(null);
+    },
+    onError: () => toast.error('Failed to delete cafe item')
+  });
+
+  const [editingItem, setEditingItem] = useState<CafeItem | null>(null);
+  const [deletingItem, setDeletingItem] = useState<string | null>(null);
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    updateCafeItemMutation.mutate({
+      id: editingItem.id,
+      name: newName,
+      category: newCategory,
+      originOrType: newOrigin,
+      price: Number(newPrice),
+      stockCount: Number(newStock),
+      roastOrBakeTime: newTime,
+      scoreOrAward: newScore
+    });
+  };
+
+  const openEditModal = (item: CafeItem) => {
+    setEditingItem(item);
+    setNewName(item.name);
+    setNewCategory(item.category);
+    setNewOrigin(item.originOrType);
+    setNewPrice(item.price.toString());
+    setNewStock(item.stockCount.toString());
+    setNewTime(item.roastOrBakeTime);
+    setNewScore(item.scoreOrAward);
+  };
+
   const addCafeItemMutation = useMutation({
     mutationFn: async (data: any) => {
       await api.post('/cafebakery/items', data);
@@ -315,9 +369,7 @@ export const CafeBakery: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('display')}
             className={`px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${activeTab === 'display' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
-          >
-             Artisan Display
-          </button>
+          > Inventory Management </button>
           <button 
             type="button"
             onClick={() => setActiveTab('billing')}
@@ -785,6 +837,84 @@ export const CafeBakery: React.FC = () => {
                   Generate Tax Invoice & Checkout
                 </button>
               </div>
+
+              
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editingItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setEditingItem(null)} />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <h3 className="text-2xl font-semibold text-stone-900 mb-6 font-display">Edit Item</h3>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Name</label>
+                  <input type="text" value={newName} onChange={e => setNewName(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Category</label>
+                    <select value={newCategory} onChange={e => setNewCategory(e.target.value as any)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
+                      <option value="Specialty Beans">Specialty Beans</option>
+                      <option value="Artisan Patisserie">Artisan Patisserie</option>
+                      <option value="Cold Brew">Cold Brew</option>
+                      <option value="Signature Beverage">Signature Beverage</option>
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Price (₹)</label>
+                    <input type="number" value={newPrice} onChange={e => setNewPrice(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock / Units</label>
+                    <input type="number" value={newStock} onChange={e => setNewStock(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Origin / Bean Type</label>
+                    <input type="text" value={newOrigin} onChange={e => setNewOrigin(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Roast / Bake Info</label>
+                    <input type="text" value={newTime} onChange={e => setNewTime(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">SCA Score / Award</label>
+                    <input type="text" value={newScore} onChange={e => setNewScore(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+                <div className="pt-4 flex gap-3">
+                  <button type="button" onClick={() => setEditingItem(null)} className="flex-1 py-4 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200 transition-all">Cancel</button>
+                  <button type="submit" className="flex-1 py-4 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 shadow-xl shadow-brand-accent/20 transition-all">Save Changes</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation */}
+      <AnimatePresence>
+        {deletingItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setDeletingItem(null)} />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-sm rounded-[32px] shadow-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle size={24} />
+              </div>
+              <h3 className="text-xl font-semibold text-stone-900 mb-2">Delete Item?</h3>
+              <p className="text-sm text-stone-500 mb-6">Are you sure you want to remove this item from the catalog? This action cannot be undone.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeletingItem(null)} className="flex-1 py-3 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200">Cancel</button>
+                <button onClick={() => deleteCafeItemMutation.mutate(deletingItem)} className="flex-1 py-3 bg-rose-600 text-white font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-rose-700 shadow-xl shadow-rose-600/20">Delete</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
               {/* Physical Thermal Receipt View */}
               {checkoutReceipt && (

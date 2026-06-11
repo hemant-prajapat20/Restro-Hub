@@ -47,6 +47,9 @@ interface PrivateDiningRoom {
   activeBill: number;
   minSpend: number;
   notes: string;
+  image?: string;
+  benefits?: string[];
+  isActive?: boolean;
 }
 
 const INITIAL_SIGNATURES: SignatureItem[] = [
@@ -178,6 +181,150 @@ export const RestroSignature: React.FC = () => {
       return response.data.map((item: any) => ({ ...item, id: item._id }));
     }
   });
+
+  
+  const updateRestroItemMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.put(`/restro/signatures/${data.id}`, data);
+    },
+    onSuccess: () => {
+      toast.success('Signature dish updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['signatures'] });
+      setEditingItem(null);
+    },
+    onError: () => toast.error('Failed to update signature dish')
+  });
+
+  const deleteRestroItemMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/restro/signatures/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Signature dish deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['signatures'] });
+      setDeletingItem(null);
+    },
+    onError: () => toast.error('Failed to delete signature dish')
+  });
+
+  const [editingItem, setEditingItem] = useState<SignatureItem | null>(null);
+  const [deletingItem, setDeletingItem] = useState<string | null>(null);
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    updateRestroItemMutation.mutate({
+      id: editingItem.id,
+      name: newDishName,
+      description: newDescription,
+      course: newCourse,
+      price: Number(newPrice),
+      chefName: newChef,
+      isVeg: newIsVeg,
+      isAvailable: editingItem.isAvailable,
+      image: editingItem.image
+    });
+  };
+
+  const openEditModal = (item: SignatureItem) => {
+    setEditingItem(item);
+    setNewDishName(item.name);
+    setNewDescription(item.description);
+    setNewCourse(item.course);
+    setNewPrice(item.price.toString());
+    setNewChef(item.chefName);
+    setNewIsVeg(item.isVeg);
+  };
+
+  
+  const addPdrMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.post('/restro/pdrs', data);
+    },
+    onSuccess: () => {
+      toast.success('Suite added successfully');
+      queryClient.invalidateQueries({ queryKey: ['pdrs'] });
+      setShowAddPdrModal(false);
+      resetPdrForm();
+    },
+    onError: () => toast.error('Failed to add suite')
+  });
+
+  const updatePdrMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await api.put(`/restro/pdrs/${data.id}`, data);
+    },
+    onSuccess: () => {
+      toast.success('Suite updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['pdrs'] });
+      setEditingPdr(null);
+      resetPdrForm();
+    },
+    onError: () => toast.error('Failed to update suite')
+  });
+
+  const deletePdrMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/restro/pdrs/${id}`);
+    },
+    onSuccess: () => {
+      toast.success('Suite deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['pdrs'] });
+      setDeletingPdr(null);
+    },
+    onError: () => toast.error('Failed to delete suite')
+  });
+
+  const [showAddPdrModal, setShowAddPdrModal] = useState(false);
+  const [editingPdr, setEditingPdr] = useState<PrivateDiningRoom | null>(null);
+  const [deletingPdr, setDeletingPdr] = useState<string | null>(null);
+
+  const [newPdrName, setNewPdrName] = useState('');
+  const [newPdrCapacity, setNewPdrCapacity] = useState('');
+  const [newPdrMinSpend, setNewPdrMinSpend] = useState('');
+  const [newPdrNotes, setNewPdrNotes] = useState('');
+  const [newPdrBenefits, setNewPdrBenefits] = useState('');
+  const [newPdrIsActive, setNewPdrIsActive] = useState(true);
+
+  const resetPdrForm = () => {
+    setNewPdrName('');
+    setNewPdrCapacity('');
+    setNewPdrMinSpend('');
+    setNewPdrNotes('');
+    setNewPdrBenefits('');
+    setNewPdrIsActive(true);
+  };
+
+  const openEditPdrModal = (room: PrivateDiningRoom) => {
+    setEditingPdr(room);
+    setNewPdrName(room.name);
+    setNewPdrCapacity(room.capacity.toString());
+    setNewPdrMinSpend(room.minSpend.toString());
+    setNewPdrNotes(room.notes);
+    setNewPdrBenefits(room.benefits?.join(', ') || '');
+    setNewPdrIsActive(room.isActive !== false);
+  };
+
+  const handlePdrSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPdrName || !newPdrCapacity || !newPdrMinSpend) return;
+
+    const data = {
+      name: newPdrName,
+      capacity: Number(newPdrCapacity),
+      minSpend: Number(newPdrMinSpend),
+      notes: newPdrNotes,
+      benefits: newPdrBenefits.split(',').map(b => b.trim()).filter(b => b),
+      isActive: newPdrIsActive,
+      image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop' // placeholder luxury dining
+    };
+
+    if (editingPdr) {
+      updatePdrMutation.mutate({ id: editingPdr.id, ...data });
+    } else {
+      addPdrMutation.mutate({ ...data, status: 'Available' });
+    }
+  };
 
   const addSignatureMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -338,7 +485,16 @@ export const RestroSignature: React.FC = () => {
                     <Crown size={18} className="text-brand-accent" />
                     Royal suites & private dining cabins
                   </h4>
-                  <span className="text-stone-400 font-semibold text-xs uppercase">Ground Floor West Wing</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-stone-400 font-semibold text-xs uppercase hidden sm:block">Ground Floor West Wing</span>
+                    <button 
+                      onClick={() => { resetPdrForm(); setShowAddPdrModal(true); }}
+                      className="flex items-center gap-2 px-3 py-1.5 bg-stone-100 text-stone-600 rounded-xl text-xs font-semibold uppercase tracking-widest hover:bg-stone-200 transition-all"
+                    >
+                      <Plus size={14} strokeWidth={3} />
+                      Add Suite
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -429,6 +585,22 @@ export const RestroSignature: React.FC = () => {
                           </div>
                           <span className="text-[10px] font-semibold uppercase text-brand-accent bg-amber-500/10 px-3 py-1 rounded-xl">Chef Special</span>
                         </div>
+
+                          <div className="flex items-center gap-2 mt-3 border-t border-stone-100 pt-3">
+                            <button 
+                              onClick={() => openEditModal(dish)}
+                              className="flex-1 py-2 bg-stone-100 text-stone-600 hover:bg-stone-200 text-[10px] font-semibold uppercase tracking-widest rounded-lg transition-all"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => setDeletingItem(dish.id)}
+                              className="flex-1 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 text-[10px] font-semibold uppercase tracking-widest rounded-lg transition-all"
+                            >
+                              Delete
+                            </button>
+                          </div>
+
                       </div>
                     </div>
                   ))}
@@ -686,6 +858,145 @@ export const RestroSignature: React.FC = () => {
                   Generate Royal Invoice & Settle Suite
                 </button>
               </div>
+
+              
+      
+      {/* PDR Add/Edit Modal */}
+      <AnimatePresence>
+        {(showAddPdrModal || editingPdr) && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => { setShowAddPdrModal(false); setEditingPdr(null); }} />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <h3 className="text-2xl font-semibold text-stone-900 mb-6 font-display">{editingPdr ? 'Edit Suite' : 'Add Royal Suite'}</h3>
+              <form onSubmit={handlePdrSubmit} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Suite Name</label>
+                  <input type="text" value={newPdrName} onChange={e => setNewPdrName(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Seat Capacity</label>
+                    <input type="number" value={newPdrCapacity} onChange={e => setNewPdrCapacity(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Minimum Spend (₹)</label>
+                    <input type="number" value={newPdrMinSpend} onChange={e => setNewPdrMinSpend(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Brief / Description</label>
+                  <textarea value={newPdrNotes} onChange={e => setNewPdrNotes(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-20 custom-scrollbar" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Benefits (comma separated)</label>
+                  <input type="text" value={newPdrBenefits} onChange={e => setNewPdrBenefits(e.target.value)} placeholder="e.g. Personal Sommelier, Private Audio" className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <input type="checkbox" checked={newPdrIsActive} onChange={e => setNewPdrIsActive(e.target.checked)} id="isActiveToggle" className="w-4 h-4 text-brand-primary rounded border-stone-300 focus:ring-brand-primary" />
+                  <label htmlFor="isActiveToggle" className="text-xs font-semibold text-stone-700 uppercase tracking-widest cursor-pointer">Suite is currently active</label>
+                </div>
+                <div className="pt-4 flex gap-3">
+                  <button type="button" onClick={() => { setShowAddPdrModal(false); setEditingPdr(null); }} className="flex-1 py-4 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200 transition-all">Cancel</button>
+                  <button type="submit" className="flex-1 py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 shadow-xl transition-all">Save Suite</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete PDR Confirmation */}
+      <AnimatePresence>
+        {deletingPdr && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setDeletingPdr(null)} />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-sm rounded-[32px] shadow-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle size={24} />
+              </div>
+              <h3 className="text-xl font-semibold text-stone-900 mb-2">Delete Suite?</h3>
+              <p className="text-sm text-stone-500 mb-6">Are you sure you want to permanently remove this Private Dining Room? This action cannot be undone.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeletingPdr(null)} className="flex-1 py-3 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200">Cancel</button>
+                <button onClick={() => deletePdrMutation.mutate(deletingPdr)} className="flex-1 py-3 bg-rose-600 text-white font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-rose-700 shadow-xl shadow-rose-600/20">Delete</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editingItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setEditingItem(null)} />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <h3 className="text-2xl font-semibold text-stone-900 mb-6 font-display">Edit Signature Dish</h3>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dish Name</label>
+                  <input type="text" value={newDishName} onChange={e => setNewDishName(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Description</label>
+                  <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-24 custom-scrollbar" />
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Course</label>
+                    <select value={newCourse} onChange={e => setNewCourse(e.target.value as any)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
+                      <option value="Starter">Starter</option>
+                      <option value="Main Course">Main Course</option>
+                      <option value="Dessert">Dessert</option>
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Base Price (₹)</label>
+                    <input type="number" value={newPrice} onChange={e => setNewPrice(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Chef Name</label>
+                    <input type="text" value={newChef} onChange={e => setNewChef(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dietary type</label>
+                    <select value={newIsVeg ? 'veg' : 'non-veg'} onChange={e => setNewIsVeg(e.target.value === 'veg')} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
+                      <option value="veg">Vegetarian</option>
+                      <option value="non-veg">Non-Vegetarian</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="pt-4 flex gap-3">
+                  <button type="button" onClick={() => setEditingItem(null)} className="flex-1 py-4 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200 transition-all">Cancel</button>
+                  <button type="submit" className="flex-1 py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 shadow-xl transition-all">Save Changes</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation */}
+      <AnimatePresence>
+        {deletingItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setDeletingItem(null)} />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-sm rounded-[32px] shadow-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle size={24} />
+              </div>
+              <h3 className="text-xl font-semibold text-stone-900 mb-2">Delete Dish?</h3>
+              <p className="text-sm text-stone-500 mb-6">Are you sure you want to remove this signature dish? This action cannot be undone.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeletingItem(null)} className="flex-1 py-3 bg-stone-100 text-stone-600 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-stone-200">Cancel</button>
+                <button onClick={() => deleteRestroItemMutation.mutate(deletingItem)} className="flex-1 py-3 bg-rose-600 text-white font-semibold rounded-2xl text-xs uppercase tracking-widest hover:bg-rose-700 shadow-xl shadow-rose-600/20">Delete</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
               {/* Imperial Thermal Receipt view */}
               {checkoutReceipt && (

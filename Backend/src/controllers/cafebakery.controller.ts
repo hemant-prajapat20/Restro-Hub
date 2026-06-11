@@ -62,3 +62,35 @@ export const checkoutCafe = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error checking out cafe' });
   }
 };
+
+export const updateCafeItem = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { id } = req.params;
+    const updatedItem = await CafeItem.findOneAndUpdate(
+      { _id: id, businessId },
+      req.body,
+      { new: true }
+    );
+    if (!updatedItem) {
+      return res.status(404).json({ message: 'cafe item not found' });
+    }
+    res.json(updatedItem);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error updating cafe item' });
+  }
+};
+
+export const deleteCafeItem = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { id } = req.params;
+    const deletedItem = await CafeItem.findOneAndDelete({ _id: id, businessId });
+    if (!deletedItem) {
+      return res.status(404).json({ message: 'cafe item not found' });
+    }
+    res.json({ message: 'cafe item deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error deleting cafe item' });
+  }
+};

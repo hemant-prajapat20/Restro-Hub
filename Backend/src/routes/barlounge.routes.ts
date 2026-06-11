@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getLiquorItems, addLiquorItem, updateLiquorStock, checkoutBarLounge } from '../controllers/barlounge.controller';
+import { getLiquorItems, addLiquorItem, updateLiquorStock, checkoutBarLounge, updateBarItem, deleteBarItem } from '../controllers/barlounge.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -17,5 +17,10 @@ router.route('/liquor/:id/stock')
 
 router.route('/checkout')
   .post(checkoutBarLounge);
+
+
+router.route('/items/:id')
+  .put(updateBarItem)
+  .delete(deleteBarItem);
 
 export default router;

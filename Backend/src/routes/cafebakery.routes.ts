@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getCafeItems, addCafeItem, updateCafeStock, checkoutCafe } from '../controllers/cafebakery.controller';
+import { getCafeItems, addCafeItem, updateCafeStock, checkoutCafe, updateCafeItem, deleteCafeItem } from '../controllers/cafebakery.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -17,5 +17,10 @@ router.route('/items/:id/stock')
 
 router.route('/checkout')
   .post(checkoutCafe);
+
+
+router.route('/items/:id')
+  .put(updateCafeItem)
+  .delete(deleteCafeItem);
 
 export default router;
