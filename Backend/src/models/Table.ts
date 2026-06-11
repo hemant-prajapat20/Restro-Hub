@@ -8,6 +8,7 @@ export interface ITable extends Document {
   currentOrderId?: mongoose.Types.ObjectId;
   assignedWaiter?: string;
   linkedTables?: mongoose.Types.ObjectId[];
+  floor?: number;
 }
 
 const TableSchema = new Schema({
@@ -17,7 +18,8 @@ const TableSchema = new Schema({
   status: { type: String, enum: ['Available', 'Occupied', 'Reserved', 'Cleaning', 'Merged'], default: 'Available' },
   currentOrderId: { type: Schema.Types.ObjectId, ref: 'Order' },
   assignedWaiter: { type: String },
-  linkedTables: [{ type: Schema.Types.ObjectId, ref: 'Table' }]
+  linkedTables: [{ type: Schema.Types.ObjectId, ref: 'Table' }],
+  floor: { type: Number, default: 1 }
 }, { timestamps: true });
 
 export default mongoose.model<ITable>('Table', TableSchema);

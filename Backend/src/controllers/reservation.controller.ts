@@ -10,9 +10,11 @@ export const getReservations = async (req: Request, res: Response): Promise<void
   }
 };
 
+import Table from '../models/Table';
+
 export const createReservation = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, phone, guests, time, floor, seats, tableNumber } = req.body;
+    const { name, phone, guests, time, floor, seats, tableNumber, tableId } = req.body;
     const newReservation = await Reservation.create({
       name,
       phone,
@@ -24,6 +26,16 @@ export const createReservation = async (req: Request, res: Response): Promise<vo
       status: 'Awaiting'
     });
     
+    // Auto-lock the table to prevent double booking
+    if (tableId) {
+      await Table.findByIdAndUpdate(tableId, { status: 'Reserved' });
+    } else if (tableNumber) {
+      await Table.findOneAndUpdate(
+        { number: tableNumber, floor: floor }, 
+        { status: 'Reserved' }
+      );
+    }
+
     // Broadcast via socket.io if needed
     const io = req.app.get('io');
     if (io) {
@@ -46,6 +58,13 @@ export const updateReservationStatus = async (req: Request, res: Response): Prom
       { status },
       { new: true }
     );
+
+    if (reservation && status === 'Confirmed' && reservation.tableNumber) {
+      await Table.findOneAndUpdate(
+        { number: reservation.tableNumber, floor: reservation.floor },
+        { status: 'Occupied' }
+      );
+    }
 
     if (!reservation) {
       res.status(404).json({ status: 'error', message: 'Reservation not found' });

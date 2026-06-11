@@ -49,6 +49,10 @@ const StatusBadge = ({ status }: { status: TableStatus }) => {
 
 export const Tables: React.FC = () => {
   const [activeFloor, setActiveFloor] = useState(1);
+  const [showAddTableModal, setShowAddTableModal] = useState(false);
+  const [newTableIdentifier, setNewTableIdentifier] = useState('');
+  const [newTableCapacity, setNewTableCapacity] = useState(4);
+  const [newTableFloor, setNewTableFloor] = useState(1);
 
   
   const [showAddReservationModal, setShowAddReservationModal] = useState(false);
@@ -56,8 +60,8 @@ export const Tables: React.FC = () => {
   const [newResPhone, setNewResPhone] = useState('');
   const [newResGuests, setNewResGuests] = useState(2);
   const [newResTime, setNewResTime] = useState('19:00');
-  const [newResFloor, setNewResFloor] = useState(1);
-  const [newResTableNum, setNewResTableNum] = useState('');
+  const [newResFloor, setNewResFloor] = useState<number>(1);
+  const [newResTableId, setNewResTableId] = useState('');
 
   const queryClient = useQueryClient();
 
@@ -73,7 +77,7 @@ export const Tables: React.FC = () => {
     queryKey: ['reservations'],
     queryFn: async () => {
       const res = await api.get('/reservations');
-      return res.data;
+      return res.data.data || res.data;
     }
   });
 
@@ -97,6 +101,7 @@ export const Tables: React.FC = () => {
     mutationFn: async (data: any) => await api.post('/reservations', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
       setShowAddReservationModal(false);
       setNewResName('');
       setNewResPhone('');
@@ -108,6 +113,7 @@ export const Tables: React.FC = () => {
     mutationFn: async ({ id, status }: { id: string, status: string }) => await api.patch(`/reservations/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
       toast.success('Reservation Updated');
     }
   });
@@ -129,22 +135,21 @@ export const Tables: React.FC = () => {
   });
 
   const updateTableStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string, status: string }) => await api.put(`/tables/${id}/status`, { status }),
+    mutationFn: async ({ id, status }: { id: string, status: string }) => await api.put(`/tables/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
     }
   });
 
   const clearTableMutation = useMutation({
-    mutationFn: async (id: string) => await api.post(`/tables/${id}/clear`),
+    mutationFn: async (id: string) => await api.put(`/tables/${id}`, { status: 'Cleaning' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
-      toast.success('Table Cleared');
-      setSelectedTable(null);
+      toast.success('Table Cleared & Set to Cleaning');
+      setSelectedTableId(null);
     }
   });
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
-  const [showAddTableModal, setShowAddTableModal] = useState(false);
 
   // Dynamic table billing state
   const [tableOrders, setTableOrders] = useState<Record<string, { itemId: string; name: string; price: number; quantity: number }[]>>({
@@ -191,12 +196,10 @@ export const Tables: React.FC = () => {
 
   // Adding item to order
   const addToTableOrder = (tableId: string, menuItem: MenuItem) => {
-    setTables(prev => prev.map(t => {
-      if (t._id === tableId && (t.status === 'Available' || t.status === 'Reserved' || t.status === 'Cleaning')) {
-        return { ...t, status: 'Occupied' };
-      }
-      return t;
-    }));
+    const t = tables.find(t => t._id === tableId);
+    if (t && (t.status === 'Available' || t.status === 'Reserved' || t.status === 'Cleaning')) {
+      updateTableStatusMutation.mutate({ id: tableId, status: 'Occupied' });
+    }
 
     setTableOrders(prev => {
       const items = prev[tableId] || [];
@@ -237,7 +240,7 @@ export const Tables: React.FC = () => {
   };
 
   const setTableStatus = (tableId: string, status: TableStatus) => {
-    setTables(prev => prev.map(t => t._id === tableId ? { ...t, status } : t));
+    updateTableStatusMutation.mutate({ id: tableId, status });
   };
 
   const verifyDiscount = () => {
@@ -274,8 +277,9 @@ export const Tables: React.FC = () => {
       payment: paymentMethod
     });
 
-    // Reset table order and mark table as 'Cleaning'
-    setTables(prev => prev.map(t => t._id === tableId ? { ...t, status: 'Cleaning' } : t));
+    // Mark table as 'Cleaning' using backend
+    clearTableMutation.mutate(tableId);
+
     setTableOrders(prev => {
       const copy = { ...prev };
       delete copy[tableId];
@@ -337,13 +341,13 @@ export const Tables: React.FC = () => {
         {floorTables.map((table) => (
           <motion.div
             layout
-            key={table.id}
+            key={table._id}
             onClick={() => {
-              setSelectedTableId(table.id);
+              setSelectedTableId(table._id);
               setModalTab('checkout');
             }}
             className={`bg-white rounded-3xl p-6 border transition-all duration-300 relative overflow-hidden group cursor-pointer ${
-              selectedTableId === table.id ? 'border-brand-accent ring-2 ring-brand-accent/10 scale-[1.02] z-10' : 'border-slate-200 shadow-soft hover:border-brand-accent/50'
+              selectedTableId === table._id ? 'border-brand-accent ring-2 ring-brand-accent/10 scale-[1.02] z-10' : 'border-slate-200 shadow-soft hover:border-brand-accent/50'
             }`}
           >
             <div className="flex items-start justify-between mb-8">
@@ -364,7 +368,7 @@ export const Tables: React.FC = () => {
                       <Clock size={12} />
                       Dine Sessions
                     </span>
-                    <span className="font-mono text-slate-900 font-extrabold">₹{computeTableTotal(table.id).toLocaleString()}</span>
+                    <span className="font-mono text-slate-900 font-extrabold">₹{computeTableTotal(table._id).toLocaleString()}</span>
                  </div>
                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-brand-danger w-3/4 rounded-full animate-pulse" />
@@ -374,6 +378,10 @@ export const Tables: React.FC = () => {
               <div className="flex flex-col items-center justify-center py-4 rounded-2xl bg-brand-warning/5 border border-brand-warning/10">
                  <RefreshCw className="text-brand-warning animate-spin mb-2" size={20} />
                  <p className="text-[10px] font-semibold text-brand-warning uppercase tracking-widest">Cleaning / Resetting</p>
+              </div>
+            ) : table.status === 'Reserved' ? (
+              <div className="h-14 flex items-center justify-center border-2 border-dashed border-brand-accent/30 bg-brand-accent/5 rounded-2xl">
+                 <p className="text-xs font-bold text-brand-accent uppercase tracking-widest">Reserved</p>
               </div>
             ) : (
               <div className="h-14 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
@@ -460,6 +468,14 @@ export const Tables: React.FC = () => {
                            >
                              Complete Reset & Open Table
                            </button>
+                         </div>
+                       )}
+
+                       {selectedTable.status === 'Reserved' && (
+                         <div className="p-6 bg-brand-accent/10 border border-brand-accent/20 text-brand-accent rounded-3xl text-center space-y-3">
+                           <Clock className="mx-auto" size={28} />
+                           <p className="text-xs font-semibold uppercase tracking-wider">Table Reserved</p>
+                           <p className="text-xs font-medium text-slate-500">This table is locked by an Advanced Reservation. Confirm their arrival from the Reservations Sidebar.</p>
                          </div>
                        )}
 
@@ -787,28 +803,44 @@ export const Tables: React.FC = () => {
                   <div className="space-y-6">
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Identifier</label>
-                        <input type="text" placeholder="e.g. 15, V1, T10" className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl" />
+                        <input type="text" placeholder="e.g. 15, V1, T10" value={newTableIdentifier} onChange={e => setNewTableIdentifier(e.target.value)} className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl" />
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Guest Capacity</label>
-                        <select className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl">
-                           <option>2 Seater</option>
-                           <option>4 Seater</option>
-                           <option>6 Seater</option>
-                           <option>8 Seater (Royal)</option>
+                        <select value={newTableCapacity} onChange={e => setNewTableCapacity(Number(e.target.value))} className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl font-semibold text-xl">
+                           <option value={2}>2 Seater</option>
+                           <option value={4}>4 Seater</option>
+                           <option value={6}>6 Seater</option>
+                           <option value={8}>8 Seater (Royal)</option>
                         </select>
                      </div>
                      <div className="space-y-2">
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Floor Assignment</label>
                         <div className="flex gap-2">
-                           <button className="flex-1 py-4 bg-brand-primary text-white rounded-2xl font-semibold text-xs uppercase tracking-widest">Ground</button>
-                           <button className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-semibold text-xs uppercase tracking-widest">Terrace</button>
+                           <button onClick={() => setNewTableFloor(1)} className={`flex-1 py-4 ${newTableFloor===1 ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400'} rounded-2xl font-semibold text-xs uppercase tracking-widest`}>Ground</button>
+                           <button onClick={() => setNewTableFloor(2)} className={`flex-1 py-4 ${newTableFloor===2 ? 'bg-brand-primary text-white' : 'bg-slate-50 text-slate-400'} rounded-2xl font-semibold text-xs uppercase tracking-widest`}>Terrace</button>
                         </div>
                      </div>
                   </div>
                   <div className="flex gap-4 mt-10">
                      <button onClick={() => setShowAddTableModal(false)} className="flex-1 py-4 font-semibold text-slate-400">DISCARD</button>
-                     <button onClick={() => setShowAddTableModal(false)} className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20">PROVISION TABLE</button>
+                     <button 
+                        onClick={() => {
+                           if (!newTableIdentifier) return toast.error('Table Identifier is required');
+                           addTableMutation.mutate({
+                               number: newTableIdentifier,
+                               capacity: newTableCapacity,
+                               floor: newTableFloor,
+                               status: 'Available'
+                           });
+                           setShowAddTableModal(false);
+                           setNewTableIdentifier('');
+                        }}
+                        disabled={addTableMutation.isPending}
+                        className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
+                     >
+                        {addTableMutation.isPending ? 'PROVISIONING...' : 'PROVISION TABLE'}
+                     </button>
                   </div>
                </motion.div>
             </div>
@@ -820,9 +852,8 @@ export const Tables: React.FC = () => {
          <div className="lg:col-span-2 bg-white rounded-[40px] border border-slate-200 shadow-soft p-8">
             <div className="flex items-center justify-between mb-8">
                <h4 className="text-xl font-semibold font-display uppercase tracking-tight text-slate-800">Advanced Reservations</h4>
-               <div className="flex gap-2">
+               <div className="flex items-center gap-3">
                  <button onClick={() => setShowAddReservationModal(true)} className="px-6 py-2.5 bg-brand-accent text-white rounded-2xl text-xs font-semibold hover:bg-brand-accent/90 transition-all uppercase tracking-widest">Add Reservation</button>
-                 <button className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-2xl text-xs font-semibold border border-slate-100 hover:bg-slate-100 transition-all uppercase tracking-widest">View Archives</button>
                </div>
             </div>
             <div className="space-y-4">
@@ -930,7 +961,7 @@ export const Tables: React.FC = () => {
                      </div>
                      <div>
                         <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Phone</label>
-                        <input type="text" value={newResPhone} onChange={e => setNewResPhone(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                        <input type="tel" maxLength={10} value={newResPhone} onChange={e => setNewResPhone(e.target.value.replace(/\D/g, ''))} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
                      </div>
                      <div className="flex gap-4">
                        <div className="flex-1">
@@ -948,7 +979,12 @@ export const Tables: React.FC = () => {
                      <div className="flex gap-4">
                        <div className="flex-1">
                           <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Number</label>
-                          <input type="text" value={newResTableNum} onChange={e => setNewResTableNum(e.target.value)} placeholder="e.g. T4" className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
+                          <select value={newResTableId} onChange={e => setNewResTableId(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg">
+                             <option value="">Select Available Table</option>
+                             {tables.filter(t => t.floor === newResFloor && t.status === 'Available').map(t => (
+                               <option key={t._id} value={t._id}>Table {t.number} ({t.capacity} Seats)</option>
+                             ))}
+                          </select>
                        </div>
                        <div className="flex-1">
                           <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Time</label>
@@ -961,6 +997,10 @@ export const Tables: React.FC = () => {
                      <button 
                         onClick={() => {
                            if (!newResName || !newResPhone) return toast.error('Name and phone required');
+                           if (!/^\d{10}$/.test(newResPhone)) return toast.error('Mobile number must be exactly 10 digits');
+                           
+                           const selectedT = tables.find(t => t._id === newResTableId);
+
                            createReservationMutation.mutate({ 
                              name: newResName, 
                              phone: newResPhone, 
@@ -968,7 +1008,8 @@ export const Tables: React.FC = () => {
                              time: newResTime,
                              floor: newResFloor,
                              seats: newResGuests,
-                             tableNumber: newResTableNum
+                             tableNumber: selectedT ? selectedT.number : '',
+                             tableId: newResTableId
                            });
                         }}
                         disabled={createReservationMutation.isPending}

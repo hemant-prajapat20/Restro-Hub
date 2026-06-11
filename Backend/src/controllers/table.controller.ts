@@ -14,13 +14,14 @@ export const getTables = async (req: Request, res: Response) => {
 export const addTable = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
-    const { number, capacity, status } = req.body;
+    const { number, capacity, status, floor } = req.body;
 
     const newTable = new Table({
       businessId,
       number,
       capacity,
-      status
+      status,
+      floor
     });
 
     const savedTable = await newTable.save();
