@@ -129,7 +129,7 @@ export const updateRestroItem = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
     const { id } = req.params;
-    const updatedItem = await RestroItem.findOneAndUpdate(
+    const updatedItem = await SignatureItem.findOneAndUpdate(
       { _id: id, businessId },
       req.body,
       { new: true }
@@ -147,7 +147,7 @@ export const deleteRestroItem = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
     const { id } = req.params;
-    const deletedItem = await RestroItem.findOneAndDelete({ _id: id, businessId });
+    const deletedItem = await SignatureItem.findOneAndDelete({ _id: id, businessId });
     if (!deletedItem) {
       return res.status(404).json({ message: 'restro item not found' });
     }

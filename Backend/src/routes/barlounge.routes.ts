@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getLiquorItems, addLiquorItem, updateLiquorStock, checkoutBarLounge, updateBarItem, deleteBarItem } from '../controllers/barlounge.controller';
+import { getVipSuites, addVipSuite, updateVipSuite, deleteVipSuite, checkoutVipSuite, getLiquorItems, addLiquorItem, updateLiquorStock, checkoutBarLounge, updateLiquorItem, deleteLiquorItem } from '../controllers/barlounge.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -20,7 +20,21 @@ router.route('/checkout')
 
 
 router.route('/items/:id')
-  .put(updateBarItem)
-  .delete(deleteBarItem);
+  .put(updateLiquorItem)
+  .delete(deleteLiquorItem);
+
+
+// VIP Suites
+router.route('/suites')
+  .get(getVipSuites)
+  .post(addVipSuite);
+
+router.route('/suites/:id')
+  .put(updateVipSuite)
+  .delete(deleteVipSuite);
+
+router.route('/suites/:id/checkout')
+  .post(checkoutVipSuite);
+
 
 export default router;

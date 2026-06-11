@@ -141,7 +141,7 @@ export const MenuManagement: React.FC = () => {
   };
 
   const openEditModal = (item: any) => {
-    setEditingId(item.id || item._id);
+    setEditingId(item.id || (item as any)._id);
     setFormData({
       name: item.name,
       category: item.category,
@@ -251,7 +251,7 @@ export const MenuManagement: React.FC = () => {
         {filteredItems.map((item) => (
           <motion.div 
             layout
-            key={item.id || item._id} 
+            key={item.id || (item as any)._id} 
             className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent transition-all flex flex-col h-fit"
           >
               <div className="relative h-40">

@@ -27,7 +27,7 @@ router.route('/pdrs/:id/checkout')
   .post(checkoutPdr);
 
 
-router.route('/items/:id')
+router.route('/signatures/:id')
   .put(updateRestroItem)
   .delete(deleteRestroItem);
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Crown, 
   Plus, 
@@ -108,13 +108,16 @@ export const RestroSignature: React.FC = () => {
   const [newDescription, setNewDescription] = useState('');
   const [newCourse, setNewCourse] = useState<'Starter' | 'Main Course' | 'Dessert'>('Main Course');
   const [newPrice, setNewPrice] = useState('');
+  const [newImage, setNewImage] = useState('');
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [newChef, setNewChef] = useState('');
   const [newIsVeg, setNewIsVeg] = useState(true);
 
   // Restro Fine-Dining Billing POS states
   const [activeTab, setActiveTab] = useState<'display' | 'billing'>('display');
   const [cart, setCart] = useState<{ dish: SignatureItem; quantity: number; directive: string }[]>([]);
-  const [targetRoomId, setTargetRoomId] = useState<string>('P2');
+  const [targetRoomId, setTargetRoomId] = useState<string>('');
+
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Maison Guild Tab'>('UPI');
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
@@ -157,15 +160,6 @@ export const RestroSignature: React.FC = () => {
     }
   };
 
-  // Compute live billing breakdown values
-  const cartSubtotal = cart.reduce((sum, item) => sum + (item.dish.price * item.quantity), 0);
-  const discountAmount = Math.round(cartSubtotal * (appliedDiscount / 100));
-  const amountAfterDiscount = cartSubtotal - discountAmount;
-  const serviceCharge = Math.round(amountAfterDiscount * 0.15); // 15% luxury silver service
-  const cgst = Math.round(amountAfterDiscount * 0.09); // 9% CGST
-  const sgst = Math.round(amountAfterDiscount * 0.09); // 9% SGST
-  const cartTotal = amountAfterDiscount + serviceCharge + cgst + sgst;
-
   const { data: signatures = [], isLoading: loadingSignatures } = useQuery<SignatureItem[]>({
     queryKey: ['signatures'],
     queryFn: async () => {
@@ -181,6 +175,26 @@ export const RestroSignature: React.FC = () => {
       return response.data.map((item: any) => ({ ...item, id: item._id }));
     }
   });
+
+  useEffect(() => {
+    if (pdrs.length > 0 && !pdrs.find(p => p.id === targetRoomId)) {
+      setTargetRoomId(pdrs[0].id);
+    }
+  }, [pdrs, targetRoomId]);
+
+  // Compute live billing breakdown values
+  const cartSubtotal = cart.reduce((sum, item) => sum + (item.dish.price * item.quantity), 0);
+  const selectedSuite = pdrs.find(p => p.id === targetRoomId);
+  const suiteFee = selectedSuite ? selectedSuite.minSpend : 0;
+  const totalSubtotal = cartSubtotal + suiteFee;
+  const discountAmount = Math.round(totalSubtotal * (appliedDiscount / 100));
+  const amountAfterDiscount = totalSubtotal - discountAmount;
+  const serviceCharge = Math.round(amountAfterDiscount * 0.15); // 15% luxury silver service
+  const cgst = Math.round(amountAfterDiscount * 0.09); // 9% CGST
+  const sgst = Math.round(amountAfterDiscount * 0.09); // 9% SGST
+  const cartTotal = amountAfterDiscount + serviceCharge + cgst + sgst;
+
+  
 
   
   const updateRestroItemMutation = useMutation({
@@ -210,9 +224,22 @@ export const RestroSignature: React.FC = () => {
   const [editingItem, setEditingItem] = useState<SignatureItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<string | null>(null);
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
+
+    let uploadedImageUrl = '';
+    if (newImageFile) {
+      const uploadData = new FormData();
+      uploadData.append('image', newImageFile);
+      try {
+        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        uploadedImageUrl = uploadRes.data.url;
+      } catch (e) {
+        console.error('Upload failed', e);
+      }
+    }
+
     updateRestroItemMutation.mutate({
       id: editingItem.id,
       name: newDishName,
@@ -222,7 +249,7 @@ export const RestroSignature: React.FC = () => {
       chefName: newChef,
       isVeg: newIsVeg,
       isAvailable: editingItem.isAvailable,
-      image: editingItem.image
+      image: uploadedImageUrl || (newImage && newImage.startsWith('blob:') ? editingItem.image : newImage)
     });
   };
 
@@ -232,6 +259,7 @@ export const RestroSignature: React.FC = () => {
     setNewDescription(item.description);
     setNewCourse(item.course);
     setNewPrice(item.price.toString());
+    setNewImage(item.image || '');
     setNewChef(item.chefName);
     setNewIsVeg(item.isVeg);
   };
@@ -285,6 +313,8 @@ export const RestroSignature: React.FC = () => {
   const [newPdrNotes, setNewPdrNotes] = useState('');
   const [newPdrBenefits, setNewPdrBenefits] = useState('');
   const [newPdrIsActive, setNewPdrIsActive] = useState(true);
+  const [newPdrImage, setNewPdrImage] = useState('');
+  const [newPdrImageFile, setNewPdrImageFile] = useState<File | null>(null);
 
   const resetPdrForm = () => {
     setNewPdrName('');
@@ -293,6 +323,7 @@ export const RestroSignature: React.FC = () => {
     setNewPdrNotes('');
     setNewPdrBenefits('');
     setNewPdrIsActive(true);
+    setNewPdrImage('');
   };
 
   const openEditPdrModal = (room: PrivateDiningRoom) => {
@@ -305,9 +336,21 @@ export const RestroSignature: React.FC = () => {
     setNewPdrIsActive(room.isActive !== false);
   };
 
-  const handlePdrSubmit = (e: React.FormEvent) => {
+  const handlePdrSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPdrName || !newPdrCapacity || !newPdrMinSpend) return;
+
+    let uploadedPdrImageUrl = '';
+    if (newPdrImageFile) {
+      const uploadData = new FormData();
+      uploadData.append('image', newPdrImageFile);
+      try {
+        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        uploadedPdrImageUrl = uploadRes.data.url;
+      } catch (e) {
+        console.error('Upload failed', e);
+      }
+    }
 
     const data = {
       name: newPdrName,
@@ -316,7 +359,7 @@ export const RestroSignature: React.FC = () => {
       notes: newPdrNotes,
       benefits: newPdrBenefits.split(',').map(b => b.trim()).filter(b => b),
       isActive: newPdrIsActive,
-      image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop' // placeholder luxury dining
+      image: uploadedPdrImageUrl || (newPdrImage && newPdrImage.startsWith('blob:') ? (editingPdr ? editingPdr.image : null) : newPdrImage) || 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop' // placeholder luxury dining
     };
 
     if (editingPdr) {
@@ -336,6 +379,7 @@ export const RestroSignature: React.FC = () => {
       setNewDishName('');
       setNewDescription('');
       setNewPrice('');
+    setNewImage('');
       setNewChef('');
       setShowAddDishModal(false);
     },
@@ -389,9 +433,22 @@ export const RestroSignature: React.FC = () => {
     });
   };
 
-  const handleCreateSignature = (e: React.FormEvent) => {
+  const handleCreateSignature = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDishName || !newPrice || !newChef) return;
+
+    let uploadedImageUrl = '';
+    if (newImageFile) {
+      const uploadData = new FormData();
+      uploadData.append('image', newImageFile);
+      try {
+        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        uploadedImageUrl = uploadRes.data.url;
+      } catch (e) {
+        console.error('Upload failed', e);
+      }
+    }
+
 
     addSignatureMutation.mutate({
       name: newDishName,
@@ -401,9 +458,7 @@ export const RestroSignature: React.FC = () => {
       chefName: newChef,
       isVeg: newIsVeg,
       isAvailable: true,
-      image: newIsVeg 
-        ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop'
-        : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop'
+      image: uploadedImageUrl || (newImage && newImage.startsWith('blob:') ? null : newImage) || (newIsVeg ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop')
     });
   };
 
@@ -509,8 +564,9 @@ export const RestroSignature: React.FC = () => {
                       <div className="h-32 relative overflow-hidden rounded-t-[30px] cursor-pointer" onClick={() => setSelectedRoom(room)}>
                         <img 
                           src={room.image || 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop'} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
-                          alt={room.name}
+                          alt={room.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" 
+                          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop'; }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                         <div className="absolute top-3 left-3 px-2 py-1 bg-stone-900/60 backdrop-blur-md rounded-xl text-[9px] font-semibold uppercase text-white tracking-widest border border-stone-700">
@@ -598,8 +654,13 @@ export const RestroSignature: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start content-start">
                   {signatures.map((dish) => (
                     <div key={dish.id} className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/50 transition-all flex flex-col md:flex-row h-fit">
-                      <div className="w-full md:w-36 h-40 md:h-full relative overflow-hidden flex-shrink-0">
-                        <img src={dish.image} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" alt={dish.name} />
+                      <div className="w-full md:w-36 h-40 md:h-auto md:self-stretch relative overflow-hidden flex-shrink-0">
+                        <img 
+                          src={dish.image || (dish.isVeg ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop')} 
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700" 
+                          alt={dish.name} 
+                          onError={(e) => { e.currentTarget.src = dish.isVeg ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop'; }}
+                        />
                       </div>
                       <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                         <div>
@@ -716,7 +777,12 @@ export const RestroSignature: React.FC = () => {
                     className="p-4 bg-white rounded-[32px] border border-stone-200/80 hover:border-brand-accent text-left group flex items-start gap-4 transition-all relative cursor-pointer"
                   >
                     <div className="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0">
-                      <img src={dish.image} alt={dish.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
+                      <img 
+                        src={dish.image || (dish.isVeg ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop')} 
+                        alt={dish.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-all" 
+                        onError={(e) => { e.currentTarget.src = dish.isVeg ? 'https://images.unsplash.com/photo-1567184109171-9bfe3957eb05?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=400&fit=crop'; }}
+                      />
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center gap-1.5">
@@ -861,9 +927,15 @@ export const RestroSignature: React.FC = () => {
                 {/* Ledger Breakdown */}
                 <div className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-2">
                   <div className="flex justify-between items-center text-xs text-stone-500 font-semibold">
-                    <span>Subtotal</span>
+                    <span>Items Subtotal</span>
                     <span className="font-mono">₹{cartSubtotal.toLocaleString()}</span>
                   </div>
+                  {suiteFee > 0 && (
+                    <div className="flex justify-between items-center text-xs text-stone-500 font-semibold">
+                      <span>Suite Minimum Spend</span>
+                      <span className="font-mono">₹{suiteFee.toLocaleString()}</span>
+                    </div>
+                  )}
                   {discountAmount > 0 && (
                     <div className="flex justify-between items-center text-xs text-brand-danger font-semibold">
                       <span>Privilege Deduction ({appliedDiscount}%)</span>
@@ -1058,6 +1130,19 @@ export const RestroSignature: React.FC = () => {
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Brief / Description</label>
                   <textarea value={newPdrNotes} onChange={e => setNewPdrNotes(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-20 custom-scrollbar" />
                 </div>
+                
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-2">Image Preview</label>
+                  {newPdrImage && <img src={newPdrImage} alt="Preview" className="h-24 w-36 object-cover rounded-xl mb-3 shadow-sm border border-stone-200" />}
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Upload Image</label>
+                  <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewPdrImageFile(file);
+                      setNewPdrImage(URL.createObjectURL(file));
+                    }
+                  }} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                </div>
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Benefits (comma separated)</label>
                   <input type="text" value={newPdrBenefits} onChange={e => setNewPdrBenefits(e.target.value)} placeholder="e.g. Personal Sommelier, Private Audio" className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
@@ -1111,6 +1196,19 @@ export const RestroSignature: React.FC = () => {
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Description</label>
                   <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-24 custom-scrollbar" />
+                </div>
+                
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-2">Image Preview</label>
+                  {newImage && <img src={newImage} alt="Preview" className="h-24 w-36 object-cover rounded-xl mb-3 shadow-sm border border-stone-200" />}
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Upload Image</label>
+                  <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewImageFile(file);
+                      setNewImage(URL.createObjectURL(file));
+                    }
+                  }} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1">
@@ -1273,6 +1371,16 @@ export const RestroSignature: React.FC = () => {
                   />
                 </div>
 
+                
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
+                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+
+                <div className="pt-2">
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
+                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Course Placement</label>

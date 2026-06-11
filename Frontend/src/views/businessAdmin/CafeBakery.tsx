@@ -124,6 +124,8 @@ export const CafeBakery: React.FC = () => {
   const [newCategory, setNewCategory] = useState<'Specialty Beans' | 'Artisan Patisserie' | 'Cold Brew' | 'Signature Beverage'>('Specialty Beans');
   const [newOrigin, setNewOrigin] = useState('');
   const [newPrice, setNewPrice] = useState('');
+  const [newImage, setNewImage] = useState('');
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [newStock, setNewStock] = useState('');
   const [newTime, setNewTime] = useState('');
   const [newScore, setNewScore] = useState('');
@@ -184,9 +186,22 @@ export const CafeBakery: React.FC = () => {
   const [editingItem, setEditingItem] = useState<CafeItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<string | null>(null);
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
+
+    let uploadedImageUrl = '';
+    if (newImageFile) {
+      const uploadData = new FormData();
+      uploadData.append('image', newImageFile);
+      try {
+        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        uploadedImageUrl = uploadRes.data.url;
+      } catch (e) {
+        console.error('Upload failed', e);
+      }
+    }
+
     updateCafeItemMutation.mutate({
       id: editingItem.id,
       name: newName,
@@ -195,7 +210,8 @@ export const CafeBakery: React.FC = () => {
       price: Number(newPrice),
       stockCount: Number(newStock),
       roastOrBakeTime: newTime,
-      scoreOrAward: newScore
+      scoreOrAward: newScore,
+      image: uploadedImageUrl || (newImage && newImage.startsWith('blob:') ? editingItem.image : newImage)
     });
   };
 
@@ -205,6 +221,7 @@ export const CafeBakery: React.FC = () => {
     setNewCategory(item.category);
     setNewOrigin(item.originOrType);
     setNewPrice(item.price.toString());
+    setNewImage(item.image || '');
     setNewStock(item.stockCount.toString());
     setNewTime(item.roastOrBakeTime);
     setNewScore(item.scoreOrAward);
@@ -220,6 +237,7 @@ export const CafeBakery: React.FC = () => {
       setNewName('');
       setNewOrigin('');
       setNewPrice('');
+    setNewImage('');
       setNewStock('');
       setNewTime('');
       setNewScore('');
@@ -256,9 +274,22 @@ export const CafeBakery: React.FC = () => {
     }
   };
 
-  const handleAddArtisanItem = (e: React.FormEvent) => {
+  const handleAddArtisanItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newPrice || !newStock) return;
+
+    let uploadedImageUrl = '';
+    if (newImageFile) {
+      const uploadData = new FormData();
+      uploadData.append('image', newImageFile);
+      try {
+        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        uploadedImageUrl = uploadRes.data.url;
+      } catch (e) {
+        console.error('Upload failed', e);
+      }
+    }
+
 
     addCafeItemMutation.mutate({
       name: newName,
@@ -458,7 +489,7 @@ export const CafeBakery: React.FC = () => {
                     >
                       <div className="h-40 relative overflow-hidden">
                         <img 
-                          src={item.image} 
+                          src={item.image || 'https://images.unsplash.com/photo-1550461716-ba42010c2cde?w=400&h=400&fit=crop'} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
                         />
@@ -618,7 +649,7 @@ export const CafeBakery: React.FC = () => {
                     className="p-4 bg-white rounded-2xl border border-stone-200/80 hover:border-brand-accent text-left group flex items-start gap-4 transition-all disabled:opacity-55 cursor-pointer relative"
                   >
                     <div className="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100/60 overflow-hidden flex-shrink-0 relative">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
+                      <img src={item.image || 'https://images.unsplash.com/photo-1550461716-ba42010c2cde?w=400&h=400&fit=crop'} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-all" onError={(e) => { e.currentTarget.src = item.category === 'Artisan Patisserie' ? 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=400&fit=crop'; }} />
                       {item.stockCount <= 5 && item.stockCount > 0 && (
                         <span className="absolute bottom-1 left-1 right-1 text-center text-[7px] font-semibold bg-rose-500 text-white rounded uppercase tracking-wider">
                            Low stock
@@ -850,6 +881,19 @@ export const CafeBakery: React.FC = () => {
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Name</label>
                   <input type="text" value={newName} onChange={e => setNewName(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                </div>
+                
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-2">Image Preview</label>
+                  {newImage && <img src={newImage} alt="Preview" className="h-24 w-36 object-cover rounded-xl mb-3 shadow-sm border border-stone-200" />}
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Upload Image</label>
+                  <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewImageFile(file);
+                      setNewImage(URL.createObjectURL(file));
+                    }
+                  }} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1">
