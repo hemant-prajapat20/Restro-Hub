@@ -45,6 +45,7 @@ export const StaffManagement: React.FC = () => {
 
   // Form states for New Staff
   const [newName, setNewName] = useState('');
+  const [newGender, setNewGender] = useState<'Male'|'Female'>('Male');
   const [newRole, setNewRole] = useState('');
   const [newShift, setNewShift] = useState<'Morning (6 AM - 2 PM)' | 'Evening (2 PM - 10 PM)' | 'Night (10 PM - 6 AM)' | 'General (10 AM - 7 PM)'>('General (10 AM - 7 PM)');
   const [newSalary, setNewSalary] = useState('');
@@ -105,6 +106,7 @@ export const StaffManagement: React.FC = () => {
       setNewSalary('');
       setNewContact('');
       setNewEmail('');
+      setNewGender('Male');
       setShowAddModal(false);
     },
     onError: () => toast.error('Failed to onboard staff')
@@ -127,6 +129,8 @@ export const StaffManagement: React.FC = () => {
 
     const assignedRole = newRole || (staffCategories.length > 0 ? staffCategories[0] : 'Staff');
 
+    const seedName = newGender === 'Female' ? `Sophia-${newName}` : `Felix-${newName}`;
+
     addStaffMutation.mutate({
       name: newName,
       role: assignedRole,
@@ -136,7 +140,7 @@ export const StaffManagement: React.FC = () => {
       contact: newContact,
       email: newEmail || `${newName.toLowerCase().replace(/\s/g, '')}@indiserve.pro`,
       score: Number(newScore) || 5.0,
-      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newName}`
+      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}`
     });
   };
 
@@ -428,16 +432,29 @@ export const StaffManagement: React.FC = () => {
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Onboard certified luxury hospitality brigade personnel</p>
 
               <form onSubmit={handleOnboardStaff} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="e.g. Master Sommelier Dev" 
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. Master Sommelier Dev" 
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gender</label>
+                    <select 
+                      value={newGender} 
+                      onChange={(e) => setNewGender(e.target.value as 'Male'|'Female')}
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

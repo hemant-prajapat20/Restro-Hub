@@ -16,24 +16,46 @@ export const getStaff = async (req: Request, res: Response) => {
 export const addStaff = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
-    const { name, role, department, phone, email, shift, status } = req.body;
+    const { name, role, contact, phone, email, shift, salary, status, score, image } = req.body;
+
+    // Support both 'contact' and 'phone' field names from frontend
+    const contactNumber = contact || phone;
+
+    if (!contactNumber) {
+      return res.status(400).json({ message: 'Contact number is required' });
+    }
+
+    // Validate 10-digit phone
+    const digits = contactNumber.replace(/\D/g, '');
+    if (digits.length !== 10) {
+      return res.status(400).json({ message: 'Contact must be a valid 10-digit mobile number' });
+    }
+
+    if (!salary || isNaN(Number(salary))) {
+      return res.status(400).json({ message: 'A valid salary is required' });
+    }
 
     const newStaff = new Staff({
       businessId,
       name,
       role,
-      department,
-      phone,
+      contact: contactNumber,
       email,
-      shift,
+      shift: shift || 'General (10 AM - 7 PM)',
+      salary: Number(salary),
+      score: score || 5.0,
+      image: image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
       status: status || 'Active',
-      joinDate: new Date()
     });
 
     const savedStaff = await newStaff.save();
     await logMessage(businessId, 'Staff Member Added', `Added new staff member: ${savedStaff.name}`, 'success');
     res.status(201).json(savedStaff);
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((e: any) => e.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
     res.status(500).json({ message: 'Server error adding staff' });
   }
 };
