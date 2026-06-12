@@ -333,13 +333,28 @@ export const POS: React.FC = () => {
                       onChange={(e) => setCustomerName(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:border-brand-accent outline-none"
                     />
-                    <input 
-                      type="text" 
-                      placeholder="Mobile Number" 
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:border-brand-accent outline-none"
-                    />
+                    <div>
+                      <input 
+                        type="text" 
+                        placeholder="Mobile Number (10 digits)" 
+                        maxLength={10}
+                        value={customerPhone}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || /^\d+$/.test(val)) {
+                            setCustomerPhone(val);
+                          }
+                        }}
+                        className={`w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-semibold outline-none transition-all ${
+                          customerPhone && customerPhone.length !== 10 
+                            ? 'border-red-400 focus:border-red-500 text-red-600 focus:ring-2 focus:ring-red-100' 
+                            : 'border-slate-200 focus:border-brand-accent'
+                        }`}
+                      />
+                      {customerPhone && customerPhone.length !== 10 && (
+                        <p className="text-[10px] text-red-500 font-semibold mt-1 ml-1">Must be exactly 10 digits</p>
+                      )}
+                    </div>
                   </div>
                 </div>
 

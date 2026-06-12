@@ -702,6 +702,34 @@ export const Tables: React.FC = () => {
                                </div>
                              </div>
 
+                             {/* Customer Details */}
+                             <div className="space-y-2 pt-2 border-t border-slate-100">
+                               <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Guest Information</label>
+                               <div className="flex gap-2">
+                                 <input
+                                   type="text"
+                                   placeholder="Name (Required)"
+                                   value={customerName}
+                                   onChange={e => setCustomerName(e.target.value)}
+                                   className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest placeholder-slate-300"
+                                 />
+                                 <input
+                                   type="text"
+                                   placeholder="Mobile (10 Digits)"
+                                   maxLength={10}
+                                   value={customerPhone}
+                                   onChange={(e) => {
+                                      const val = e.target.value;
+                                      if (val === '' || /^\d+$/.test(val)) setCustomerPhone(val);
+                                   }}
+                                   className={`flex-1 px-4 py-2 bg-slate-50 border rounded-xl text-xs font-bold uppercase tracking-widest placeholder-slate-300 ${customerPhone && customerPhone.length !== 10 ? 'border-red-400' : 'border-slate-200'}`}
+                                 />
+                               </div>
+                               {customerPhone && customerPhone.length !== 10 && (
+                                  <p className="text-[9px] text-red-500 font-semibold pl-1">Mobile number must be exactly 10 digits.</p>
+                               )}
+                             </div>
+
                              {/* Privilege Promotions Form */}
                              <div className="space-y-2 pt-2 border-t border-slate-100">
                                <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Privilege Discount Code</label>
