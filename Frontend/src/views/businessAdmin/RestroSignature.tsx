@@ -1425,51 +1425,50 @@ export const RestroSignature: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 border border-amber-900/10 overflow-hidden"
+              className="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl p-4 border border-amber-900/10 max-h-[90vh] overflow-y-auto custom-scrollbar"
             >
-              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Propose Chef Signature</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Introduce high-end recipes to VIP menus</p>
+              <h3 className="text-xl font-semibold text-stone-900 mb-1 font-display">Propose Chef Signature</h3>
+              <p className="text-[10px] text-stone-400 uppercase tracking-widest font-semibold mb-4">Introduce high-end recipes to VIP menus</p>
 
-              <form onSubmit={handleCreateSignature} className="space-y-3">
+              <form onSubmit={handleCreateSignature} className="space-y-2.5">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Signature Masterpiece Name</label>
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Signature Masterpiece Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Saffron-Roasted King Quail" 
                     value={newDishName}
                     onChange={(e) => setNewDishName(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                    className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gourmet Description & Sourcing</label>
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gourmet Description & Sourcing</label>
                   <textarea 
-                    placeholder="Describe wild sourcing, age, rare elements, plating designs..." 
+                    placeholder="Describe wild sourcing, rare elements..." 
                     value={newDescription}
                     onChange={(e) => setNewDescription(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-medium text-sm h-24 focus:outline-none resize-none"
+                    className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-medium text-xs h-16 focus:outline-none resize-none"
                   />
                 </div>
 
-                
                 <div>
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
-                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
+                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs" />
                 </div>
 
-                <div className="pt-2">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
-                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                <div className="pt-1">
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
+                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Course Placement</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Course Placement</label>
                     <select 
                       value={newCourse} 
                       onChange={(e) => setNewCourse(e.target.value as any)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs text-stone-600"
                     >
                       <option value="Starter">Starter / Appetizer</option>
                       <option value="Main Course">Main Course</option>
@@ -1477,21 +1476,21 @@ export const RestroSignature: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Chef Sommelier</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Chef Sommelier</label>
                     <input 
                       type="text" 
                       required
                       placeholder="e.g. Master Chef Ranveer" 
                       value={newChef}
                       onChange={(e) => setNewChef(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Base Price (₹)</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Base Price (₹)</label>
                     <input 
                       type="number" 
                       min="0"
@@ -1499,16 +1498,16 @@ export const RestroSignature: React.FC = () => {
                       placeholder="e.g. 2400" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dietary Category</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dietary Category</label>
                     <div className="flex gap-2 pt-1">
                        <button 
                          type="button" 
                          onClick={() => setNewIsVeg(true)}
-                         className={`flex-1 py-3 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all border ${
+                         className={`flex-1 py-1.5 text-[10px] font-semibold uppercase tracking-widest rounded-xl transition-all border ${
                            newIsVeg ? 'bg-green-50 text-green-700 border-green-200' : 'bg-stone-50 border-stone-100 text-stone-400'
                          }`}
                        >
@@ -1517,7 +1516,7 @@ export const RestroSignature: React.FC = () => {
                        <button 
                          type="button" 
                          onClick={() => setNewIsVeg(false)}
-                         className={`flex-1 py-3 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all border ${
+                         className={`flex-1 py-1.5 text-[10px] font-semibold uppercase tracking-widest rounded-xl transition-all border ${
                            !newIsVeg ? 'bg-red-50 text-red-700 border-red-200' : 'bg-stone-50 border-stone-100 text-stone-400'
                          }`}
                        >

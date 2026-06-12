@@ -1095,41 +1095,41 @@ export const BarLounge: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 border border-amber-900/10 overflow-hidden text-stone-800"
+              className="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl p-4 border border-amber-900/10 max-h-[90vh] overflow-y-auto custom-scrollbar text-stone-800"
             >
-              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Acquire Premium Bottle</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Catalog fine wines, single malts or custom creations</p>
+              <h3 className="text-xl font-semibold text-stone-900 mb-1 font-display">Acquire Premium Bottle</h3>
+              <p className="text-[10px] text-stone-400 uppercase tracking-widest font-semibold mb-4">Catalog fine wines, single malts or creations</p>
 
-              <form onSubmit={handleAddLiquor} className="space-y-3">
+              <form onSubmit={handleAddLiquor} className="space-y-2.5">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Liquor / Label Name</label>
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Liquor / Label Name</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Glenfiddich Grande Couronne 26 Y.O." 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+                    className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/30"
                   />
                 </div>
 
-                
-                <div className="space-y-1 pb-4">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
-                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none" />
+                <div className="space-y-1">
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
+                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none" />
                 </div>
 
-                <div className="pt-2">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
-                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                <div className="pt-1">
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
+                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs" />
                 </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Label Category</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Label Category</label>
                     <select 
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
                     >
                       <option value="Single Malt">Single Malt</option>
                       <option value="Vintage Wine">Vintage Wine</option>
@@ -1138,44 +1138,44 @@ export const BarLounge: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Vintage / Age</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Vintage / Age</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 26 Y.O. or 2018" 
                       value={newVintage}
                       onChange={(e) => setNewVintage(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Alcohol (ABV %)</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Alcohol (ABV %)</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 43.8%" 
                       value={newAbv}
                       onChange={(e) => setNewAbv(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-mono text-sm focus:outline-none"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-mono text-xs focus:outline-none"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Bottle Size (Ml)</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Bottle Size (Ml)</label>
                     <input 
                       type="number" 
                       min="0"
                       placeholder="750" 
                       value={newCapacity}
                       onChange={(e) => setNewCapacity(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Glass Price (₹)</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Glass Price (₹)</label>
                     <input 
                       type="number" 
                       min="0"
@@ -1183,11 +1183,11 @@ export const BarLounge: React.FC = () => {
                       placeholder="3500" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock Bottles</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Stock Bottles</label>
                     <input 
                       type="number" 
                       min="0"
@@ -1195,25 +1195,25 @@ export const BarLounge: React.FC = () => {
                       placeholder="6" 
                       value={newStock}
                       onChange={(e) => setNewStock(e.target.value)}
-                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Origin / Estate Vineyard</label>
+                  <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Origin / Estate Vineyard</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Champagne region, France" 
                     value={newOrigin}
                     onChange={(e) => setNewOrigin(e.target.value)}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                    className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
                   />
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest cursor-pointer">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-stone-900 border border-amber-500/20 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl cursor-pointer">CELLAR ACQUISITION</button>
+                <div className="flex gap-4 pt-2">
+                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-2 font-semibold text-stone-400 hover:bg-stone-50 rounded-xl text-xs uppercase tracking-widest cursor-pointer">DISCARD</button>
+                  <button type="submit" className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-stone-900 font-bold rounded-xl text-xs uppercase tracking-widest shadow-xl shadow-amber-500/20">ACQUIRE BOTTLE</button>
                 </div>
               </form>
             </motion.div>
