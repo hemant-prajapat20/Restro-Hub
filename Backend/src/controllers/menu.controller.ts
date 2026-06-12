@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import MenuItem from '../models/MenuItem';
+import { logMessage } from '../utils/messageLogger';
 
 // Get all menu items for a business
 export const getMenuItems = async (req: Request, res: Response) => {
@@ -31,6 +32,7 @@ export const addMenuItem = async (req: Request, res: Response) => {
     });
 
     const savedItem = await newItem.save();
+    await logMessage(businessId, 'Menu Item Added', `Added new item: ${savedItem.name}`, 'success');
     res.status(201).json(savedItem);
   } catch (error) {
     res.status(500).json({ message: 'Server error adding menu item' });
@@ -53,6 +55,7 @@ export const updateMenuItem = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Menu item not found' });
     }
 
+    await logMessage(businessId, 'Menu Item Updated', `Updated item: ${updatedItem.name}`, 'info');
     res.json(updatedItem);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating menu item' });
@@ -71,6 +74,7 @@ export const deleteMenuItem = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Menu item not found' });
     }
 
+    await logMessage(businessId, 'Menu Item Deleted', `Deleted item: ${deletedItem.name}`, 'warning');
     res.json({ message: 'Menu item deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting menu item' });

@@ -64,7 +64,7 @@ export const Dashboard: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Dashboard...</div>;
   }
 
-  const { dailyRevenue, totalOrders, activeCustomers, avgTableTurnTime, salesData, categoryData } = analytics;
+  const { dailyRevenue, totalOrders, activeCustomers, avgTableTurnTime, salesData, categoryData, topItems, aiInsights } = analytics;
 
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
@@ -164,19 +164,19 @@ export const Dashboard: React.FC = () => {
               <h4 className="text-lg font-semibold font-display uppercase tracking-wider text-slate-300 text-sm">AI Business Insights</h4>
             </div>
             <div className="space-y-4">
-              <div className="bg-white/10 p-4 rounded-xl border border-white/10">
-                <p className="text-sm font-medium mb-1">Stock Alert</p>
-                <p className="text-xs text-slate-400">Chicken Breast stock is below threshold. Estimated depletion: 3.5 hours.</p>
-                <button className="mt-3 text-xs font-semibold text-brand-accent hover:underline">REORDER NOW</button>
-              </div>
-              <div className="bg-white/10 p-4 rounded-xl border border-white/10">
-                <p className="text-sm font-medium mb-1">Peak Prediction</p>
-                <p className="text-xs text-slate-400">High traffic predicted at 7:30 PM due to local events. 12% increase expected.</p>
-              </div>
-              <div className="bg-white/10 p-4 rounded-xl border border-white/10">
-                <p className="text-sm font-medium mb-1">Upselling Opportunity</p>
-                <p className="text-xs text-slate-400">Recommend "Mango Lassi" with "Biryani" - 24% conversion rate today.</p>
-              </div>
+              {aiInsights && aiInsights.length > 0 ? aiInsights.map((insight: any, index: number) => (
+                <div key={index} className="bg-white/10 p-4 rounded-xl border border-white/10">
+                  <p className="text-sm font-medium mb-1">{insight.title}</p>
+                  <p className="text-xs text-slate-400">{insight.description}</p>
+                  {insight.action && (
+                    <button className="mt-3 text-xs font-semibold text-brand-accent hover:underline">{insight.action}</button>
+                  )}
+                </div>
+              )) : (
+                <div className="bg-white/10 p-4 rounded-xl border border-white/10">
+                  <p className="text-xs text-slate-400">Not enough data to generate insights yet.</p>
+                </div>
+              )}
             </div>
           </div>
           <div className="absolute top-[-20px] right-[-20px] w-40 h-40 bg-brand-accent opacity-10 rounded-full blur-3xl" />
@@ -224,12 +224,7 @@ export const Dashboard: React.FC = () => {
         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Top Performing Items</h4>
            <div className="space-y-4">
-              {[
-                { name: 'Butter Chicken', sales: 142, revenue: '₹53,960', progress: 100 },
-                { name: 'Paneer Tikka', sales: 118, revenue: '₹37,760', progress: 85 },
-                { name: 'Dal Makhani', sales: 94, revenue: '₹26,320', progress: 65 },
-                { name: 'Garlic Naan', sales: 312, revenue: '₹18,720', progress: 50 },
-              ].map((item) => (
+              {topItems && topItems.length > 0 ? topItems.map((item: any) => (
                 <div key={item.name} className="space-y-2">
                    <div className="flex justify-between items-end">
                       <div>
@@ -247,7 +242,9 @@ export const Dashboard: React.FC = () => {
                       />
                    </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-sm text-slate-500 font-medium">No sales data available yet.</p>
+              )}
            </div>
         </div>
       </div>

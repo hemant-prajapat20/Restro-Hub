@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Staff from '../models/Staff';
+import { logMessage } from '../utils/messageLogger';
 
 export const getStaff = async (req: Request, res: Response) => {
   try {
@@ -29,6 +30,7 @@ export const addStaff = async (req: Request, res: Response) => {
     });
 
     const savedStaff = await newStaff.save();
+    await logMessage(businessId, 'Staff Member Added', `Added new staff member: ${savedStaff.name}`, 'success');
     res.status(201).json(savedStaff);
   } catch (error) {
     res.status(500).json({ message: 'Server error adding staff' });
@@ -50,6 +52,7 @@ export const updateStaff = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Staff member not found' });
     }
 
+    await logMessage(businessId, 'Staff Member Updated', `Updated staff member: ${updatedStaff.name}`, 'info');
     res.json(updatedStaff);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating staff' });
@@ -67,6 +70,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Staff member not found' });
     }
 
+    await logMessage(businessId, 'Staff Member Removed', `Removed staff member: ${deletedStaff.name}`, 'warning');
     res.json({ message: 'Staff member deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting staff' });

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Order from '../models/Order';
 import SystemSettings from '../models/SystemSettings';
+import { logMessage } from '../utils/messageLogger';
 
 // Get all orders for a business
 export const getOrders = async (req: Request, res: Response) => {
@@ -56,14 +57,7 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     // Insert Message for the Message Center
-    import('../models/Message').then(({ default: Message }) => {
-       Message.create({
-         businessId,
-         action: 'New Transaction',
-         message: `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`,
-         type: 'success'
-       }).catch(err => console.error('Failed to log message:', err));
-    });
+    await logMessage(businessId, 'New Transaction', `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`, 'success');
 
     res.status(201).json(populatedOrder);
   } catch (error) {
@@ -92,6 +86,10 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     const io = req.app.get('io');
     if (io) {
       io.emit('orderUpdated', updatedOrder);
+    }
+
+    if (status === 'Completed' || status === 'Served') {
+        await logMessage(businessId, 'Order Completed', `Order ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} status changed to ${status}.`, 'success');
     }
 
     res.json(updatedOrder);

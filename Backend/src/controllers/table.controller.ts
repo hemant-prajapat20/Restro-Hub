@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Table from '../models/Table';
+import { logMessage } from '../utils/messageLogger';
 
 export const getTables = async (req: Request, res: Response) => {
   try {
@@ -25,6 +26,7 @@ export const addTable = async (req: Request, res: Response) => {
     });
 
     const savedTable = await newTable.save();
+    await logMessage(businessId, 'Table Added', `Added new table: T-${savedTable.number}`, 'success');
     res.status(201).json(savedTable);
   } catch (error) {
     res.status(500).json({ message: 'Server error adding table' });
@@ -46,6 +48,7 @@ export const updateTable = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Table not found' });
     }
 
+    await logMessage(businessId, 'Table Updated', `Updated table: T-${updatedTable.number}`, 'info');
     res.json(updatedTable);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating table' });
@@ -63,6 +66,7 @@ export const deleteTable = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Table not found' });
     }
 
+    await logMessage(businessId, 'Table Removed', `Removed table: T-${deletedTable.number}`, 'warning');
     res.json({ message: 'Table deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting table' });
