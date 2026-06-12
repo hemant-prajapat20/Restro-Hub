@@ -72,7 +72,7 @@ export const InvoiceView: React.FC = () => {
   const dateFormatted = new Date(invoice.createdAt || invoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
   
   return (
-    <div className="bg-[#f8f9fc] min-h-screen font-sans text-slate-800 pb-10 print:bg-white">
+    <div className="bg-[#f8f9fc] min-h-screen font-sans text-slate-800 pb-10 print:bg-white print:pb-0 print:h-[297mm] print:overflow-hidden">
       
       {/* Top Action Bar */}
       <div className="px-10 py-6 flex justify-end items-center print:hidden bg-white border-b border-slate-100 shadow-sm">
@@ -120,29 +120,29 @@ export const InvoiceView: React.FC = () => {
       </div>
 
       {/* Invoice Container */}
-      <div className="w-full bg-white min-h-screen">
+      <div className="w-full bg-white min-h-screen print:min-h-0 print:h-full print:scale-[0.95] print:origin-top">
         
         {/* Golden Header */}
-        <div className="bg-[#C5A059] text-white px-10 py-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <div className="bg-[#C5A059] text-white px-10 py-12 print:px-6 print:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 print:gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 backdrop-blur-sm shadow-inner">
-               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 text-white"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" strokeLinecap="round" strokeLinejoin="round"/><circle cx="5" cy="19" r="1"/></svg>
+            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 backdrop-blur-sm shadow-inner print:w-12 print:h-12">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 print:w-6 print:h-6 text-white"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" strokeLinecap="round" strokeLinejoin="round"/><circle cx="5" cy="19" r="1"/></svg>
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-wide uppercase">RESTROHUB</h1>
-              <p className="text-[10px] font-bold tracking-[0.2em] text-orange-100 uppercase mt-1">Premium Dining Solutions</p>
+              <h1 className="text-2xl print:text-xl font-black tracking-wide uppercase">RESTROHUB</h1>
+              <p className="text-[10px] print:text-[8px] font-bold tracking-[0.2em] text-orange-100 uppercase mt-1">Premium Dining Solutions</p>
             </div>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-200 mb-1">Tax Invoice</p>
-            <h2 className="text-2xl font-black tracking-wider">INV/2026/{invoiceId}</h2>
-            <p className="text-[10px] font-bold tracking-[0.2em] text-orange-100 uppercase mt-2">Dated: {dateFormatted}</p>
+            <p className="text-[10px] print:text-[8px] font-bold uppercase tracking-[0.2em] text-orange-200 mb-1">Tax Invoice</p>
+            <h2 className="text-2xl print:text-xl font-black tracking-wider">INV/2026/{invoiceId}</h2>
+            <p className="text-[10px] print:text-[8px] font-bold tracking-[0.2em] text-orange-100 uppercase mt-2">Dated: {dateFormatted}</p>
           </div>
         </div>
 
-        <div className="p-10">
+        <div className="p-10 print:p-6 print:pt-4">
           {/* Customer & Provider Grids */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 print:gap-4 print:mb-4">
             <div className="bg-[#f8f9fc] rounded-2xl p-6 border border-slate-100">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-200 pb-2">Customer Details</p>
               <h3 className="text-lg font-bold text-slate-900 mb-3">{invoice.customerDetails?.name || 'Walk-in Customer'}</h3>
@@ -163,36 +163,36 @@ export const InvoiceView: React.FC = () => {
           </div>
 
           {/* Items Table Card */}
-          <div className="border border-slate-100 rounded-2xl overflow-hidden mb-8">
+          <div className="border border-slate-100 rounded-2xl overflow-hidden mb-8 print:mb-4">
             <table className="w-full text-sm text-left">
-              <thead className="bg-[#f8f9fc] text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <thead className="bg-[#f8f9fc] text-[10px] font-bold text-slate-400 uppercase tracking-widest print:text-[8px]">
                 <tr>
-                  <th className="px-6 py-4">Service Description</th>
-                  <th className="px-6 py-4 text-center">Qty</th>
-                  <th className="px-6 py-4 text-right">Rate</th>
-                  <th className="px-6 py-4 text-right">Total</th>
+                  <th className="px-6 py-4 print:py-2">Service Description</th>
+                  <th className="px-6 py-4 print:py-2 text-center">Qty</th>
+                  <th className="px-6 py-4 print:py-2 text-right">Rate</th>
+                  <th className="px-6 py-4 print:py-2 text-right">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
                 {invoice.items && invoice.items.length > 0 ? invoice.items.map((item: any, idx: number) => (
                   <tr key={idx}>
-                    <td className="px-6 py-5">
-                      <p className="font-bold text-slate-900 uppercase">{item.name}</p>
-                      <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1">HSN: 9987 - FOOD & BEVERAGE</p>
+                    <td className="px-6 py-5 print:py-2">
+                      <p className="font-bold text-slate-900 uppercase print:text-xs">{item.name}</p>
+                      <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1 print:text-[7px]">HSN: 9987 - FOOD & BEVERAGE</p>
                     </td>
-                    <td className="px-6 py-5 text-center font-bold text-slate-700">{(item.quantity || 1).toString().padStart(2, '0')}</td>
-                    <td className="px-6 py-5 text-right font-bold text-slate-700">₹{(item.price || (item.price * item.quantity)).toFixed(2)}</td>
-                    <td className="px-6 py-5 text-right font-black text-slate-900">₹{(item.price * item.quantity).toFixed(2)}</td>
+                    <td className="px-6 py-5 print:py-2 text-center font-bold text-slate-700 print:text-xs">{(item.quantity || 1).toString().padStart(2, '0')}</td>
+                    <td className="px-6 py-5 print:py-2 text-right font-bold text-slate-700 print:text-xs">₹{(item.price || (item.price * item.quantity)).toFixed(2)}</td>
+                    <td className="px-6 py-5 print:py-2 text-right font-black text-slate-900 print:text-xs">₹{(item.price * item.quantity).toFixed(2)}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td className="px-6 py-5">
-                      <p className="font-bold text-slate-900 uppercase">Historical Order Data</p>
-                      <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1">HSN: 9987 - FOOD & BEVERAGE</p>
+                    <td className="px-6 py-5 print:py-2">
+                      <p className="font-bold text-slate-900 uppercase print:text-xs">Historical Order Data</p>
+                      <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1 print:text-[7px]">HSN: 9987 - FOOD & BEVERAGE</p>
                     </td>
-                    <td className="px-6 py-5 text-center font-bold text-slate-700">01</td>
-                    <td className="px-6 py-5 text-right font-bold text-slate-700">₹{subtotal.toFixed(2)}</td>
-                    <td className="px-6 py-5 text-right font-black text-slate-900">₹{subtotal.toFixed(2)}</td>
+                    <td className="px-6 py-5 print:py-2 text-center font-bold text-slate-700 print:text-xs">01</td>
+                    <td className="px-6 py-5 print:py-2 text-right font-bold text-slate-700 print:text-xs">₹{subtotal.toFixed(2)}</td>
+                    <td className="px-6 py-5 print:py-2 text-right font-black text-slate-900 print:text-xs">₹{subtotal.toFixed(2)}</td>
                   </tr>
                 )}
               </tbody>
@@ -200,41 +200,41 @@ export const InvoiceView: React.FC = () => {
           </div>
 
           {/* Bottom Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-            <div className="space-y-4">
-              <div className="bg-[#f8f9fc] rounded-2xl p-5 border border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-2">Payment Method</p>
-                <div className="flex items-center gap-2 mt-3">
-                  <div className="w-3 h-3 bg-emerald-500 rounded-sm"></div>
-                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider">{invoice.paymentMethod || 'CASH'}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end print:gap-4 print:break-inside-avoid">
+            <div className="space-y-4 print:space-y-2">
+              <div className="bg-[#f8f9fc] rounded-2xl p-5 border border-slate-100 print:p-3">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-2 print:text-[8px] print:mb-1 print:pb-1">Payment Method</p>
+                <div className="flex items-center gap-2 mt-3 print:mt-1">
+                  <div className="w-3 h-3 bg-emerald-500 rounded-sm print:w-2 print:h-2"></div>
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider print:text-[10px]">{invoice.paymentMethod || 'CASH'}</span>
                 </div>
               </div>
               
-              <div className="bg-[#f8f9fc] rounded-2xl p-5 border border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-2">Amount In Words</p>
-                <p className="text-[11px] mt-3 font-black italic text-slate-900 uppercase tracking-wider">{toWords(grandTotal)}</p>
+              <div className="bg-[#f8f9fc] rounded-2xl p-5 border border-slate-100 print:p-3">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-2 print:text-[8px] print:mb-1 print:pb-1">Amount In Words</p>
+                <p className="text-[11px] mt-3 font-black italic text-slate-900 uppercase tracking-wider print:mt-1 print:text-[9px]">{toWords(grandTotal)}</p>
               </div>
 
-              <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-2">
-                <ShieldCheck size={14} className="text-emerald-500" />
+              <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-2 print:pt-1 print:text-[7px]">
+                <ShieldCheck size={14} className="text-emerald-500 print:w-3 print:h-3" />
                 <span>E-Invoice Verified • No Signature Required</span>
               </div>
             </div>
 
-            <div className="bg-[#0f172a] text-white rounded-[24px] p-8 shadow-2xl">
-              <div className="space-y-5 text-sm font-semibold text-slate-300">
+            <div className="bg-[#0f172a] text-white rounded-[24px] p-8 shadow-2xl print:p-5 print:rounded-2xl">
+              <div className="space-y-5 text-sm font-semibold text-slate-300 print:space-y-3 print:text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="uppercase tracking-widest text-[11px] font-bold text-slate-400">Subtotal (Net)</span>
+                  <span className="uppercase tracking-widest text-[11px] font-bold text-slate-400 print:text-[9px]">Subtotal (Net)</span>
                   <span className="font-bold">₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-[#fbbf24]">
-                  <span className="uppercase tracking-widest text-[11px] font-bold text-[#C5A059]">GST Total (5%)</span>
-                  <span className="font-bold text-white">₹{tax.toFixed(2)}</span>
+                  <span className="uppercase tracking-widest text-[11px] font-bold text-[#C5A059] print:text-[9px]">GST Total (5%)</span>
+                  <span className="font-bold text-white print:text-black">₹{tax.toFixed(2)}</span>
                 </div>
               </div>
-              <div className="pt-6 mt-6 border-t border-slate-800 flex justify-between items-center">
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Grand Total</span>
-                <span className="text-4xl font-black tracking-tight text-white">₹{grandTotal.toFixed(2)}</span>
+              <div className="pt-6 mt-6 border-t border-slate-800 flex justify-between items-center print:pt-3 print:mt-3 print:border-slate-300">
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 print:text-[9px]">Grand Total</span>
+                <span className="text-4xl font-black tracking-tight text-white print:text-black print:text-2xl">₹{grandTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
