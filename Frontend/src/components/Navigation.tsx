@@ -50,12 +50,12 @@ const businessNavItems = [
   { id: 'tables', label: 'Tables', icon: Table2 },
   { id: 'kds', label: 'Kitchen (KDS)', icon: ChefHat },
   { id: 'delivery', label: 'Online Orders', icon: ShoppingBag },
-  { id: 'transactions', label: 'Transactions', icon: FileText },
-  { id: 'messages', label: 'Message Center', icon: Bell },
   { id: 'inventory', label: 'Inventory', icon: ClipboardList },
   { id: 'staff', label: 'Staff Directory', icon: Users },
   { id: 'customers', label: 'Customer CRM', icon: Contact },
   { id: 'reports', label: 'Reports & GST', icon: TrendingUp },
+  { id: 'transactions', label: 'Transactions', icon: FileText },
+  { id: 'messages', label: 'Message Center', icon: Bell },
 ];
 
 const superAdminNavItems = [
@@ -190,12 +190,16 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   }, [showDropdown]);
 
   useEffect(() => {
-    if (!isSuperAdmin) return;
     const fetchNotifications = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/activity', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        if (!token) return;
+        
+        const endpoint = isSuperAdmin ? '/api/activity' : '/api/messages';
+        const res = await fetch(`http://localhost:5000${endpoint}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         const data = await res.json();
         if (data.status === 'success') {
@@ -213,12 +217,16 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const markAllRead = async () => {
-    if (!isSuperAdmin) return;
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/activity/read', {
+      const endpoint = isSuperAdmin ? '/api/activity/read' : '/api/messages/read';
+      await fetch(`http://localhost:5000${endpoint}`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
       });
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     } catch (err) {
@@ -265,21 +273,18 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
         <div className="relative" ref={dropdownRef}>
           <button 
             aria-label="Notifications"
-            onClick={() => isSuperAdmin ? setShowDropdown(!showDropdown) : null}
+            onClick={() => setShowDropdown(!showDropdown)}
             className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all"
           >
             <Bell className="w-6 h-6" />
-            {isSuperAdmin && unreadCount > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
-            {!isSuperAdmin && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-brand-accent rounded-full border-2 border-white" />
-            )}
           </button>
 
-          {isSuperAdmin && showDropdown && (
+          {showDropdown && (
             <div className="fixed left-4 right-4 top-20 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-80 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-50">
               <div className="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <span className="font-semibold text-sm">Notifications</span>
@@ -299,7 +304,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                   ))
                 )}
               </div>
-              <Link to="/super-admin/messages" onClick={() => setShowDropdown(false)} className="block p-3 text-center text-xs text-brand-accent font-semibold hover:bg-slate-50 transition-colors border-t border-slate-100">
+              <Link to={isSuperAdmin ? "/super-admin/messages" : "/admin/messages"} onClick={() => setShowDropdown(false)} className="block p-3 text-center text-xs text-brand-accent font-semibold hover:bg-slate-50 transition-colors border-t border-slate-100">
                 View Message Center
               </Link>
             </div>

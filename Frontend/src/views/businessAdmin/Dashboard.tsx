@@ -297,7 +297,7 @@ const RecentTransactionsTable = () => {
   return (
     <>
       {orders.map((invoice: any) => (
-        <tr key={invoice._id} className="hover:bg-slate-50/50 transition-all group">
+        <tr key={invoice._id} onClick={() => window.open(`/invoice/${invoice._id || invoice.id}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
            <td className="px-6 py-4">
               <p className="text-sm font-semibold text-brand-primary">#{invoice._id.slice(-8).toUpperCase()}</p>
               <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>

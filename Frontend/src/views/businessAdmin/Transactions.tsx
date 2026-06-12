@@ -6,7 +6,8 @@ import {
   Receipt,
   X,
   Send,
-  Printer
+  Printer,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
@@ -82,7 +83,7 @@ export const Transactions: React.FC = () => {
                    {filteredInvoices.length === 0 ? (
                      <tr><td colSpan={6} className="p-8 text-center text-slate-500 font-medium">No transactions found</td></tr>
                    ) : filteredInvoices.map((invoice: any) => (
-                     <tr key={invoice.id} onClick={() => setSelectedInvoice(invoice)} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
+                     <tr key={invoice.id} onClick={() => window.open(`/invoice/${invoice._id || invoice.id}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
                         <td className="px-6 py-4">
                            <p className="text-sm font-semibold text-brand-primary">#{invoice.id.slice(-8).toUpperCase()}</p>
                            <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
@@ -107,113 +108,6 @@ export const Transactions: React.FC = () => {
              </table>
           </div>
        </div>
-
-        <FramerAnimatePresence>
-        {selectedInvoice && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-              onClick={() => setSelectedInvoice(null)}
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative bg-white w-full max-w-md rounded-[32px] shadow-2xl p-8 flex flex-col max-h-[90vh]"
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Receipt className="text-brand-accent" />
-                    Transaction Details
-                  </h3>
-                  <p className="text-xs font-mono text-slate-500 mt-1">ID: {selectedInvoice.id.slice(-8).toUpperCase()}</p>
-                </div>
-                <button onClick={() => setSelectedInvoice(null)} className="p-2 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-full transition-all">
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
-                <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-100">
-                  <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-widest">Customer Details</p>
-                  <p className="text-sm font-bold text-slate-900 mt-1">{selectedInvoice.customerDetails?.name || 'Walk-in Customer'}</p>
-                  <p className="text-xs font-medium text-slate-500">{selectedInvoice.customerDetails?.phone || 'N/A'}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Order Items</p>
-                  <div className="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    {selectedInvoice.items && selectedInvoice.items.length > 0 ? selectedInvoice.items.map((item: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-start text-xs font-semibold text-slate-700">
-                        <span>{item.quantity}x {item.name}</span>
-                        <span className="font-mono">₹{item.price * item.quantity}</span>
-                      </div>
-                    )) : (
-                      <p className="text-xs text-slate-400 italic">No items detailed in legacy records.</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                  <div className="flex justify-between text-xs font-semibold text-slate-500">
-                    <span>Subtotal</span>
-                    <span className="font-mono text-slate-900">₹{selectedInvoice.subtotal?.toLocaleString() || (selectedInvoice.amount - selectedInvoice.tax).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-500">
-                    <span>GST Applied</span>
-                    <span className="font-mono text-slate-900">₹{selectedInvoice.tax?.toLocaleString()}</span>
-                  </div>
-                  <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-bold text-slate-900">
-                    <span>Grand Total ({selectedInvoice.paymentMethod || 'Cash'})</span>
-                    <span className="font-mono text-brand-primary">₹{selectedInvoice.amount?.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 mt-2 border-t border-slate-100 flex gap-3">
-                <button 
-                  onClick={() => setSelectedInvoice(null)}
-                  className="px-6 py-3 border border-slate-200 text-slate-500 rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
-                >
-                  Back
-                </button>
-                <button 
-                  onClick={() => {
-                    toast.success('Digital invoice sent to customer successfully!');
-                  }}
-                  className="flex-1 px-4 py-3 bg-slate-900 text-brand-accent rounded-xl font-semibold text-xs uppercase tracking-widest shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2 hover:bg-slate-800 transition-all"
-                >
-                  <Send size={16} /> Send
-                </button>
-                <button 
-                  onClick={() => {
-                    generateReceiptPDF({
-                      title: "RESTROHUB TRANSACTION",
-                      invoiceNumber: selectedInvoice.id.slice(-8).toUpperCase(),
-                      timestamp: new Date(selectedInvoice.date).toLocaleString(),
-                      items: selectedInvoice.items || [],
-                      subtotal: selectedInvoice.subtotal || (selectedInvoice.amount - selectedInvoice.tax),
-                      tax: selectedInvoice.tax,
-                      total: selectedInvoice.amount,
-                      customerName: selectedInvoice.customerDetails?.name || 'Walk-in',
-                      customerPhone: selectedInvoice.customerDetails?.phone || 'N/A',
-                      paymentMethod: selectedInvoice.paymentMethod || 'Cash'
-                    });
-                    toast.success('Invoice downloaded successfully');
-                  }}
-                  className="px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-2 hover:bg-brand-primary/90 transition-all"
-                >
-                  <Printer size={16} /> Print
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-        </FramerAnimatePresence>
     </div>
   );
 };

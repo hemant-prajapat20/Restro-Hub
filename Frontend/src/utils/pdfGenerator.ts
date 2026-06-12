@@ -37,8 +37,8 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   const width = doc.internal.pageSize.getWidth();
   let y = 0;
 
-  // 1. Header Background (Amber Theme)
-  doc.setFillColor(217, 119, 6);
+  // 1. Header Background (Brand Accent Theme)
+  doc.setFillColor(197, 160, 89);
   doc.rect(0, 0, width, 25, 'F');
 
   // Company Name inside Header

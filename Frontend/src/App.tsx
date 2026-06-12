@@ -30,6 +30,7 @@ import { Reports } from './views/businessAdmin/Reports';
 import { Settings as BusinessSettings } from './views/businessAdmin/Settings';
 import { Transactions } from './views/businessAdmin/Transactions';
 import { MessageCenter as BusinessMessageCenter } from './views/businessAdmin/MessageCenter';
+import { InvoiceView } from './views/businessAdmin/InvoiceView';
 
 import { Customers } from './views/businessAdmin/Customers';
 
@@ -69,6 +70,9 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="messages" element={<MessageCenter />} />
         </Route>
+
+        {/* Invoice Print Route */}
+        <Route path="/invoice/:id" element={<InvoiceView />} />
 
         {/* Customer Routes */}
         <Route path="/customer" element={<CustomerPlaceholder />} />
