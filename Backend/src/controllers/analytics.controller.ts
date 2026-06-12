@@ -72,33 +72,92 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
 
     const dailyRevenue = dailyOrders.reduce((sum, order) => sum + order.total, 0);
 
-    // Total Orders Today
+    const totalOrdersResult = await Order.aggregate([
+      { $match: { businessId: new mongoose.Types.ObjectId(businessId), status: { $in: ['Completed', 'Served'] } } },
+      { $group: { _id: null, totalRevenue: { $sum: "$total" } } }
+    ]);
+    const totalRevenue = totalOrdersResult[0]?.totalRevenue || 0;
+
     const totalOrders = await Order.countDocuments({
       businessId,
       createdAt: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    // Active Customers (Count of customers with pending/in-kitchen/ready orders)
-    const activeOrders = await Order.find({
+    const activeTotalStaff = await User.countDocuments({
       businessId,
-      status: { $in: ['Pending', 'In Kitchen', 'Ready'] }
+      isActive: true
     });
 
-    // Assume 1 customer per order for simplicity
-    const activeCustomers = activeOrders.length;
+    let avgTableTurnTime = '0m';
+    if (dailyOrders.length > 0) {
+      const times = dailyOrders.map(order => {
+        const start = new Date(order.createdAt as Date).getTime();
+        const end = new Date(order.updatedAt as Date).getTime();
+        return (end - start) / (1000 * 60);
+      }).filter(t => t > 0);
+      
+      if (times.length > 0) {
+        const avg = times.reduce((a, b) => a + b, 0) / times.length;
+        avgTableTurnTime = `${Math.max(Math.round(avg), 1)}m`;
+      } else {
+        avgTableTurnTime = '1m';
+      }
+    }
 
-    // Sales Data (Mocking hourly data based on total revenue)
-    const salesData = [
-      { name: '10 AM', sales: Math.floor(dailyRevenue * 0.1) },
-      { name: '12 PM', sales: Math.floor(dailyRevenue * 0.2) },
-      { name: '2 PM', sales: Math.floor(dailyRevenue * 0.3) },
-      { name: '4 PM', sales: Math.floor(dailyRevenue * 0.1) },
-      { name: '6 PM', sales: Math.floor(dailyRevenue * 0.15) },
-      { name: '8 PM', sales: Math.floor(dailyRevenue * 0.1) },
-      { name: '10 PM', sales: Math.floor(dailyRevenue * 0.05) },
-    ];
+    const salesDataMap: Record<string, number> = {
+      '10 AM': 0, '12 PM': 0, '2 PM': 0, '4 PM': 0, '6 PM': 0, '8 PM': 0, '10 PM': 0
+    };
+    
+    dailyOrders.forEach(order => {
+      const hour = new Date(order.createdAt as Date).getHours();
+      let bucket = '';
+      if (hour >= 10 && hour < 12) bucket = '10 AM';
+      else if (hour >= 12 && hour < 14) bucket = '12 PM';
+      else if (hour >= 14 && hour < 16) bucket = '2 PM';
+      else if (hour >= 16 && hour < 18) bucket = '4 PM';
+      else if (hour >= 18 && hour < 20) bucket = '6 PM';
+      else if (hour >= 20 && hour < 22) bucket = '8 PM';
+      else bucket = '10 PM';
+      
+      salesDataMap[bucket] += order.total;
+    });
 
-    // Top Items Aggregation
+    const salesData = Object.keys(salesDataMap).map(key => ({
+      name: key,
+      sales: salesDataMap[key]
+    }));
+
+    // Weekly Sales Data
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - 6);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const weeklyOrders = await Order.find({
+      businessId,
+      status: { $in: ['Completed', 'Served'] },
+      createdAt: { $gte: startOfWeek, $lte: endOfDay }
+    });
+
+    const weeklySalesDataMap: Record<string, number> = {};
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      weeklySalesDataMap[days[d.getDay()]] = 0;
+    }
+
+    weeklyOrders.forEach(order => {
+      const day = days[new Date(order.createdAt as Date).getDay()];
+      if (weeklySalesDataMap[day] !== undefined) {
+        weeklySalesDataMap[day] += order.total;
+      }
+    });
+
+    const weeklySalesData = Object.keys(weeklySalesDataMap).map(key => ({
+      name: key,
+      sales: weeklySalesDataMap[key]
+    }));
+
     const topItemsAgg = await Order.aggregate([
       { $match: { businessId: new mongoose.Types.ObjectId(businessId), status: { $in: ['Completed', 'Served'] } } },
       { $unwind: "$items" },
@@ -115,19 +174,23 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
       progress: Math.floor((item.sales / maxSales) * 100)
     }));
 
-    // Category Data Aggregation
     const categoryAgg = await Order.aggregate([
       { $match: { businessId: new mongoose.Types.ObjectId(businessId), status: { $in: ['Completed', 'Served'] } } },
       { $unwind: "$items" },
       { $lookup: { from: 'menuitems', localField: 'items.menuItem', foreignField: '_id', as: 'menuItemData' } },
       { $unwind: { path: "$menuItemData", preserveNullAndEmptyArrays: true } },
-      { $group: { _id: "$menuItemData.category", revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } } } }
+      { 
+        $group: { 
+          _id: { $ifNull: ["$items.category", { $ifNull: ["$menuItemData.category", "General"] }] }, 
+          revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } } 
+        } 
+      }
     ]);
 
     const totalRev = categoryAgg.reduce((sum, cat) => sum + cat.revenue, 0) || 1;
     const colors = ['#0F172A', '#F97316', '#38BDF8', '#22C55E', '#8B5CF6', '#EC4899'];
     let categoryData = categoryAgg.map((cat, idx) => ({
-      name: cat._id || 'Other',
+      name: cat._id,
       value: Math.round((cat.revenue / totalRev) * 100),
       color: colors[idx % colors.length]
     })).filter(c => c.value > 0);
@@ -136,7 +199,6 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
        categoryData = [{ name: 'No Data', value: 100, color: '#94A3B8' }];
     }
 
-    // Dynamic AI Insights
     const aiInsights = [];
     if (topItems.length > 0) {
       aiInsights.push({
@@ -165,10 +227,12 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
       status: 'success',
       data: {
         dailyRevenue,
+        totalRevenue,
         totalOrders,
-        activeCustomers,
-        avgTableTurnTime: '45m', // Static for now
+        activeTotalStaff,
+        avgTableTurnTime,
         salesData,
+        weeklySalesData,
         categoryData,
         topItems,
         aiInsights,

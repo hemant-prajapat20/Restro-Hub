@@ -447,6 +447,7 @@ export const RestroSignature: React.FC = () => {
       items: cart.map((c: any) => ({
         menuItem: c.dish.id || c.dish._id,
         name: c.dish.name,
+        category: c.dish.course || 'Signature',
         quantity: c.quantity,
         price: c.dish.price,
         status: 'Served'

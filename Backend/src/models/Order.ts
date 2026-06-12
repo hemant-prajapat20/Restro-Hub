@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IOrderItem {
   menuItem: mongoose.Types.ObjectId;
   name: string;
+  category?: string;
   quantity: number;
   price: number;
   status: 'Pending' | 'In Kitchen' | 'Ready' | 'Served';
@@ -38,6 +39,7 @@ const OrderSchema = new Schema({
   items: [{
     menuItem: { type: Schema.Types.ObjectId, ref: 'MenuItem' },
     name: { type: String, required: true },
+    category: { type: String },
     quantity: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true },
     status: { type: String, enum: ['Pending', 'In Kitchen', 'Ready', 'Served'], default: 'Pending' }

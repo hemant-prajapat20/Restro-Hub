@@ -25,9 +25,19 @@ export interface PDFReceiptData {
 }
 
 export const generateReceiptPDF = (data: PDFReceiptData) => {
-  const baseHeight = 250;
-  const itemHeight = data.items.length * 5;
-  const receiptHeight = Math.max(baseHeight, 200 + itemHeight);
+  let estimatedY = 30;
+  estimatedY += 10 + 6 + 4 + 4 + (data.tableName ? 4 : 0) + 5;
+  estimatedY += 5 + 4 + 4 + 5;
+  estimatedY += 5 + 3 + 5;
+  estimatedY += (data.items.length * 4);
+  estimatedY += 2 + 5 + 4 + (data.discount && data.discount > 0 ? 4 : 0) + 4;
+  estimatedY += 5 + 6 + 6 + 4;
+  estimatedY += 10 + 4 + 3;
+  estimatedY += 8 + 5 + 3 + 2.5 + 2.5 + 2.5;
+  estimatedY += 6;
+  estimatedY += 15; // padding
+
+  const receiptHeight = estimatedY;
 
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -38,16 +48,12 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   const width = doc.internal.pageSize.getWidth();
   let y = 0;
 
-  // 1. Header Background (Brand Accent Theme)
-  doc.setFillColor(197, 160, 89);
-  doc.rect(0, 0, width, 25, 'F');
-
-  // Company Name inside Header
+  // 1. Header 
   y += 10;
   const brandName = data.title || "RESTROHUB PRIVATE LIMITED";
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(12);
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(0, 0, 0); // Pure Black
   doc.text(brandName.toUpperCase(), width / 2, y, { align: 'center' });
   
   y += 5;
@@ -58,7 +64,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   doc.text("Tel: +91 79 4830112 | GST: 24AAACR1234F1Z5", width / 2, y, { align: 'center' });
 
   // 2. Metadata (Date, Time, Invoice)
-  doc.setTextColor(28, 25, 23); // Stone-900
+  doc.setTextColor(0, 0, 0); 
   y += 10;
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(8);
@@ -77,7 +83,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
 
   // Divider
   y += 5;
-  doc.setDrawColor(214, 211, 209);
+  doc.setDrawColor(0, 0, 0);
   doc.setLineDashPattern([1, 1], 0);
   doc.line(5, y, width - 5, y);
   doc.setLineDashPattern([], 0);
@@ -161,28 +167,24 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   // 6. Total Amount in Hinglish
   y += 6;
   doc.setFontSize(9);
-  doc.setTextColor(217, 119, 6); // Amber highlight
+  doc.setTextColor(0, 0, 0); // MUST BE PURE BLACK
   doc.text("Total Amount (Kul Rashi):", width - 30, y, { align: 'right' });
   doc.text(`Rs. ${data.total.toFixed(2)}`, width - 5, y, { align: 'right' });
 
   // 7. Payment Status
   y += 6;
   doc.setFontSize(8);
-  doc.setTextColor(28, 25, 23);
   doc.text("Payment Status:", width - 30, y, { align: 'right' });
-  // Success is green, Pending is orange
-  doc.setTextColor(22, 163, 74); // Green
   doc.text("SUCCESS", width - 5, y, { align: 'right' });
   
   // Divider Thick
-  doc.setTextColor(28, 25, 23);
   doc.setLineWidth(0.5);
   y += 4;
   doc.line(5, y, width - 5, y);
 
   // 8. Digital Signature
   y += 10;
-  doc.setDrawColor(37, 99, 235); // Blue ink
+  doc.setDrawColor(0, 0, 0); // Black ink
   doc.setLineWidth(0.4);
   const sigStartX = width / 2 - 10;
   const sigStartY = y;
@@ -191,16 +193,14 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   y += 4;
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(6);
-  doc.setTextColor(37, 99, 235);
   doc.text("DIGITALLY SIGNED & VERIFIED", width / 2, y, { align: 'center' });
   y += 3;
   doc.setFont('Helvetica', 'italic');
-  doc.setTextColor(120, 113, 108); // Stone-500
   doc.text("Authorized Signatory", width / 2, y, { align: 'center' });
 
   // 9. Rules / Terms
   y += 8;
-  doc.setDrawColor(214, 211, 209);
+  doc.setDrawColor(0, 0, 0);
   doc.setLineDashPattern([1, 1], 0);
   doc.line(5, y, width - 5, y);
   doc.setLineDashPattern([], 0);
@@ -208,13 +208,11 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   y += 5;
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(6);
-  doc.setTextColor(28, 25, 23);
   doc.text("RULES & CONDITIONS", 5, y);
   
   y += 3;
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(5);
-  doc.setTextColor(120, 113, 108);
   doc.text("1. All taxes are as per government regulations.", 5, y);
   y += 2.5;
   doc.text("2. Items once billed cannot be cancelled or refunded.", 5, y);

@@ -67,6 +67,7 @@ export const POS: React.FC = () => {
       items: cart.map(c => ({
         menuItem: c.itemId,
         name: c.name,
+        category: c.category || 'General',
         quantity: c.quantity,
         price: c.price
       })),
@@ -99,7 +100,7 @@ export const POS: React.FC = () => {
       if (existing) {
         return prev.map(i => i.itemId === currentId ? { ...i, quantity: i.quantity + 1 } : i);
       }
-      return [...prev, { itemId: currentId as string, name: item.name, price: item.price, quantity: 1 }];
+      return [...prev, { itemId: currentId as string, name: item.name, category: item.category, price: item.price, quantity: 1 }];
     });
   };
 
@@ -435,6 +436,7 @@ export const POS: React.FC = () => {
                           items: cart.map(c => ({
                             menuItem: c.itemId,
                             name: c.name,
+                            category: c.category || 'General',
                             quantity: c.quantity,
                             price: c.price,
                             status: 'Served'

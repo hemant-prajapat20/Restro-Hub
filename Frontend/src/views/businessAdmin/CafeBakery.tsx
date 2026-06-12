@@ -359,6 +359,7 @@ export const CafeBakery: React.FC = () => {
       items: cart.map((c: any) => ({
         menuItem: c.item.id || c.item._id,
         name: c.item.name + (c.milk && c.milk !== 'None' ? ` (${c.milk})` : ''),
+        category: c.item.category || 'Cafe',
         quantity: c.quantity,
         price: c.item.price,
         status: 'Served'
@@ -1151,16 +1152,19 @@ export const CafeBakery: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Label Category</label>
-                    <select 
+                    <input 
+                      list="cafe-categories"
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
-                    >
-                      <option value="Specialty Beans">Specialty Beans</option>
-                      <option value="Artisan Patisserie">Artisan Patisserie</option>
-                      <option value="Cold Brew">Cold Brew</option>
-                      <option value="Signature Beverage">Signature Beverage</option>
-                    </select>
+                      placeholder="Select or type category..."
+                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-800 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/20"
+                    />
+                    <datalist id="cafe-categories">
+                      <option value="Specialty Beans" />
+                      <option value="Artisan Patisserie" />
+                      <option value="Cold Brew" />
+                      <option value="Signature Beverage" />
+                    </datalist>
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Grade / Score</label>

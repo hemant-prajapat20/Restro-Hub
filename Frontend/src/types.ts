@@ -26,6 +26,7 @@ export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Served' | 'Comple
 export interface OrderItem {
   itemId: string;
   name: string;
+  category?: string;
   quantity: number;
   price: number;
   notes?: string;

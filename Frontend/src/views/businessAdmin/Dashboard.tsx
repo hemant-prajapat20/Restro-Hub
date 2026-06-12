@@ -52,6 +52,8 @@ const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => 
 );
 
 export const Dashboard: React.FC = () => {
+  const [graphPeriod, setGraphPeriod] = React.useState<'Today' | 'This Week'>('Today');
+
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['businessAnalytics'],
     queryFn: async () => {
@@ -64,14 +66,16 @@ export const Dashboard: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Dashboard...</div>;
   }
 
-  const { dailyRevenue, totalOrders, activeCustomers, avgTableTurnTime, salesData, categoryData, topItems, aiInsights } = analytics;
+  const { dailyRevenue, totalRevenue, totalOrders, activeTotalStaff, avgTableTurnTime, salesData, weeklySalesData, categoryData, topItems, aiInsights } = analytics;
+
+  const currentGraphData = graphPeriod === 'Today' ? salesData : weeklySalesData;
 
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto overflow-y-auto h-[calc(100vh-80px)] custom-scrollbar font-[Inter] font-semibold">
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          title="Daily Revenue" 
+          title="Today Revenue" 
           value={`₹${dailyRevenue.toLocaleString()}`} 
           subValue="vs yesterday" 
           trend={12.5} 
@@ -79,18 +83,18 @@ export const Dashboard: React.FC = () => {
           color="blue"
         />
         <StatCard 
-          title="Total Orders" 
-          value={totalOrders} 
-          subValue="vs average" 
+          title="Total Revenue" 
+          value={`₹${totalRevenue?.toLocaleString() || 0}`} 
+          subValue="all time" 
           trend={4.2} 
           icon={ShoppingBag}
           color="orange"
         />
         <StatCard 
-          title="Active Customers" 
-          value={activeCustomers} 
-          subValue="current dining" 
-          trend={-2.1} 
+          title="Active Total Staff" 
+          value={activeTotalStaff || 0} 
+          subValue="currently active" 
+          trend={2.1} 
           icon={Users}
           color="emerald"
         />
@@ -112,14 +116,18 @@ export const Dashboard: React.FC = () => {
               <h4 className="text-lg font-semibold font-display">Revenue Velocity</h4>
               <p className="text-sm text-slate-500">Live sales performance across day parts</p>
             </div>
-            <select className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium">
-              <option>Today</option>
-              <option>Yesterday</option>
+            <select 
+              value={graphPeriod}
+              onChange={(e) => setGraphPeriod(e.target.value as 'Today' | 'This Week')}
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium"
+            >
+              <option value="Today">Today</option>
+              <option value="This Week">This Week</option>
             </select>
           </div>
           <div className="h-[300px] w-full min-w-0">
             <ResponsiveContainer width="99%" height={300}>
-              <AreaChart data={salesData}>
+              <AreaChart data={currentGraphData}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#F97316" stopOpacity={0.3}/>

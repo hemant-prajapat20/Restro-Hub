@@ -364,6 +364,7 @@ export const BarLounge: React.FC = () => {
       items: cart.map((c: any) => ({
         menuItem: c.item.id || c.item._id,
         name: c.item.name + (c.pourSize !== 'Standard' ? ` (${c.pourSize})` : ''),
+        category: c.item.category || 'Bar',
         quantity: c.quantity,
         price: getItemPrice(c),
         status: 'Served'
@@ -1092,16 +1093,19 @@ export const BarLounge: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Label Category</label>
-                    <select 
+                    <input 
+                      list="bar-categories"
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs focus:outline-none"
-                    >
-                      <option value="Single Malt">Single Malt</option>
-                      <option value="Vintage Wine">Vintage Wine</option>
-                      <option value="Cognac">Cognac</option>
-                      <option value="Craft Cocktail">Craft Cocktail</option>
-                    </select>
+                      placeholder="Select or type category..."
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-xs text-stone-800 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/20"
+                    />
+                    <datalist id="bar-categories">
+                      <option value="Single Malt" />
+                      <option value="Vintage Wine" />
+                      <option value="Cognac" />
+                      <option value="Craft Cocktail" />
+                    </datalist>
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Vintage / Age</label>
