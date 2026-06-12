@@ -221,20 +221,20 @@ export const InvoiceView: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-[#0f172a] text-white rounded-[24px] p-8 shadow-2xl print:p-5 print:rounded-2xl">
-              <div className="space-y-5 text-sm font-semibold text-slate-300 print:space-y-3 print:text-xs">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-[24px] p-8 shadow-2xl print:bg-none print:!bg-white print:text-slate-900 print:border print:border-slate-200 print:shadow-none print:p-5 print:rounded-2xl">
+              <div className="space-y-5 text-sm font-semibold text-slate-300 print:space-y-3 print:text-slate-600 print:text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="uppercase tracking-widest text-[11px] font-bold text-slate-400 print:text-[9px]">Subtotal (Net)</span>
-                  <span className="font-bold">₹{subtotal.toFixed(2)}</span>
+                  <span className="uppercase tracking-widest text-[11px] font-bold text-slate-400 print:text-slate-500 print:text-[9px]">Subtotal (Net)</span>
+                  <span className="font-bold print:text-slate-900 text-white">₹{subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center text-[#fbbf24]">
-                  <span className="uppercase tracking-widest text-[11px] font-bold text-[#C5A059] print:text-[9px]">GST Total (5%)</span>
-                  <span className="font-bold text-white print:text-black">₹{tax.toFixed(2)}</span>
+                <div className="flex justify-between items-center text-[#fbbf24] print:text-slate-900">
+                  <span className="uppercase tracking-widest text-[11px] font-bold text-[#C5A059] print:text-slate-500 print:text-[9px]">GST Total (5%)</span>
+                  <span className="font-bold text-white print:text-slate-900">₹{tax.toFixed(2)}</span>
                 </div>
               </div>
-              <div className="pt-6 mt-6 border-t border-slate-800 flex justify-between items-center print:pt-3 print:mt-3 print:border-slate-300">
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 print:text-[9px]">Grand Total</span>
-                <span className="text-4xl font-black tracking-tight text-white print:text-black print:text-2xl">₹{grandTotal.toFixed(2)}</span>
+              <div className="pt-6 mt-6 border-t border-slate-800 flex justify-between items-center print:pt-3 print:mt-3 print:border-slate-200">
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 print:text-slate-500 print:text-[9px]">Grand Total</span>
+                <span className="text-4xl font-black tracking-tight text-white print:text-slate-900 print:text-2xl">₹{grandTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>

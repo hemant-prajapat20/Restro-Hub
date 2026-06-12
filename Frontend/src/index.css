@@ -47,10 +47,10 @@
   @apply bg-transparent;
 }
 
-/* ── Print Styles: Force invoice on single A4 page ────────────── */
+/* ── Print Styles: Force invoice on EXACTLY one A4 page ────────── */
 @media print {
   @page {
-    size: A4;
+    size: A4 portrait;
     margin: 6mm;
   }
 
@@ -59,11 +59,21 @@
   }
 
   html, body {
-    height: auto !important;
-    overflow: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+  }
+
+  #root {
+    height: 100% !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
   }
 
   * {
