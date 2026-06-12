@@ -39,7 +39,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
         ) : null}
-        {children}
+        {children as React.ReactNode}
       </motion.button>
     );
   }

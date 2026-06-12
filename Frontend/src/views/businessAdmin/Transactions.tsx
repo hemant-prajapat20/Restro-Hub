@@ -35,11 +35,12 @@ export const Transactions: React.FC = () => {
 
   const { recentInvoices } = reports || { recentInvoices: [] };
 
-  const filteredInvoices = recentInvoices.filter((inv: any) => 
-    inv.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inv.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (inv.customerDetails?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInvoices = recentInvoices.filter((inv: any) => {
+    const invId = inv._id || inv.id || '';
+    return invId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (inv.type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (inv.customerDetails?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
@@ -82,11 +83,14 @@ export const Transactions: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                    {filteredInvoices.length === 0 ? (
                      <tr><td colSpan={6} className="p-8 text-center text-slate-500 font-medium">No transactions found</td></tr>
-                   ) : filteredInvoices.map((invoice: any) => (
-                     <tr key={invoice.id} onClick={() => window.open(`/invoice/${invoice._id || invoice.id}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
+                   ) : filteredInvoices.map((invoice: any) => {
+                     const invId = invoice._id || invoice.id || '';
+                     const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
+                     return (
+                     <tr key={invId} onClick={() => window.open(`/invoice/${invId}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
                         <td className="px-6 py-4">
-                           <p className="text-sm font-semibold text-brand-primary">#{invoice.id.slice(-8).toUpperCase()}</p>
-                           <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                           <p className="text-sm font-semibold text-brand-primary">#{shortId}</p>
+                           <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt || invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                         </td>
                         <td className="px-6 py-4">
                            <p className="text-sm font-bold text-slate-900">{invoice.customerDetails?.name || 'Walk-in Customer'}</p>
@@ -103,7 +107,8 @@ export const Transactions: React.FC = () => {
                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${invoice.status === 'Completed' || invoice.status === 'Served' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{invoice.status}</span>
                         </td>
                      </tr>
-                   ))}
+                     );
+                   })}
                 </tbody>
              </table>
           </div>

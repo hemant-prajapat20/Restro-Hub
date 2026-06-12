@@ -32,7 +32,7 @@ export const POS: React.FC = () => {
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [orderState, setOrderState] = useState<'idle' | 'sending' | 'submitted'>('idle');
-  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'Card' | 'UPI' | 'Wallet' | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
   const { data: menuItems = [], isLoading, isError } = useQuery<MenuItem[]>({
     queryKey: ['menuItems'],

@@ -9,7 +9,8 @@ import {
   Calculator,
   Calendar,
   Lock,
-  Search
+  Search,
+  Printer, Send, X, Receipt
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
@@ -18,7 +19,6 @@ import { FilterBar } from '../../components/FilterBar';
 import { Button } from '../../components/Button';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import toast from 'react-hot-toast';
-import { Printer, Send, X, Receipt, AnimatePresence } from 'lucide-react';
 
 export const Reports: React.FC = () => {
   const [month, setMonth] = useState('2026-04');

@@ -293,12 +293,15 @@ const RecentTransactionsTable = () => {
 
   return (
     <>
-      {orders.map((invoice: any) => (
-        <tr key={invoice._id} onClick={() => window.open(`/invoice/${invoice._id || invoice.id}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
-           <td className="px-6 py-4">
-              <p className="text-sm font-semibold text-brand-primary">#{invoice._id.slice(-8).toUpperCase()}</p>
-              <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
-           </td>
+      {orders.map((invoice: any) => {
+        const invId = invoice._id || invoice.id || '';
+        const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
+        return (
+          <tr key={invId} onClick={() => window.open(`/invoice/${invId}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
+             <td className="px-6 py-4">
+                <p className="text-sm font-semibold text-brand-primary">#{shortId}</p>
+                <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt || invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+             </td>
            <td className="px-6 py-4 text-center">
               <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md text-[10px] font-bold uppercase tracking-widest">{invoice.type}</span>
            </td>
@@ -310,7 +313,8 @@ const RecentTransactionsTable = () => {
               <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${invoice.status === 'Completed' || invoice.status === 'Served' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{invoice.status}</span>
            </td>
         </tr>
-      ))}
+        );
+      })}
     </>
   );
 };

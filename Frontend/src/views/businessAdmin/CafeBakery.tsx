@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Coffee, Plus, Search, Flame, Timer, Utensils, TrendingUp, Sliders, Loader2, SlidersHorizontal, X, PlusCircle, TrendingDown, Sparkles, Award, ShoppingCart, Receipt, Printer, CreditCard, CheckCircle, ChevronRight, FileText, Edit2, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
+import { initializeRazorpayPayment } from '../../utils/razorpay';
+import { Banknote, Smartphone } from 'lucide-react';
 
 interface CafeItem {
   _id?: string;
@@ -83,14 +85,18 @@ export const CafeBakery: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'display' | 'billing'>('display');
   
   // Custom Barista Cart state
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+
+  // Billing states
   const [cart, setCart] = useState<CartItem[]>([]);
   const [targetTable, setTargetTable] = useState('PDR Cabin #1');
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'UPI' | 'Online'>('Cash');
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
+
 
   // Brewing Equipment state
   const [activeBrew, setActiveBrew] = useState<{name: string, secondsLeft: number, isBrewing: boolean}>({
@@ -893,7 +899,7 @@ export const CafeBakery: React.FC = () => {
                 {/* Execute Checkout Button */}
                 <button
                   type="button"
-                  onClick={handleCheckout}
+                  onClick={() => setShowCheckout(true)}
                   disabled={cart.length === 0}
                   className="w-full py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40"
                 >
@@ -1317,6 +1323,166 @@ export const CafeBakery: React.FC = () => {
                   <button type="submit" className="flex-[2] py-4 bg-stone-900 border border-amber-500/20 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl cursor-pointer hover:opacity-90">Save</button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+
+      {/* Checkout Modal */}
+      <AnimatePresence>
+        {showCheckout && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm"
+              onClick={() => setShowCheckout(false)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
+            >
+              <div className="p-5">
+                <h3 className="text-2xl font-semibold font-display mb-6">Complete Payment</h3>
+                
+                <div className="mb-6 space-y-3">
+                  <h4 className="text-sm font-semibold text-stone-500 uppercase tracking-widest">Customer Details (Required)</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Customer Name" 
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-sm font-semibold focus:border-brand-primary outline-none"
+                    />
+                    <div>
+                      <input 
+                        type="text" 
+                        placeholder="Mobile Number (10 digits)" 
+                        maxLength={10}
+                        value={customerPhone}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || /^\d+$/.test(val)) {
+                            setCustomerPhone(val);
+                          }
+                        }}
+                        className={`w-full bg-stone-50 border rounded-xl px-4 py-3 text-sm font-semibold outline-none transition-all ${
+                          customerPhone && customerPhone.length !== 10 
+                            ? 'border-red-400 focus:border-red-500 text-red-600 focus:ring-2 focus:ring-red-100' 
+                            : 'border-stone-200 focus:border-brand-primary'
+                        }`}
+                      />
+                      {customerPhone && customerPhone.length !== 10 && (
+                        <p className="text-[10px] text-red-500 font-semibold mt-1 ml-1">Must be exactly 10 digits</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  {[
+                    { id: 'Cash', icon: Banknote, label: 'Cash' },
+                    { id: 'UPI', icon: Smartphone, label: 'UPI QR' },
+                    { id: 'Card', icon: CreditCard, label: 'Card' },
+                    { id: 'Wallet', icon: Smartphone, label: 'E-Wallet' },
+                  ].map((method) => {
+                    const Icon = method.icon;
+                    const isActive = paymentMethod === method.id;
+                    return (
+                      <button
+                        key={method.id}
+                        disabled={cart.length === 0}
+                        onClick={() => setPaymentMethod(method.id as any)}
+                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${
+                          isActive 
+                            ? 'border-brand-primary bg-brand-primary/5 text-brand-primary' 
+                            : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-stone-300'
+                        }`}
+                      >
+                        <Icon size={32} className="mb-2" />
+                        <span className="font-semibold">{method.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200 mb-8">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-stone-500 font-medium">Grand Total</span>
+                    <span className="text-2xl font-semibold text-brand-primary">₹{cartTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="h-[1px] bg-stone-200 my-4" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold text-stone-400 uppercase tracking-widest">Order Reference</span>
+                    <span className="text-xs font-mono font-semibold text-stone-500">IND-CAFE-{Math.floor(1000 + Math.random() * 9000)}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => setShowCheckout(false)}
+                    className="flex-1 py-4 font-semibold text-stone-500 hover:bg-stone-50 rounded-2xl transition-all"
+                  >
+                    BACK
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const invoiceNum = 'IND-CAFE-' + Math.floor(100000 + Math.random() * 900000);
+                      
+                      const processOrder = () => {
+                        const receiptItems = cart.map((c: any) => ({
+                          itemId: c.item.id,
+                          name: c.item.name,
+                          price: c.item.price,
+                          quantity: c.quantity
+                        }));
+
+                        generateReceiptPDF({
+                          invoiceNumber: invoiceNum,
+                          timestamp: new Date().toLocaleString(),
+                          customerName,
+                          customerPhone,
+                          paymentMethod: paymentMethod || 'Cash',
+                          items: receiptItems,
+                          subtotal: cartSubtotal,
+                          tax: cgst + sgst,
+                          total: cartTotal,
+                          type: 'Cafe & Bakery'
+                        });
+
+                        handleCheckout(); // reuse existing logic
+                        setShowCheckout(false);
+                        setPaymentMethod(null);
+                      };
+
+                      if (paymentMethod === 'UPI' || paymentMethod === 'Online' || paymentMethod === 'Card') {
+                        initializeRazorpayPayment({
+                          amount: cartTotal,
+                          receiptId: invoiceNum,
+                          onSuccess: (pid) => {
+                            processOrder();
+                          },
+                          onFailure: (err) => {
+                            console.error('Payment failed', err);
+                          }
+                        });
+                      } else {
+                        processOrder();
+                      }
+                    }}
+                    disabled={!paymentMethod || !customerName.trim() || !customerPhone.match(/^\d{10}$/) || checkoutCafeMutation.isPending}
+                    className="flex-[2] bg-brand-primary hover:bg-brand-primary/90 disabled:bg-stone-300 text-brand-accent font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all"
+                  >
+                    COMPLETE PAYMENT
+                    <FileText size={18} />
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}

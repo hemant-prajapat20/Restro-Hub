@@ -7,7 +7,7 @@ export const pageVariants = {
   exit: { opacity: 0, y: -10, scale: 0.98 },
 };
 
-export const pageTransition = {
+export const pageTransition: any = {
   type: 'spring',
   stiffness: 260,
   damping: 20,

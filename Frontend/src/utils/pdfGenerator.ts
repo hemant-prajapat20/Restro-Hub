@@ -9,6 +9,7 @@ export interface PDFReceiptItem {
 
 export interface PDFReceiptData {
   title?: string;
+  type?: string;
   invoiceNumber: string;
   timestamp: string;
   tableName?: string | number;

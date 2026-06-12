@@ -24,8 +24,10 @@ import {
   Printer,
   UtensilsCrossed,
   FileText,
-  ChefHat
+  ChefHat,
+  Download
 } from 'lucide-react';
+import { initializeRazorpayPayment } from '../../utils/razorpay';
 import { motion, AnimatePresence } from 'motion/react';
 import { Table, TableStatus, MenuItem } from '../../types';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';

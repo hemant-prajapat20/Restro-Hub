@@ -75,11 +75,8 @@ export const InvoiceView: React.FC = () => {
     <div className="bg-[#f8f9fc] min-h-screen font-sans text-slate-800 pb-10 print:bg-white">
       
       {/* Top Action Bar */}
-      <div className="max-w-5xl mx-auto px-4 py-8 flex justify-between items-center print:hidden">
-        <button onClick={() => window.close()} className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
-          <ChevronLeft size={16} /> Back
-        </button>
-        <div className="flex gap-3">
+      <div className="px-10 py-6 flex justify-end items-center print:hidden bg-white border-b border-slate-100 shadow-sm">
+        <div className="flex gap-4">
           <button 
              onClick={() => {
                const phone = invoice.customerDetails?.phone || '';
@@ -91,10 +88,10 @@ export const InvoiceView: React.FC = () => {
                  toast.error('No mobile number available for this customer');
                }
              }}
-             className="px-5 py-2.5 bg-[#25D366] text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#1ebd57] transition-colors flex items-center justify-center gap-2 shadow-sm"
+             className="px-6 py-3 bg-[#25D366] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-[#1ebd57] transition-colors flex items-center justify-center gap-2 shadow-sm"
            >
-             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-             WhatsApp
+             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+             Send WhatsApp
            </button>
            <button 
              onClick={() => {
@@ -112,18 +109,18 @@ export const InvoiceView: React.FC = () => {
                });
                toast.success('Invoice downloaded successfully');
              }}
-             className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm"
+             className="px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm"
            >
-             <Download size={16} /> Download
+             <Download size={18} /> Download PDF
            </button>
-          <button onClick={() => window.print()} className="px-5 py-2.5 bg-[#C5A059] text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#b58c44] transition-colors flex items-center gap-2 shadow-lg shadow-[#C5A059]/30">
-            <Printer size={16} /> Print
+          <button onClick={() => window.print()} className="px-6 py-3 bg-[#C5A059] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-[#b58c44] transition-colors flex items-center gap-2 shadow-lg shadow-[#C5A059]/30">
+            <Printer size={18} /> Print to Printer
           </button>
         </div>
       </div>
 
       {/* Invoice Container */}
-      <div className="max-w-4xl mx-auto bg-white rounded-[32px] shadow-2xl print:shadow-none overflow-hidden print:w-full print:max-w-none print:rounded-none">
+      <div className="w-full bg-white min-h-screen">
         
         {/* Golden Header */}
         <div className="bg-[#C5A059] text-white px-10 py-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
