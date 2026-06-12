@@ -15,7 +15,8 @@ import {
   X,
   Sparkles,
   Settings,
-  Trash2
+  Trash2,
+  Edit2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -41,6 +42,7 @@ export const StaffManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingStaffId, setEditingStaffId] = useState<string | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   // Form states for New Staff
@@ -108,8 +110,9 @@ export const StaffManagement: React.FC = () => {
       setNewEmail('');
       setNewGender('Male');
       setShowAddModal(false);
+      setEditingStaffId(null);
     },
-    onError: () => toast.error('Failed to onboard staff')
+    onError: () => toast.error('Failed to save staff details')
   });
 
   const filteredCrew = crew.filter(member => {
@@ -123,7 +126,7 @@ export const StaffManagement: React.FC = () => {
     updateStaffMutation.mutate({ id: memberId, data: { status: nextStatus } });
   };
 
-  const handleOnboardStaff = (e: React.FormEvent) => {
+  const handleSaveStaff = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newSalary || !newContact) return;
 
@@ -137,17 +140,47 @@ export const StaffManagement: React.FC = () => {
       ? `&hair=longHairStraight,longHairCurly,longHairMiaWallace&clothing=blazerAndSweater,collarAndSweater`
       : `&hair=shortHairShortFlat,shortHairShortWaved,shortHairTheCaesar&clothing=blazerAndShirt,shirtCrewNeck&facialHairProbability=20`;
 
-    addStaffMutation.mutate({
+    const staffData = {
       name: newName,
       role: assignedRole,
       shift: newShift,
-      status: 'Off-Duty',
       salary: Number(newSalary),
       contact: newContact,
       email: newEmail || `${newName.toLowerCase().replace(/\s/g, '')}@indiserve.pro`,
       score: Number(newScore) || 5.0,
       image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}${avatarParams}`
-    });
+    };
+
+    if (editingStaffId) {
+      updateStaffMutation.mutate({ id: editingStaffId, data: staffData });
+      toast.success('Staff updated successfully');
+      setShowAddModal(false);
+      setEditingStaffId(null);
+      // Reset form
+      setNewName(''); setNewSalary(''); setNewContact(''); setNewEmail(''); setNewGender('Male');
+    } else {
+      addStaffMutation.mutate({ ...staffData, status: 'Off-Duty' });
+    }
+  };
+
+  const handleEditClick = (staff: StaffMember) => {
+    setEditingStaffId(staff.id);
+    setNewName(staff.name);
+    setNewRole(staff.role);
+    setNewShift(staff.shift as any);
+    setNewSalary(staff.salary.toString());
+    setNewContact(staff.contact);
+    setNewEmail(staff.email);
+    setNewScore(staff.score.toString());
+    
+    // Infer gender from image URL (since we used Sophia or Felix)
+    if (staff.image && staff.image.includes('Sophia')) {
+       setNewGender('Female');
+    } else {
+       setNewGender('Male');
+    }
+    
+    setShowAddModal(true);
   };
 
   const handleAddCategory = () => {
@@ -287,7 +320,16 @@ export const StaffManagement: React.FC = () => {
                         </div>
                      </div>
 
-                     <h5 className="text-lg font-semibold text-stone-900 group-hover:text-brand-accent transition-colors block">{member.name}</h5>
+                     <div className="flex items-center justify-between">
+                        <h5 className="text-lg font-semibold text-stone-900 group-hover:text-brand-accent transition-colors block">{member.name}</h5>
+                        <button 
+                           onClick={(e) => { e.stopPropagation(); handleEditClick(member); }}
+                           className="p-1.5 text-stone-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-lg transition-all"
+                           title="Edit Staff"
+                        >
+                           <Edit2 size={14} />
+                        </button>
+                     </div>
                      <p className="text-[10.5px] font-semibold text-stone-400 uppercase tracking-widest mt-1 block">ID: MAISON-{member.id}</p>
                      
                      <div className="mt-4 py-3 border-y border-stone-50 space-y-2">
@@ -434,10 +476,14 @@ export const StaffManagement: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Recruit Team Member</h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Onboard certified luxury hospitality brigade personnel</p>
+              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">
+                {editingStaffId ? 'Edit Team Member' : 'Recruit Team Member'}
+              </h3>
+              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">
+                {editingStaffId ? 'Update staff details and avatar' : 'Onboard certified luxury hospitality brigade personnel'}
+              </p>
 
-              <form onSubmit={handleOnboardStaff} className="space-y-4">
+              <form onSubmit={handleSaveStaff} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
@@ -543,7 +589,9 @@ export const StaffManagement: React.FC = () => {
 
                 <div className="flex gap-4 pt-4">
                   <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">INDIVIEW COMMISSION</button>
+                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">
+                    {editingStaffId ? 'UPDATE STAFF' : 'INDIVIEW COMMISSION'}
+                  </button>
                 </div>
               </form>
             </motion.div>
