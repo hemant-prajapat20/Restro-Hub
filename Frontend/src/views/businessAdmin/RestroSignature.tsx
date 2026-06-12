@@ -552,7 +552,7 @@ export const RestroSignature: React.FC = () => {
             <div className="xl:col-span-2 space-y-8">
               
               {/* Private Dining Rooms */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between px-2">
                   <h4 className="text-lg font-semibold uppercase text-stone-800 tracking-tight flex items-center gap-2">
                     <Crown size={18} className="text-brand-accent" />
@@ -733,7 +733,7 @@ export const RestroSignature: React.FC = () => {
               <div className="bg-stone-950 p-5 rounded-2xl border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
                 <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Chef Tasting Session Log</h5>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                    <div className="bg-stone-900/60 p-5 rounded-2xl border border-stone-800">
                       <span className="text-[9px] font-semibold text-brand-accent uppercase tracking-widest block mb-2">Live Session #05</span>
                       <h6 className="text-sm font-semibold text-white uppercase tracking-tight">Royals Tasting Plate</h6>
@@ -1182,24 +1182,24 @@ export const RestroSignature: React.FC = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => { setShowAddPdrModal(false); setEditingPdr(null); }} />
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
               <h3 className="text-2xl font-semibold text-stone-900 mb-6 font-display">{editingPdr ? 'Edit Suite' : 'Add Royal Suite'}</h3>
-              <form onSubmit={handlePdrSubmit} className="space-y-4">
+              <form onSubmit={handlePdrSubmit} className="space-y-3">
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Suite Name</label>
-                  <input type="text" value={newPdrName} onChange={e => setNewPdrName(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  <input type="text" value={newPdrName} onChange={e => setNewPdrName(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Seat Capacity</label>
-                    <input type="number" value={newPdrCapacity} onChange={e => setNewPdrCapacity(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                    <input type="number" value={newPdrCapacity} onChange={e => setNewPdrCapacity(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                   </div>
                   <div className="flex-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Minimum Spend (₹)</label>
-                    <input type="number" value={newPdrMinSpend} onChange={e => setNewPdrMinSpend(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                    <input type="number" value={newPdrMinSpend} onChange={e => setNewPdrMinSpend(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                   </div>
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Brief / Description</label>
-                  <textarea value={newPdrNotes} onChange={e => setNewPdrNotes(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-20 custom-scrollbar" />
+                  <textarea value={newPdrNotes} onChange={e => setNewPdrNotes(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-20 custom-scrollbar" />
                 </div>
                 
                 <div>
@@ -1212,11 +1212,11 @@ export const RestroSignature: React.FC = () => {
                       setNewPdrImageFile(file);
                       setNewPdrImage(URL.createObjectURL(file));
                     }
-                  }} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                  }} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">VIP Benefits (comma separated)</label>
-                  <input type="text" value={newPdrBenefits} onChange={e => setNewPdrBenefits(e.target.value)} placeholder="e.g. Personal Sommelier, Private Audio" className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  <input type="text" value={newPdrBenefits} onChange={e => setNewPdrBenefits(e.target.value)} placeholder="e.g. Personal Sommelier, Private Audio" className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                 </div>
                 <div className="flex items-center gap-3 pt-2">
                   <input type="checkbox" checked={newPdrIsActive} onChange={e => setNewPdrIsActive(e.target.checked)} id="isActiveToggle" className="w-4 h-4 text-brand-primary rounded border-stone-300 focus:ring-brand-primary" />
@@ -1259,14 +1259,14 @@ export const RestroSignature: React.FC = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={() => setEditingItem(null)} />
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-lg rounded-[32px] shadow-2xl p-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
               <h3 className="text-2xl font-semibold text-stone-900 mb-6 font-display">Edit Signature Dish</h3>
-              <form onSubmit={handleEditSubmit} className="space-y-4">
+              <form onSubmit={handleEditSubmit} className="space-y-3">
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dish Name</label>
-                  <input type="text" value={newDishName} onChange={e => setNewDishName(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  <input type="text" value={newDishName} onChange={e => setNewDishName(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Description</label>
-                  <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-24 custom-scrollbar" />
+                  <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm h-24 custom-scrollbar" />
                 </div>
                 
                 <div>
@@ -1279,12 +1279,12 @@ export const RestroSignature: React.FC = () => {
                       setNewImageFile(file);
                       setNewImage(URL.createObjectURL(file));
                     }
-                  }} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                  }} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Course</label>
-                    <select value={newCourse} onChange={e => setNewCourse(e.target.value as any)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
+                    <select value={newCourse} onChange={e => setNewCourse(e.target.value as any)} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
                       <option value="Starter">Starter</option>
                       <option value="Main Course">Main Course</option>
                       <option value="Dessert">Dessert</option>
@@ -1292,17 +1292,17 @@ export const RestroSignature: React.FC = () => {
                   </div>
                   <div className="flex-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Base Price (₹)</label>
-                    <input type="number" value={newPrice} onChange={e => setNewPrice(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                    <input type="number" value={newPrice} onChange={e => setNewPrice(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Chef Name</label>
-                    <input type="text" value={newChef} onChange={e => setNewChef(e.target.value)} required className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                    <input type="text" value={newChef} onChange={e => setNewChef(e.target.value)} required className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                   </div>
                   <div className="flex-1">
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Dietary type</label>
-                    <select value={newIsVeg ? 'veg' : 'non-veg'} onChange={e => setNewIsVeg(e.target.value === 'veg')} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
+                    <select value={newIsVeg ? 'veg' : 'non-veg'} onChange={e => setNewIsVeg(e.target.value === 'veg')} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm">
                       <option value="veg">Vegetarian</option>
                       <option value="non-veg">Non-Vegetarian</option>
                     </select>
@@ -1358,7 +1358,7 @@ export const RestroSignature: React.FC = () => {
               <h3 className="text-2xl font-semibold text-stone-900 font-display mb-1">{selectedRoom.name}</h3>
               <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest mb-6 border-b border-stone-100 pb-3">{selectedRoom.notes}</p>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest px-1 mb-2">Switch Active Status</p>
                  <button 
                    onClick={() => handleToggleRoomStatus(selectedRoom.id, 'Available')}
@@ -1414,12 +1414,12 @@ export const RestroSignature: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
+              className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 border border-amber-900/10 overflow-hidden"
             >
               <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Propose Chef Signature</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Introduce high-end recipes to VIP menus</p>
 
-              <form onSubmit={handleCreateSignature} className="space-y-4">
+              <form onSubmit={handleCreateSignature} className="space-y-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Signature Masterpiece Name</label>
                   <input 
@@ -1428,7 +1428,7 @@ export const RestroSignature: React.FC = () => {
                     placeholder="e.g. Saffron-Roasted King Quail" 
                     value={newDishName}
                     onChange={(e) => setNewDishName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                   />
                 </div>
 
@@ -1438,19 +1438,19 @@ export const RestroSignature: React.FC = () => {
                     placeholder="Describe wild sourcing, age, rare elements, plating designs..." 
                     value={newDescription}
                     onChange={(e) => setNewDescription(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-medium text-sm h-24 focus:outline-none resize-none"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-medium text-sm h-24 focus:outline-none resize-none"
                   />
                 </div>
 
                 
                 <div>
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
-                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
+                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm" />
                 </div>
 
                 <div className="pt-2">
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
-                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -1458,7 +1458,7 @@ export const RestroSignature: React.FC = () => {
                     <select 
                       value={newCourse} 
                       onChange={(e) => setNewCourse(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
                       <option value="Starter">Starter / Appetizer</option>
                       <option value="Main Course">Main Course</option>
@@ -1473,7 +1473,7 @@ export const RestroSignature: React.FC = () => {
                       placeholder="e.g. Master Chef Ranveer" 
                       value={newChef}
                       onChange={(e) => setNewChef(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                 </div>
@@ -1488,7 +1488,7 @@ export const RestroSignature: React.FC = () => {
                       placeholder="e.g. 2400" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1517,7 +1517,7 @@ export const RestroSignature: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddDishModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
+                  <button type="button" onClick={() => setShowAddDishModal(false)} className="flex-1 py-2.5 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
                   <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">CONFIRM RECOMMENDATION</button>
                 </div>
               </form>

@@ -1060,12 +1060,12 @@ export const BarLounge: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden text-stone-800"
+              className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 border border-amber-900/10 overflow-hidden text-stone-800"
             >
               <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">Acquire Premium Bottle</h3>
               <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">Catalog fine wines, single malts or custom creations</p>
 
-              <form onSubmit={handleAddLiquor} className="space-y-4">
+              <form onSubmit={handleAddLiquor} className="space-y-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Liquor / Label Name</label>
                   <input 
@@ -1074,19 +1074,19 @@ export const BarLounge: React.FC = () => {
                     placeholder="e.g. Glenfiddich Grande Couronne 26 Y.O." 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30"
                   />
                 </div>
 
                 
                 <div className="space-y-1 pb-4">
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Image URL (Optional)</label>
-                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none" />
+                  <input type="text" value={newImage} onChange={e => setNewImage(e.target.value)} placeholder="https://..." className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none" />
                 </div>
 
                 <div className="pt-2">
                   <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2 block mb-1">Or Upload from Device</label>
-                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
+                  <input type="file" accept="image/*" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -1094,7 +1094,7 @@ export const BarLounge: React.FC = () => {
                     <select 
                       value={newCategory} 
                       onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     >
                       <option value="Single Malt">Single Malt</option>
                       <option value="Vintage Wine">Vintage Wine</option>
@@ -1109,7 +1109,7 @@ export const BarLounge: React.FC = () => {
                       placeholder="e.g. 26 Y.O. or 2018" 
                       value={newVintage}
                       onChange={(e) => setNewVintage(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1122,7 +1122,7 @@ export const BarLounge: React.FC = () => {
                       placeholder="e.g. 43.8%" 
                       value={newAbv}
                       onChange={(e) => setNewAbv(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-mono text-sm focus:outline-none"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-mono text-sm focus:outline-none"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1133,7 +1133,7 @@ export const BarLounge: React.FC = () => {
                       placeholder="750" 
                       value={newCapacity}
                       onChange={(e) => setNewCapacity(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1148,7 +1148,7 @@ export const BarLounge: React.FC = () => {
                       placeholder="3500" 
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1160,7 +1160,7 @@ export const BarLounge: React.FC = () => {
                       placeholder="6" 
                       value={newStock}
                       onChange={(e) => setNewStock(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1172,12 +1172,12 @@ export const BarLounge: React.FC = () => {
                     placeholder="e.g. Champagne region, France" 
                     value={newOrigin}
                     onChange={(e) => setNewOrigin(e.target.value)}
-                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm focus:outline-none"
                   />
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest cursor-pointer">DISCARD</button>
+                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest cursor-pointer">DISCARD</button>
                   <button type="submit" className="flex-[2] py-4 bg-stone-900 border border-amber-500/20 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl cursor-pointer">CELLAR ACQUISITION</button>
                 </div>
               </form>
