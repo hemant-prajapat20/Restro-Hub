@@ -30,6 +30,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { RootState } from '../store';
+import api from '../utils/api';
+import { io } from 'socket.io-client';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -192,42 +194,36 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        
-        const endpoint = isSuperAdmin ? '/api/activity' : '/api/messages';
-        const res = await fetch(`http://localhost:5000${endpoint}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
-        if (data.status === 'success') {
-          setNotifications(data.data);
+        const endpoint = isSuperAdmin ? '/activity' : '/messages';
+        const res = await api.get(endpoint);
+        if (res.data.status === 'success') {
+          setNotifications(res.data.data);
         }
       } catch (err) {
         console.error("Failed to load notifications", err);
       }
     };
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000);
-    return () => clearInterval(interval);
+
+    // Set up Socket.IO connection for real-time notifications
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    
+    socket.on('newMessage', (newNotif) => {
+      // Add the new notification to the top of the list
+      setNotifications(prev => [newNotif, ...prev]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [isSuperAdmin]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const markAllRead = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const endpoint = isSuperAdmin ? '/api/activity/read' : '/api/messages/read';
-      await fetch(`http://localhost:5000${endpoint}`, {
-        method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({})
-      });
+      const endpoint = isSuperAdmin ? '/activity/read' : '/messages/read';
+      await api.put(endpoint);
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     } catch (err) {
       console.error(err);
