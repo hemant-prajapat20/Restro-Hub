@@ -441,6 +441,24 @@ export const RestroSignature: React.FC = () => {
     // Checkout API
     checkoutPdrMutation.mutate({ id: targetRoomId, data: { totalBill: cartTotal } });
 
+    // Save to global transactions
+    api.post('/orders', {
+      type: 'Restro',
+      items: cart.map((c: any) => ({
+        menuItem: c.dish.id || c.dish._id,
+        name: c.dish.name,
+        quantity: c.quantity,
+        price: c.dish.price,
+        status: 'Served'
+      })),
+      subtotal: cartSubtotal,
+      tax: cgst + sgst,
+      total: cartTotal,
+      paymentMethod: paymentMethod || 'Cash',
+      status: 'Completed',
+      customerDetails: { name: customerName || 'Walk-in VIP', phone: customerPhone || 'N/A' }
+    }).catch(err => console.error('Error saving global transaction:', err));
+
     // Generate Imperial fine-dining receipt
     const invoiceNum = 'ROYAL-POS-' + Math.floor(100000 + Math.random() * 900000);
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();

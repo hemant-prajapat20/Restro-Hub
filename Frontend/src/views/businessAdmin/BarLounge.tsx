@@ -367,6 +367,24 @@ export const BarLounge: React.FC = () => {
 
     checkoutBarMutation.mutate(cart);
 
+    // Save to global transactions
+    api.post('/orders', {
+      type: 'Bar',
+      items: cart.map((c: any) => ({
+        menuItem: c.item.id || c.item._id,
+        name: c.item.name + (c.pourSize !== 'Standard' ? ` (${c.pourSize})` : ''),
+        quantity: c.quantity,
+        price: getItemPrice(c),
+        status: 'Served'
+      })),
+      subtotal: cartSubtotal,
+      tax: cgst + sgst,
+      total: cartTotal,
+      paymentMethod: paymentMethod || 'Cash',
+      status: 'Completed',
+      customerDetails: { name: customerName || 'Walk-in', phone: customerPhone || 'N/A' }
+    }).catch(err => console.error('Error saving global transaction:', err));
+
     // Generate Invoice receipt
     const invoiceNum = 'MSN-BAR-' + Math.floor(100000 + Math.random() * 900000);
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
@@ -932,7 +950,7 @@ export const BarLounge: React.FC = () => {
                 {/* Settle Checkout Button */}
                 <button
                   type="button"
-                  onClick={handleCheckout}
+                  onClick={() => setShowCheckout(true)}
                   disabled={cart.length === 0}
                   className="w-full py-4 bg-stone-950 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-stone-950/10 hover:bg-stone-900 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
                 >

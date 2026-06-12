@@ -417,7 +417,18 @@ export const POS: React.FC = () => {
                         }));
 
                         // Generate enhanced car-wash style invoice PDF
-                        
+                        generateReceiptPDF({
+                          invoiceNumber: invoiceNum,
+                          timestamp: new Date().toLocaleString(),
+                          customerName,
+                          customerPhone,
+                          paymentMethod: paymentMethod || 'Cash',
+                          items: receiptItems,
+                          subtotal: subTotal,
+                          tax: sgst + cgst,
+                          total: total,
+                          type: 'POS Billing'
+                        });
 
                         orderMutation.mutate({
                           type: 'POS',

@@ -352,6 +352,24 @@ export const CafeBakery: React.FC = () => {
 
     checkoutCafeMutation.mutate(cart);
 
+    // Save to global transactions
+    api.post('/orders', {
+      type: 'Cafe',
+      items: cart.map((c: any) => ({
+        menuItem: c.item.id || c.item._id,
+        name: c.item.name + (c.milk && c.milk !== 'None' ? ` (${c.milk})` : ''),
+        quantity: c.quantity,
+        price: c.item.price,
+        status: 'Served'
+      })),
+      subtotal: cartSubtotal,
+      tax: cgst + sgst,
+      total: cartTotal,
+      paymentMethod: paymentMethod || 'Cash',
+      status: 'Completed',
+      customerDetails: { name: customerName || 'Walk-in', phone: customerPhone || 'N/A' }
+    }).catch(err => console.error('Error saving global transaction:', err));
+
     // Create virtual physical receipt
     const receipt = {
       invoiceNumber: 'MAISON-CF-' + Math.floor(100000 + Math.random() * 900000),
