@@ -293,9 +293,9 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                   <div className="p-4 text-center text-sm text-slate-500">No new notifications</div>
                 ) : (
                   notifications.map((notif, i) => (
-                    <div key={i} className={cn("p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors", notif.isRead ? "opacity-60" : "")}>
-                      <p className="text-xs font-medium text-slate-900 mb-1">{notif.message}</p>
-                      <span className="text-[10px] text-slate-400">{new Date(notif.createdAt).toLocaleString()}</span>
+                    <div key={i} className={cn("p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors", notif.isRead ? "" : "bg-slate-50/50")}>
+                      <p className={cn("text-xs mb-1", notif.isRead ? "font-normal text-slate-600" : "font-bold text-black")}>{notif.message}</p>
+                      <span className={cn("text-[10px]", notif.isRead ? "text-slate-400" : "text-slate-500 font-medium")}>{new Date(notif.createdAt).toLocaleString()}</span>
                     </div>
                   ))
                 )}

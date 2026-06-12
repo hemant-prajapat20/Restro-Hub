@@ -97,14 +97,14 @@ export const MessageCenter: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2">
-                    <h3 className={`font-semibold break-words ${msg.isRead ? 'text-slate-800' : 'text-slate-900'}`}>
+                    <h3 className={`break-words ${msg.isRead ? 'text-slate-800 font-semibold' : 'text-black font-bold'}`}>
                       {msg.action}
                     </h3>
                     <span className="text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full shrink-0">
                       {new Date(msg.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <p className={`text-sm break-words ${msg.isRead ? 'text-slate-500' : 'text-slate-700 font-medium'}`}>
+                  <p className={`text-sm break-words ${msg.isRead ? 'text-slate-500 font-normal' : 'text-black font-bold'}`}>
                     {msg.message}
                   </p>
                 </div>
