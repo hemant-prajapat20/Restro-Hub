@@ -88,7 +88,9 @@ export const CafeBakery: React.FC = () => {
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Maison Guild Tab'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'UPI' | 'Online'>('Cash');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
 
   // Brewing Equipment state
   const [activeBrew, setActiveBrew] = useState<{name: string, secondsLeft: number, isBrewing: boolean}>({
@@ -1071,22 +1073,7 @@ export const CafeBakery: React.FC = () => {
                        </button>
                        <button 
                          onClick={() => {
-                           generateReceiptPDF({
-                             title: "Maison Cafe & Patisserie",
-                             invoiceNumber: checkoutReceipt.invoiceNumber,
-                             timestamp: checkoutReceipt.timestamp,
-                             tableName: checkoutReceipt.table,
-                             items: checkoutReceipt.items.map((cartItem: any) => ({
-                               name: `${cartItem.item.name} (${cartItem.milk})`,
-                               price: cartItem.item.price,
-                               quantity: cartItem.quantity
-                             })),
-                             subtotal: checkoutReceipt.subtotal,
-                             tax: checkoutReceipt.cgst + checkoutReceipt.sgst,
-                             discount: checkoutReceipt.discount,
-                             total: checkoutReceipt.total,
-                             paymentMethod: checkoutReceipt.payment
-                           });
+                           
                          }}
                          className="px-3 py-2.5 bg-brand-primary text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-brand-primary/10 hover:scale-102 active:scale-98 transition-all"
                        >

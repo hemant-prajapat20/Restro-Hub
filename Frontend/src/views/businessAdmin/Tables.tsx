@@ -200,7 +200,9 @@ export const Tables: React.FC = () => {
   // Settle Bill State
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0); // percentage
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Cash'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'UPI' | 'Online'>('Cash');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [settledReceipt, setSettledReceipt] = useState<any | null>(null);
 
   const selectedTable = tables.find(t => t._id === selectedTableId) || null;
@@ -316,34 +318,50 @@ export const Tables: React.FC = () => {
     const total = computeTableTotal(tableId);
     const subtotal = computeTableSubtotal(tableId);
 
-    // Generate physical settlement receipt
     const invoiceNum = 'IND-TBL-' + Math.floor(100000 + Math.random() * 900000);
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
     
-    setSettledReceipt({
-      invoiceNumber: invoiceNum,
-      timestamp: dateStr,
-      tableNumber: selectedTable?.number,
-      items: tableOrders[tableId] || [],
-      subtotal: subtotal,
-      tax: computeTableTax(tableId),
-      discount: Math.round(subtotal * (appliedDiscount / 100)),
-      total: total,
-      payment: paymentMethod
-    });
+    const processOrder = () => {
+      // Generate PDF Invoice like Car Wash App
+      
 
-    // Mark table as 'Cleaning' using backend
-    clearTableMutation.mutate(tableId);
+      setSettledReceipt({
+        invoiceNumber: invoiceNum,
+        timestamp: dateStr,
+        tableNumber: selectedTable?.number,
+        items: tableOrders[tableId] || [],
+        subtotal: subtotal,
+        tax: computeTableTax(tableId),
+        discount: Math.round(subtotal * (appliedDiscount / 100)),
+        total: total,
+        payment: paymentMethod
+      });
 
-    setTableOrders(prev => {
-      const copy = { ...prev };
-      delete copy[tableId];
-      return copy;
-    });
+      clearTableMutation.mutate(tableId);
 
-    // Reset checkout forms
-    setAppliedDiscount(0);
-    setDiscountCode('');
+      setTableOrders(prev => {
+        const copy = { ...prev };
+        delete copy[tableId];
+        return copy;
+      });
+
+      setAppliedDiscount(0);
+      setDiscountCode('');
+    };
+
+    if (paymentMethod === 'UPI' || paymentMethod === 'Online') {
+      initializeRazorpayPayment({
+        amount: total,
+        receiptId: invoiceNum,
+        onSuccess: (pid) => {
+          import('react-hot-toast').then(toast => toast.default.success('Payment Verified: ' + pid));
+          processOrder();
+        },
+        onFailure: (err) => console.error(err)
+      });
+    } else {
+      processOrder();
+    }
   };
 
   const categories = ['All', ...Array.from(new Set(menuItems.map((item: any) => item.category))) as string[]];
@@ -708,7 +726,7 @@ export const Tables: React.FC = () => {
                              <div className="space-y-2 pt-2">
                                <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Settlement Option</label>
                                <div className="grid grid-cols-3 gap-2">
-                                 {(['UPI', 'Card', 'Cash'] as const).map(mode => (
+                                 {(['Cash', 'UPI', 'Online'] as const).map(mode => (
                                    <button
                                      key={mode}
                                      onClick={() => setPaymentMethod(mode)}

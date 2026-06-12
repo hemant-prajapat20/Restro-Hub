@@ -162,8 +162,12 @@ export const getBusinessReports = async (req: Request, res: Response): Promise<v
           date: order.createdAt,
           type: order.type,
           amount: order.total,
+          subtotal: order.subtotal,
           tax: order.tax,
-          status: order.status
+          status: order.status,
+          paymentMethod: order.paymentMethod || 'Cash',
+          customerDetails: order.customerDetails || {},
+          items: order.items || []
         }))
       }
     });

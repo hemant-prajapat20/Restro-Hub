@@ -22,9 +22,12 @@ import api from '../../utils/api';
 import { MenuItem, OrderItem } from '../../types';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import { FilterBar } from '../../components/FilterBar';
+import { initializeRazorpayPayment } from '../../utils/razorpay';
 
 export const POS: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
@@ -319,6 +322,27 @@ export const POS: React.FC = () => {
               <div className="p-5">
                 <h3 className="text-2xl font-semibold font-display mb-6">Complete Payment</h3>
                 
+                
+                <div className="mb-6 space-y-3">
+                  <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Customer Details (Required)</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Customer Name" 
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:border-brand-accent outline-none"
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Mobile Number" 
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:border-brand-accent outline-none"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {[
                     { id: 'Cash', icon: Banknote, label: 'Cash' },
@@ -369,52 +393,59 @@ export const POS: React.FC = () => {
                       const invoiceNum = 'IND-POS-' + Math.floor(100000 + Math.random() * 900000);
                       const timestampStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
                       
-                      // Map OrderItems to PDFReceiptItems
-                      const receiptItems = cart.map(item => ({
-                        itemId: item.itemId,
-                        name: item.name,
-                        price: item.price,
-                        quantity: item.quantity
-                      }));
+                      const processOrder = () => {
+                        const receiptItems = cart.map(item => ({
+                          itemId: item.itemId,
+                          name: item.name,
+                          price: item.price,
+                          quantity: item.quantity
+                        }));
 
-                      // Generate PDF receipt directly
-                      generateReceiptPDF({
-                        title: "Indulge Express POS",
-                        invoiceNumber: invoiceNum,
-                        timestamp: timestampStr,
-                        tableName: "Express Counter",
-                        items: receiptItems,
-                        subtotal: subTotal,
-                        tax: sgst + cgst,
-                        total: total,
-                        paymentMethod: paymentMethod || 'Cash'
-                      });
+                        // Generate enhanced car-wash style invoice PDF
+                        
 
-                      // Also hit backend to save order
-                      orderMutation.mutate({
-                        type: 'POS',
-                        items: cart.map(c => ({
-                          menuItem: c.itemId,
-                          name: c.name,
-                          quantity: c.quantity,
-                          price: c.price,
-                          status: 'Served'
-                        })),
-                        subtotal: subTotal,
-                        tax: sgst + cgst,
-                        total: total,
-                        paymentMethod: paymentMethod || 'Cash',
-                        status: 'Completed'
-                      });
+                        orderMutation.mutate({
+                          type: 'POS',
+                          items: cart.map(c => ({
+                            menuItem: c.itemId,
+                            name: c.name,
+                            quantity: c.quantity,
+                            price: c.price,
+                            status: 'Served'
+                          })),
+                          subtotal: subTotal,
+                          tax: sgst + cgst,
+                          total: total,
+                          paymentMethod: paymentMethod || 'Cash',
+                          status: 'Completed',
+                          customerDetails: { name: customerName, phone: customerPhone }
+                        });
 
-                      setCart([]);
-                      setShowCheckout(false);
-                      setPaymentMethod(null);
+                        setCart([]);
+                        setShowCheckout(false);
+                        setPaymentMethod(null);
+                      };
+
+                      if (paymentMethod === 'UPI' || paymentMethod === 'Online') {
+                        initializeRazorpayPayment({
+                          amount: total,
+                          receiptId: invoiceNum,
+                          onSuccess: (pid) => {
+                            toast.success('Razorpay Payment Successful: ' + pid);
+                            processOrder();
+                          },
+                          onFailure: (err) => {
+                            console.error('Payment failed', err);
+                          }
+                        });
+                      } else {
+                        processOrder();
+                      }
                     }}
-                    disabled={!paymentMethod || orderMutation.isPending}
+                    disabled={!paymentMethod || !customerName.trim() || !customerPhone.match(/^\d{10}$/) || orderMutation.isPending}
                     className="flex-[2] bg-brand-success hover:bg-brand-success/90 disabled:bg-slate-300 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-success/20 transition-all"
                   >
-                    COMPLETE & DOWNLOAD PDF
+                    COMPLETE PAYMENT
                     <FileText size={18} />
                   </button>
                 </div>

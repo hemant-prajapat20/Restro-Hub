@@ -143,7 +143,9 @@ export const BarLounge: React.FC = () => {
   const [cart, setCart] = useState<{ item: LiquorItem; quantity: number; mixer: string; pourSize: string; notes: string }[]>([]);
 
   const [targetTable, setTargetTable] = useState<string>('Main Salon Table #12');
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Maison Guild Tab'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'UPI' | 'Online'>('Cash');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [discountCode, setDiscountCode] = useState<string>('');
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any>(null);
@@ -836,9 +838,9 @@ export const BarLounge: React.FC = () => {
                         onChange={(e: any) => setPaymentMethod(e.target.value as any)}
                         className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none truncate"
                       >
+                        <option value="Cash">Cash Settlement</option>
                         <option value="UPI">Instant UPI (Tejas/BHIM)</option>
-                        <option value="Card">Visa Signature Metallic</option>
-                        <option value="Maison Guild Tab">Maison Membership Journal</option>
+                        <option value="Online">Online / Card (Razorpay)</option>
                       </select>
                     </div>
                   </div>
@@ -1011,22 +1013,7 @@ export const BarLounge: React.FC = () => {
                        </button>
                        <button 
                          onClick={() => {
-                           generateReceiptPDF({
-                             title: "Maison De Luxe Bar",
-                             invoiceNumber: checkoutReceipt.invoiceNumber,
-                             timestamp: checkoutReceipt.timestamp,
-                             tableName: checkoutReceipt.table,
-                             items: checkoutReceipt.items.map((cartItem: any) => ({
-                               name: `${cartItem.item.name} (${cartItem.pourSize})`,
-                               price: getItemPrice(cartItem),
-                               quantity: cartItem.quantity
-                             })),
-                             subtotal: checkoutReceipt.subtotal,
-                             tax: checkoutReceipt.cgst + checkoutReceipt.sgst,
-                             discount: checkoutReceipt.discount,
-                             total: checkoutReceipt.total,
-                             paymentMethod: checkoutReceipt.payment
-                           });
+                           
                          }}
                          className="px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/10 hover:scale-102 active:scale-98 transition-all"
                        >

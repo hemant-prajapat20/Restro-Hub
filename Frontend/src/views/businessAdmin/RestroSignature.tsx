@@ -118,7 +118,7 @@ export const RestroSignature: React.FC = () => {
   const [cart, setCart] = useState<{ dish: SignatureItem; quantity: number; directive: string }[]>([]);
   const [targetRoomId, setTargetRoomId] = useState<string>('');
 
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Maison Guild Tab'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'UPI' | 'Online'>('Cash');
   const [discountCode, setDiscountCode] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -1118,24 +1118,7 @@ export const RestroSignature: React.FC = () => {
                           </button>
                           <button 
                             onClick={() => {
-                              generateReceiptPDF({
-                                title: checkoutReceipt.hotelName,
-                                invoiceNumber: checkoutReceipt.invoiceNumber,
-                                timestamp: checkoutReceipt.timestamp,
-                                tableName: checkoutReceipt.roomName,
-                                items: checkoutReceipt.items.map((cartItem: any) => ({
-                                  name: cartItem.dish.name,
-                                  price: cartItem.dish.price,
-                                  quantity: cartItem.quantity
-                                })),
-                                subtotal: checkoutReceipt.subtotal,
-                                tax: checkoutReceipt.cgst + checkoutReceipt.sgst,
-                                discount: checkoutReceipt.discount,
-                                total: checkoutReceipt.total,
-                                paymentMethod: checkoutReceipt.payment,
-                                customerName: checkoutReceipt.customerName,
-                                customerPhone: checkoutReceipt.customerPhone
-                              });
+                              
                             }}
                             className="px-3 py-2.5 bg-stone-900 border border-amber-900/40 text-brand-accent rounded-xl text-[9.5px] font-sans font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer shadow-lg hover:scale-102 active:scale-98 transition-all"
                           >
