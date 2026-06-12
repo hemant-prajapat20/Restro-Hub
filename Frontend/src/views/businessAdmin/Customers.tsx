@@ -7,7 +7,8 @@ import {
   Phone,
   ChevronRight,
   Filter,
-  Receipt
+  Receipt,
+  MessageCircle
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
@@ -40,9 +41,7 @@ export const Customers: React.FC = () => {
   );
 
   const uniqueCustomers = new Set(transactions.map(t => t.phone)).size;
-  const avgTransactionValue = transactions.length > 0 
-    ? Math.round(transactions.reduce((a, b) => a + b.total, 0) / transactions.length) 
-    : 0;
+  const totalTransactionValue = transactions.reduce((a, b) => a + b.total, 0);
 
   return (
     <div className="px-8 pt-8 pb-0 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
@@ -78,9 +77,9 @@ export const Customers: React.FC = () => {
             <TrendingUp size={28} />
           </div>
           <div>
-            <p className="text-sm text-slate-500 mb-1">Avg Transaction Value</p>
+            <p className="text-sm text-slate-500 mb-1">Total Revenue</p>
             <h3 className="text-2xl font-bold text-slate-900">
-              ₹{avgTransactionValue.toLocaleString()}
+              ₹{totalTransactionValue.toLocaleString()}
             </h3>
           </div>
         </div>
@@ -176,9 +175,19 @@ export const Customers: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <button className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-lg transition-colors">
-                        <ChevronRight size={20} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {tx.phone !== 'N/A' && (
+                          <a 
+                            href={`https://wa.me/${tx.phone.replace(/\D/g, '')}?text=Hello ${tx.name}, thank you for visiting Restrohub!`}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                            title="Message on WhatsApp"
+                          >
+                            <MessageCircle size={20} />
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </motion.tr>
                 ))
