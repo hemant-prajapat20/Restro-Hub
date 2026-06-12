@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { 
   Users, 
   Search, 
+  Star,
   TrendingUp, 
   Calendar,
   Phone,
@@ -40,7 +41,13 @@ export const Customers: React.FC = () => {
     t._id.includes(searchQuery)
   );
 
-  const uniqueCustomers = new Set(transactions.map(t => t.phone)).size;
+  const customerSpends: Record<string, number> = {};
+  transactions.forEach(t => {
+    if (t.phone && t.phone !== 'N/A') {
+      customerSpends[t.phone] = (customerSpends[t.phone] || 0) + t.total;
+    }
+  });
+  const vvipCustomers = Object.values(customerSpends).filter(total => total > 20000).length;
   const totalTransactionValue = transactions.reduce((a, b) => a + b.total, 0);
 
   return (
@@ -55,12 +62,12 @@ export const Customers: React.FC = () => {
       {/* Top Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white p-4 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">
-          <div className="p-4 bg-brand-accent/10 rounded-2xl text-brand-accent">
-            <Users size={28} />
+          <div className="p-4 bg-amber-50 rounded-2xl text-amber-500">
+            <Star size={28} />
           </div>
           <div>
-            <p className="text-sm text-slate-500 mb-1">Unique Customers</p>
-            <h3 className="text-2xl font-bold text-slate-900">{uniqueCustomers}</h3>
+            <p className="text-sm text-slate-500 mb-1">VVIP Customers</p>
+            <h3 className="text-2xl font-bold text-slate-900">{vvipCustomers}</h3>
           </div>
         </div>
         <div className="bg-white p-4 rounded-[24px] shadow-soft border border-stone-200/80 flex items-center gap-4">

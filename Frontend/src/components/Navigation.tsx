@@ -230,6 +230,16 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     }
   };
 
+  const markOneRead = async (notifId: string) => {
+    // Optimistically update UI immediately
+    setNotifications(prev => prev.map(n => n._id === notifId ? { ...n, isRead: true } : n));
+    try {
+      await api.put('/messages/read', { messageId: notifId });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 lg:ml-64 sticky top-0 z-40 glass">
       
@@ -293,7 +303,10 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                   <div className="p-4 text-center text-sm text-slate-500">No new notifications</div>
                 ) : (
                   notifications.map((notif, i) => (
-                    <div key={i} className={cn("p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors", notif.isRead ? "" : "bg-slate-50/50")}>
+                    <div
+                      key={i}
+                      onClick={() => !notif.isRead && markOneRead(notif._id)}
+                      className={cn("p-3 border-b border-slate-50 transition-colors", notif.isRead ? "hover:bg-slate-50" : "bg-amber-50/40 hover:bg-amber-50 cursor-pointer")}>
                       <p className={cn("text-xs mb-1", notif.isRead ? "font-normal text-slate-600" : "font-bold text-black")}>{notif.message}</p>
                       <span className={cn("text-[10px]", notif.isRead ? "text-slate-400" : "text-slate-500 font-medium")}>{new Date(notif.createdAt).toLocaleString()}</span>
                     </div>
