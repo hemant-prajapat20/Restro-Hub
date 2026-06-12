@@ -177,8 +177,8 @@ export const Reports: React.FC = () => {
          </div>
        </div>
 
-       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden h-full flex flex-col">
+       <div className="grid grid-cols-1 gap-5">
+          <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden h-full flex flex-col">
              <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                 <h5 className="font-semibold font-display text-slate-900">Recent Invoices</h5>
                 <div className="relative">
@@ -227,32 +227,6 @@ export const Reports: React.FC = () => {
                 <button className="text-xs font-semibold text-slate-400 hover:text-brand-primary uppercase tracking-widest transition-all">View full audit trail</button>
              </div>
           </div>
-
-          <div className="space-y-8">
-             <div className="bg-brand-primary p-5 rounded-[32px] text-white relative overflow-hidden h-full flex flex-col">
-                <div className="relative z-10 flex flex-col h-full gap-5">
-                   <div className="flex items-center gap-3">
-                      <Lock className="text-brand-accent fill-brand-accent" size={20} />
-                      <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Security Vault</h4>
-                   </div>
-                   <div>
-                      <p className="text-slate-400 text-sm font-medium">All financial reports are signed with enterprise-grade SHA-256 encryption.</p>
-                   </div>
-                   <div className="space-y-3">
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">QUICK ACTIONS</p>
-                      <button className="w-full text-left p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                         <p className="text-sm font-semibold">Generate P&L Statement</p>
-                         <p className="text-[10px] text-slate-500 uppercase">Q1 2026 Analysis</p>
-                      </button>
-                      <button className="w-full text-left p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                         <p className="text-sm font-semibold">Staff Salary Report</p>
-                         <p className="text-[10px] text-slate-500 uppercase">Performance bonuses included</p>
-                      </button>
-                   </div>
-                </div>
-                <div className="absolute right-[-100px] bottom-[-100px] w-96 h-96 bg-brand-accent opacity-5 rounded-full blur-3xl pointer-events-none" />
-             </div>
-           </div>
         </div>
         <FramerAnimatePresence>
         {selectedInvoice && (
