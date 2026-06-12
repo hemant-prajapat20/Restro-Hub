@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { SuperAdminSidebar, SuperAdminHeader } from '../components/SuperAdminNavigation';
+import { Sidebar as SuperAdminSidebar, Header as SuperAdminHeader } from '../components/Navigation';
 
 export const SuperAdminLayout: React.FC = () => {
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
