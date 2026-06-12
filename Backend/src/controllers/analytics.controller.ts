@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Business from '../models/Business';
 import User from '../models/User';
+import Staff from '../models/Staff';
 import Order from '../models/Order';
 import Customer from '../models/Customer';
 
@@ -83,9 +84,9 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
       createdAt: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    const activeTotalStaff = await User.countDocuments({
+    const activeTotalStaff = await Staff.countDocuments({
       businessId,
-      isActive: true
+      status: 'Active'
     });
 
     let avgTableTurnTime = '0m';
