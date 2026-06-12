@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Staff from '../models/Staff';
+import Business from '../models/Business';
 import { logMessage } from '../utils/messageLogger';
 
 export const getStaff = async (req: Request, res: Response) => {
@@ -74,5 +75,50 @@ export const deleteStaff = async (req: Request, res: Response) => {
     res.json({ message: 'Staff member deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting staff' });
+  }
+};
+
+export const getStaffCategories = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const business = await Business.findById(businessId);
+    
+    if (!business) {
+      return res.status(404).json({ message: 'Business not found' });
+    }
+    
+    // Default categories if none exist
+    const categories = business.staffCategories && business.staffCategories.length > 0 
+      ? business.staffCategories 
+      : ['Waiter', 'Kitchen', 'Manager', 'Cashier', 'Delivery'];
+      
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching staff categories' });
+  }
+};
+
+export const updateStaffCategories = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { categories } = req.body;
+    
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({ message: 'Categories must be an array of strings' });
+    }
+    
+    const business = await Business.findByIdAndUpdate(
+      businessId,
+      { staffCategories: categories },
+      { new: true }
+    );
+    
+    if (!business) {
+      return res.status(404).json({ message: 'Business not found' });
+    }
+    
+    res.json(business.staffCategories);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error updating staff categories' });
   }
 };

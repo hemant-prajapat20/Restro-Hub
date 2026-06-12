@@ -19,6 +19,7 @@ export interface IUser extends Document {
   role: Role;
   businessId?: mongoose.Types.ObjectId; // Null for Super Admin
   outletId?: mongoose.Types.ObjectId;   // Null for Business Admin
+  staffCategory?: string;
   otp?: string;
   otpExpires?: Date;
   businessAdminCode?: string;
@@ -42,6 +43,7 @@ const userSchema = new Schema<IUser>(
     },
     businessId: { type: Schema.Types.ObjectId, ref: 'Business' },
     outletId: { type: Schema.Types.ObjectId, ref: 'Outlet' },
+    staffCategory: { type: String },
     otp: { type: String },
     otpExpires: { type: Date },
     businessAdminCode: { type: String, unique: true, sparse: true },

@@ -1,12 +1,28 @@
 import { Request, Response } from 'express';
 import Customer from '../models/Customer';
 import { logMessage } from '../utils/messageLogger';
+import Order from '../models/Order';
 
 export const getCustomers = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
-    const customers = await Customer.find({ businessId }).sort({ lastVisit: -1 });
-    res.json(customers);
+    
+    // Fetch all completed orders as transactions
+    const orders = await Order.find({ 
+      businessId, 
+      status: { $in: ['Completed', 'Served'] } 
+    }).sort({ createdAt: -1 });
+
+    const transactions = orders.map(order => ({
+      _id: order._id,
+      name: order.customerDetails?.name || 'Walk-in Customer',
+      phone: order.customerDetails?.phone || 'N/A',
+      type: order.type,
+      total: order.total,
+      date: order.createdAt
+    }));
+
+    res.json(transactions);
   } catch (error) {
     res.status(500).json({ message: 'Server error fetching customers' });
   }

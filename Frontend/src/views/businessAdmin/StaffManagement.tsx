@@ -13,15 +13,17 @@ import {
   DollarSign, 
   CheckCircle,
   X,
-  Sparkles
+  Sparkles,
+  Settings,
+  Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface StaffMember {
   id: string;
   name: string;
-  role: 'Executive Chef' | 'Head Sommelier' | 'Head Barista' | 'Lead Maitre d' | 'Sous Chef' | 'Premium Hostess';
-  shift: 'Morning (6 AM - 2 PM)' | 'Evening (2 PM - 10 PM)' | 'Night (10 PM - 6 AM)' | 'General (10 AM - 7 PM)';
+  role: string;
+  shift: string;
   status: 'Clocked In' | 'On Break' | 'Off-Duty';
   salary: number;
   contact: string;
@@ -29,57 +31,6 @@ interface StaffMember {
   score: number; // Quality / Performance rating
   image: string;
 }
-
-const INITIAL_STAFF: StaffMember[] = [
-  {
-    id: 'ST1',
-    name: 'Chef Ranveer Brar',
-    role: 'Executive Chef',
-    shift: 'General (10 AM - 7 PM)',
-    status: 'Clocked In',
-    salary: 155000,
-    contact: '+91 9811029410',
-    email: 'ranveer@indiserve.pro',
-    score: 4.9,
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ranveer'
-  },
-  {
-    id: 'ST2',
-    name: 'Sommelier Jessica',
-    role: 'Head Sommelier',
-    shift: 'Evening (2 PM - 10 PM)',
-    status: 'Clocked In',
-    salary: 95000,
-    contact: '+91 9876543210',
-    email: 'jessica@indiserve.pro',
-    score: 4.8,
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica'
-  },
-  {
-    id: 'ST3',
-    name: 'Barista Vikram',
-    role: 'Head Barista',
-    shift: 'Morning (6 AM - 2 PM)',
-    status: 'On Break',
-    salary: 75000,
-    contact: '+91 9123456789',
-    email: 'vikram@indiserve.pro',
-    score: 4.7,
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vikram'
-  },
-  {
-    id: 'ST4',
-    name: 'Hostess Sneha',
-    role: 'Premium Hostess',
-    shift: 'Evening (2 PM - 10 PM)',
-    status: 'Off-Duty',
-    salary: 65000,
-    contact: '+91 9812233445',
-    email: 'sneha@indiserve.pro',
-    score: 4.9,
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sneha'
-  }
-];
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
@@ -90,15 +41,19 @@ export const StaffManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   // Form states for New Staff
   const [newName, setNewName] = useState('');
-  const [newRole, setNewRole] = useState<'Executive Chef' | 'Head Sommelier' | 'Head Barista' | 'Lead Maitre d' | 'Sous Chef' | 'Premium Hostess'>('Premium Hostess');
+  const [newRole, setNewRole] = useState('');
   const [newShift, setNewShift] = useState<'Morning (6 AM - 2 PM)' | 'Evening (2 PM - 10 PM)' | 'Night (10 PM - 6 AM)' | 'General (10 AM - 7 PM)'>('General (10 AM - 7 PM)');
   const [newSalary, setNewSalary] = useState('');
   const [newContact, setNewContact] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newScore, setNewScore] = useState('5.0');
+  
+  // Category management
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   const { data: crew = [], isLoading } = useQuery<StaffMember[]>({
     queryKey: ['staff'],
@@ -109,6 +64,25 @@ export const StaffManagement: React.FC = () => {
         id: item._id
       }));
     }
+  });
+
+  const { data: staffCategories = [], isLoading: categoriesLoading } = useQuery<string[]>({
+    queryKey: ['staffCategories'],
+    queryFn: async () => {
+      const response = await api.get('/staff/categories');
+      return response.data;
+    }
+  });
+
+  const updateStaffCategoriesMutation = useMutation({
+    mutationFn: async (categories: string[]) => {
+      await api.post('/staff/categories', { categories });
+    },
+    onSuccess: () => {
+      toast.success('Staff categories updated');
+      queryClient.invalidateQueries({ queryKey: ['staffCategories'] });
+    },
+    onError: () => toast.error('Failed to update categories')
   });
 
   const updateStaffMutation = useMutation({
@@ -151,9 +125,11 @@ export const StaffManagement: React.FC = () => {
     e.preventDefault();
     if (!newName || !newSalary || !newContact) return;
 
+    const assignedRole = newRole || (staffCategories.length > 0 ? staffCategories[0] : 'Staff');
+
     addStaffMutation.mutate({
       name: newName,
-      role: newRole,
+      role: assignedRole,
       shift: newShift,
       status: 'Off-Duty',
       salary: Number(newSalary),
@@ -164,7 +140,23 @@ export const StaffManagement: React.FC = () => {
     });
   };
 
-  if (isLoading) {
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) return;
+    if (staffCategories.includes(newCategoryName.trim())) {
+      toast.error('Category already exists');
+      return;
+    }
+    const newCategories = [...staffCategories, newCategoryName.trim()];
+    updateStaffCategoriesMutation.mutate(newCategories);
+    setNewCategoryName('');
+  };
+
+  const handleDeleteCategory = (category: string) => {
+    const newCategories = staffCategories.filter(c => c !== category);
+    updateStaffCategoriesMutation.mutate(newCategories);
+  };
+
+  if (isLoading || categoriesLoading) {
     return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
@@ -221,7 +213,7 @@ export const StaffManagement: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {['All', 'Executive Chef', 'Head Sommelier', 'Head Barista', 'Premium Hostess'].map((role) => (
+          {['All', ...staffCategories].map((role) => (
             <button
               key={role}
               onClick={() => setSelectedRoleFilter(role)}
@@ -235,6 +227,15 @@ export const StaffManagement: React.FC = () => {
             </button>
           ))}
           <div className="h-6 w-[1px] bg-stone-200 mx-2 hidden xl:block" />
+          
+          <button 
+            onClick={() => setShowCategoryModal(true)}
+            className="p-3 bg-stone-100 text-stone-600 rounded-2xl hover:bg-stone-200 transition-all border border-stone-200"
+            title="Manage Staff Categories"
+          >
+            <Settings size={20} />
+          </button>
+          
           <button 
             onClick={() => setShowAddModal(true)}
             className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
@@ -246,7 +247,7 @@ export const StaffManagement: React.FC = () => {
       </div>
 
       {/* Staff Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-8">
          <AnimatePresence>
             {filteredCrew.map((member) => (
                <motion.div
@@ -339,6 +340,73 @@ export const StaffManagement: React.FC = () => {
          </AnimatePresence>
       </div>
 
+      {/* Categories Management Modal */}
+      <AnimatePresence>
+        {showCategoryModal && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm"
+              onClick={() => setShowCategoryModal(false)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 border border-amber-900/10"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900">Manage Categories</h3>
+                  <p className="text-sm text-slate-500">Add or remove staff categories</p>
+                </div>
+                <button onClick={() => setShowCategoryModal(false)} className="text-slate-400 hover:text-slate-600">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="New category name..."
+                    className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20"
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                  />
+                  <button 
+                    onClick={handleAddCategory}
+                    className="px-4 py-2 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto space-y-2 mt-4 custom-scrollbar">
+                  {staffCategories.map(category => (
+                    <div key={category} className="flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                      <span className="font-medium text-slate-700">{category}</span>
+                      <button 
+                        onClick={() => handleDeleteCategory(category)}
+                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {staffCategories.length === 0 && (
+                    <div className="text-center py-4 text-slate-400 text-sm">No custom categories found.</div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Onboarding Recruit Modal */}
       <AnimatePresence>
         {showAddModal && (
@@ -377,15 +445,13 @@ export const StaffManagement: React.FC = () => {
                     <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
                     <select 
                       value={newRole} 
-                      onChange={(e) => setNewRole(e.target.value as any)}
+                      onChange={(e) => setNewRole(e.target.value)}
                       className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
                     >
-                      <option value="Executive Chef">Executive Chef</option>
-                      <option value="Head Sommelier">Head Sommelier</option>
-                      <option value="Head Barista">Head Barista</option>
-                      <option value="Lead Maitre d'">Lead Maitre d'</option>
-                      <option value="Sous Chef">Sous Chef</option>
-                      <option value="Premium Hostess">Premium Hostess</option>
+                      <option value="" disabled>Select a Category...</option>
+                      {staffCategories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="space-y-1">

@@ -25,6 +25,7 @@ export interface IBusiness extends Document {
   platforms: string[];
   subscriptionAmountPaid?: number;
   activeModules: BusinessModule[];
+  staffCategories?: string[];
   subscriptionExpiry: Date;
   status: BusinessStatus;
   isActive: boolean; // Legacy flag, kept for backward compatibility if needed
@@ -51,6 +52,7 @@ const businessSchema = new Schema<IBusiness>(
         enum: Object.values(BusinessModule)
       }
     ],
+    staffCategories: [{ type: String }],
     subscriptionExpiry: { type: Date, required: true },
     status: {
       type: String,
