@@ -137,12 +137,10 @@ export const BarLounge: React.FC = () => {
   const [dispenseLog, setDispenseLog] = useState<{name: string, timestamp: string, tables: string}[]>([]);
 
   // Tab View state
-  const [activeTab, setActiveTab] = useState<'display' | 'billing' | 'suites'>('display');
+  const [activeTab, setActiveTab] = useState<'display' | 'billing'>('display');
 
   // Billing states
   const [cart, setCart] = useState<{ item: LiquorItem; quantity: number; mixer: string; pourSize: string; notes: string }[]>([]);
-  
-  const [selectedPosSuiteId, setSelectedPosSuiteId] = useState<string>('');
 
   const [targetTable, setTargetTable] = useState<string>('Main Salon Table #12');
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Maison Guild Tab'>('UPI');
@@ -309,67 +307,7 @@ export const BarLounge: React.FC = () => {
   });
 
   
-  const { data: vipSuites = [], isLoading: loadingSuites } = useQuery<VipSuite[]>({
-    queryKey: ['vipSuites'],
-    queryFn: async () => {
-      const response = await api.get('/barlounge/suites');
-      return response.data.map((s: any) => ({ ...s, id: s._id }));
-    }
-  });
-
-  const addVipSuiteMutation = useMutation({
-    mutationFn: async (data: any) => {
-      await api.post('/barlounge/suites', data);
-    },
-    onSuccess: () => {
-      toast.success('VIP Suite added successfully');
-      queryClient.invalidateQueries({ queryKey: ['vipSuites'] });
-      setNewSuiteName('');
-      setNewSuiteCapacity('');
-      setNewSuiteFee('');
-      setNewSuiteImageFile(null);
-      setNewSuiteImage('');
-      setShowAddSuiteModal(false);
-    },
-    onError: () => toast.error('Failed to add VIP suite')
-  });
-
-  const updateVipSuiteMutation = useMutation({
-    mutationFn: async (data: any) => {
-      await api.put(`/barlounge/suites/${data.id}`, data);
-    },
-    onSuccess: () => {
-      toast.success('VIP Suite updated successfully');
-      queryClient.invalidateQueries({ queryKey: ['vipSuites'] });
-      setEditingSuite(null);
-    },
-    onError: () => toast.error('Failed to update VIP suite')
-  });
-
-  const deleteVipSuiteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await api.delete(`/barlounge/suites/${id}`);
-    },
-    onSuccess: () => {
-      toast.success('VIP Suite deleted successfully');
-      queryClient.invalidateQueries({ queryKey: ['vipSuites'] });
-    },
-    onError: () => toast.error('Failed to delete VIP suite')
-  });
-
-  const [showAddSuiteModal, setShowAddSuiteModal] = useState(false);
-  const [editingSuite, setEditingSuite] = useState<VipSuite | null>(null);
-  const [newSuiteName, setNewSuiteName] = useState('');
-  const [newSuiteCapacity, setNewSuiteCapacity] = useState('');
-  const [newSuiteFee, setNewSuiteFee] = useState('');
-  const [newSuiteImageFile, setNewSuiteImageFile] = useState<File | null>(null);
-  const [newSuiteImage, setNewSuiteImage] = useState('');
-
-  
-
-  
-  const selectedPosSuite = vipSuites.find(s => s.id === selectedPosSuiteId);
-  const suiteFeeAmount = selectedPosSuite ? selectedPosSuite.bookingFee : 0;
+  const suiteFeeAmount = 0;
   
   const liquorSubtotal = cart.reduce((total, cartItem) => total + (getItemPrice(cartItem) * cartItem.quantity), 0);
   const cartSubtotal = liquorSubtotal + suiteFeeAmount;
@@ -378,64 +316,6 @@ export const BarLounge: React.FC = () => {
   const cgst = (cartSubtotal - discountAmount) * 0.09;
   const sgst = (cartSubtotal - discountAmount) * 0.09;
   const cartTotal = cartSubtotal - discountAmount + serviceCharge + cgst + sgst;
-
-  const handleAddSuite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newSuiteName || !newSuiteCapacity || !newSuiteFee) return;
-
-    let uploadedImageUrl = '';
-    if (newSuiteImageFile) {
-      const uploadData = new FormData();
-      uploadData.append('image', newSuiteImageFile);
-      try {
-        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        uploadedImageUrl = uploadRes.data.url;
-      } catch (e) {
-        console.error('Upload failed', e);
-      }
-    }
-
-    addVipSuiteMutation.mutate({
-      name: newSuiteName,
-      capacity: Number(newSuiteCapacity),
-      bookingFee: Number(newSuiteFee),
-      image: uploadedImageUrl || (newSuiteImage && newSuiteImage.startsWith('blob:') ? null : newSuiteImage) || 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400&h=400&fit=crop'
-    });
-  };
-
-  const handleEditSuiteSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingSuite) return;
-
-    let uploadedImageUrl = '';
-    if (newSuiteImageFile) {
-      const uploadData = new FormData();
-      uploadData.append('image', newSuiteImageFile);
-      try {
-        const uploadRes = await api.post('/upload/image', uploadData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        uploadedImageUrl = uploadRes.data.url;
-      } catch (e) {
-        console.error('Upload failed', e);
-      }
-    }
-
-    updateVipSuiteMutation.mutate({
-      id: editingSuite.id,
-      name: newSuiteName,
-      capacity: Number(newSuiteCapacity),
-      bookingFee: Number(newSuiteFee),
-      image: uploadedImageUrl || (newSuiteImage && newSuiteImage.startsWith('blob:') ? editingSuite.image : newSuiteImage)
-    });
-  };
-
-  const openEditSuiteModal = (suite: VipSuite) => {
-    setEditingSuite(suite);
-    setNewSuiteName(suite.name);
-    setNewSuiteCapacity(suite.capacity.toString());
-    setNewSuiteFee(suite.bookingFee.toString());
-    setNewSuiteImage(suite.image || '');
-    setNewSuiteImageFile(null);
-  };
 
   const dispenseGlassMutation = useMutation({
     mutationFn: async ({ id, stockBottles }: { id: string, stockBottles: number }) => {
@@ -490,7 +370,7 @@ export const BarLounge: React.FC = () => {
       timestamp: dateStr,
       items: [...cart],
       suiteFee: suiteFeeAmount,
-      suiteName: selectedPosSuite?.name,
+      suiteName: '',
       subtotal: cartSubtotal,
       discount: discountAmount,
       serviceCharge,
@@ -593,17 +473,7 @@ export const BarLounge: React.FC = () => {
             <motion.div layoutId="barActiveLine" className="absolute bottom-0 left-0 right-0 h-[3px] bg-amber-500 rounded-full" />
           )}
         </button>
-        <button
-          onClick={() => setActiveTab('suites')}
-          className={`px-8 py-4 text-xs font-semibold uppercase tracking-[0.2em] transition-all relative cursor-pointer ${
-            activeTab === 'suites' ? 'text-amber-600 font-extrabold' : 'text-stone-400 hover:text-stone-700'
-          }`}
-        >
-          VIP Suites
-          {activeTab === 'suites' && (
-            <motion.div layoutId="barActiveLine" className="absolute bottom-0 left-0 right-0 h-[3px] bg-amber-500 rounded-full" />
-          )}
-        </button>
+
       </div>
 
       <AnimatePresence mode="wait">
@@ -943,19 +813,7 @@ export const BarLounge: React.FC = () => {
                 <div className="space-y-4 pt-4 border-t border-stone-100">
                   <div className="flex flex-col gap-4">
                     
-                    <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1 block truncate">VIP Suite</label>
-                      <select 
-                        value={selectedPosSuiteId}
-                        onChange={(e) => setSelectedPosSuiteId(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none truncate"
-                      >
-                        <option value="">No Suite Selected</option>
-                        {vipSuites.map(s => (
-                          <option key={s.id} value={s.id}>{s.name} (+₹{s.bookingFee})</option>
-                        ))}
-                      </select>
-                    </div>
+
 
                     <div className="flex-1 space-y-1">
                       <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1 block truncate">Lounge / Seating Cabin</label>
@@ -1116,12 +974,7 @@ export const BarLounge: React.FC = () => {
                         <span>DOCKET SUB-TOTAL</span>
                         <span>₹{checkoutReceipt.subtotal.toLocaleString()}</span>
                      </div>
-                     {checkoutReceipt.discount > 0 && (
-                       <div className="flex justify-between text-[10px] text-rose-600 font-semibold">
-                          <span>VIP PRIVILEGE DISCOUNT</span>
-                          <span>-₹{checkoutReceipt.discount.toLocaleString()}</span>
-                       </div>
-                     )}
+
                      <div className="flex justify-between text-[10px]">
                         <span>SILVER SERVICE FEE (10%)</span>
                         <span>₹{checkoutReceipt.serviceCharge.toLocaleString()}</span>
@@ -1192,53 +1045,7 @@ export const BarLounge: React.FC = () => {
       {/* Acquisition Add Liquor Modal */}
       <AnimatePresence>
         
-      {(showAddSuiteModal || editingSuite) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-[32px] shadow-2xl w-full max-w-xl overflow-hidden border border-stone-200"
-          >
-            <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
-              <h3 className="text-xl font-bold font-display text-stone-800">{editingSuite ? 'Edit VIP Suite' : 'Add VIP Suite'}</h3>
-              <button onClick={() => { setShowAddSuiteModal(false); setEditingSuite(null); }} className="p-2 bg-white hover:bg-stone-100 rounded-full text-stone-400 transition-all shadow-sm border border-stone-200">X</button>
-            </div>
-            
-            <form onSubmit={editingSuite ? handleEditSuiteSubmit : handleAddSuite} className="p-6 space-y-6">
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Suite Name</label>
-                <input type="text" value={newSuiteName} onChange={e => setNewSuiteName(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-semibold" required />
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Capacity</label>
-                  <input type="number" min="1" value={newSuiteCapacity} onChange={e => setNewSuiteCapacity(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-semibold" required />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Booking Fee (₹)</label>
-                  <input type="number" min="0" value={newSuiteFee} onChange={e => setNewSuiteFee(e.target.value)} className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all font-semibold" required />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Or Upload Image from Device</label>
-                {newSuiteImage && !newSuiteImage.startsWith('blob:') && <img src={newSuiteImage} alt="preview" className="h-20 w-32 object-cover rounded-xl mb-2 shadow-sm" />}
-                {newSuiteImageFile && <img src={URL.createObjectURL(newSuiteImageFile)} alt="preview" className="h-20 w-32 object-cover rounded-xl mb-2 shadow-sm" />}
-                <input type="file" accept="image/*" onChange={e => setNewSuiteImageFile(e.target.files?.[0] || null)} className="w-full p-3 bg-stone-50 border border-stone-200 rounded-2xl text-sm" />
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={addVipSuiteMutation.isPending || updateVipSuiteMutation.isPending}
-                className="w-full py-4 bg-amber-600 text-white rounded-2xl font-bold text-lg hover:bg-amber-700 disabled:opacity-50 transition-all shadow-xl shadow-amber-600/20"
-              >
-                {addVipSuiteMutation.isPending || updateVipSuiteMutation.isPending ? 'SAVING...' : 'SAVE VIP SUITE'}
-              </button>
-            </form>
-          </motion.div>
-        </div>
-      )}
 
       {showAddModal && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
