@@ -10,10 +10,11 @@ import {
   Calendar,
   Lock,
   Search,
-  Printer, Send, X, Receipt
+  Printer, Send, X, Receipt, AlertCircle, PackageOpen
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import api from '../../utils/api';
 import { FilterBar } from '../../components/FilterBar';
 import { Button } from '../../components/Button';
@@ -37,7 +38,8 @@ export const Reports: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Reports...</div>;
   }
 
-  const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices } = reports;
+  const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices, paymentMethodData, topFoodItems, inventoryAlerts } = reports;
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -81,6 +83,98 @@ export const Reports: React.FC = () => {
                </div>
             </div>
           ))}
+       </div>
+
+       {/* Analytics Charts Row */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+         {/* Payment Methods */}
+         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80">
+            <h5 className="font-semibold font-display text-slate-900 mb-4 flex items-center gap-2">
+              <PieIcon size={18} className="text-brand-accent" />
+              Revenue by Payment Method
+            </h5>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={paymentMethodData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {paymentMethodData?.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => `₹${value.toLocaleString()}`} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex justify-center gap-4 mt-2">
+              {paymentMethodData?.map((entry: any, index: number) => (
+                <div key={entry.name} className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
+                  {entry.name}: ₹{entry.value.toLocaleString()}
+                </div>
+              ))}
+            </div>
+         </div>
+
+         {/* Top Purchased Food */}
+         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80">
+            <h5 className="font-semibold font-display text-slate-900 mb-4 flex items-center gap-2">
+              <BarChart3 size={18} className="text-brand-accent" />
+              Most Purchased Food Items
+            </h5>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={topFoodItems} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 10, fontWeight: 600 }} />
+                  <Tooltip />
+                  <Bar dataKey="sales" fill="#3b82f6" radius={[0, 4, 4, 0]}>
+                    {topFoodItems?.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+         </div>
+       </div>
+
+       {/* Inventory Alerts Row */}
+       <div className="mb-8 bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80">
+         <div className="flex items-center justify-between mb-4">
+           <h5 className="font-semibold font-display text-slate-900 flex items-center gap-2">
+             <AlertCircle size={18} className="text-brand-danger" />
+             Low Stock & Limited Inventory Alerts
+           </h5>
+         </div>
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+           {inventoryAlerts?.length === 0 ? (
+             <div className="col-span-full p-4 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center gap-3">
+               <PackageOpen size={20} />
+               <span className="font-semibold text-sm">All inventory items are well-stocked. No low-stock alerts.</span>
+             </div>
+           ) : (
+             inventoryAlerts?.map((item: any) => (
+               <div key={item._id} className="p-4 rounded-2xl border border-rose-100 bg-rose-50 flex justify-between items-center">
+                 <div>
+                   <p className="font-bold text-slate-900 text-sm">{item.name}</p>
+                   <p className="text-xs font-semibold text-rose-500 uppercase tracking-widest mt-1">Remaining: {item.quantityInStock} {item.unit}</p>
+                 </div>
+                 <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-sm text-rose-500">
+                   <AlertCircle size={16} />
+                 </div>
+               </div>
+             ))
+           )}
+         </div>
        </div>
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

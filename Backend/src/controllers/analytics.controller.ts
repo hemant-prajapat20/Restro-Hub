@@ -5,6 +5,7 @@ import User from '../models/User';
 import Staff from '../models/Staff';
 import Order from '../models/Order';
 import Customer from '../models/Customer';
+import InventoryItem from '../models/InventoryItem';
 
 // @desc    Get dashboard analytics for SuperAdmin
 // @route   GET /api/analytics/superadmin
@@ -85,8 +86,7 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
     });
 
     const activeTotalStaff = await Staff.countDocuments({
-      businessId,
-      status: 'Active'
+      businessId
     });
 
     let avgTableTurnTime = '0m';
@@ -273,6 +273,34 @@ export const getBusinessReports = async (req: Request, res: Response): Promise<v
     const operatingCost = netRevenue * 0.6; // Mock 60% operating cost
     const netProfit = netRevenue - operatingCost - totalGst;
 
+    // Payment Method Data
+    const paymentMethodMap: Record<string, number> = {};
+    monthlyOrders.forEach(order => {
+      const pm = order.paymentMethod || 'Cash';
+      paymentMethodMap[pm] = (paymentMethodMap[pm] || 0) + order.total;
+    });
+    const paymentMethodData = Object.entries(paymentMethodMap).map(([name, value]) => ({ name, value }));
+
+    // Top Food Items
+    const foodItemMap: Record<string, number> = {};
+    monthlyOrders.forEach(order => {
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach((item: any) => {
+          foodItemMap[item.name] = (foodItemMap[item.name] || 0) + (item.quantity || 1);
+        });
+      }
+    });
+    const topFoodItems = Object.entries(foodItemMap)
+      .map(([name, sales]) => ({ name, sales }))
+      .sort((a, b) => b.sales - a.sales)
+      .slice(0, 5);
+
+    // Inventory Alerts
+    const inventoryAlerts = await InventoryItem.find({
+      businessId,
+      $expr: { $lte: ['$quantityInStock', '$reorderThreshold'] }
+    }).limit(10);
+
     res.json({
       status: 'success',
       data: {
@@ -280,6 +308,9 @@ export const getBusinessReports = async (req: Request, res: Response): Promise<v
         totalGst,
         operatingCost,
         netProfit,
+        paymentMethodData,
+        topFoodItems,
+        inventoryAlerts,
         recentInvoices: monthlyOrders.slice(0, 50).map(order => ({
           id: order._id,
           date: order.createdAt,

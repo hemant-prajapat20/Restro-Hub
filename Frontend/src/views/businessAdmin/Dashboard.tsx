@@ -75,14 +75,6 @@ export const Dashboard: React.FC = () => {
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          title="Today Revenue" 
-          value={`₹${dailyRevenue.toLocaleString()}`} 
-          subValue="vs yesterday" 
-          trend={12.5} 
-          icon={CreditCard}
-          color="blue"
-        />
-        <StatCard 
           title="Total Revenue" 
           value={`₹${totalRevenue?.toLocaleString() || 0}`} 
           subValue="all time" 
@@ -91,20 +83,28 @@ export const Dashboard: React.FC = () => {
           color="orange"
         />
         <StatCard 
-          title="Active Total Staff" 
+          title="Today Revenue" 
+          value={`₹${dailyRevenue.toLocaleString()}`} 
+          subValue="vs yesterday" 
+          trend={12.5} 
+          icon={CreditCard}
+          color="blue"
+        />
+        <StatCard 
+          title="Today Total Order" 
+          value={totalOrders || 0} 
+          subValue="today's count" 
+          trend={5.4} 
+          icon={Timer}
+          color="amber"
+        />
+        <StatCard 
+          title="Total Staff" 
           value={activeTotalStaff || 0} 
           subValue="currently active" 
           trend={2.1} 
           icon={Users}
           color="emerald"
-        />
-        <StatCard 
-          title="Avg. Table Turn Time" 
-          value={avgTableTurnTime} 
-          subValue="target 40m" 
-          trend={-8.4} 
-          icon={Timer}
-          color="amber"
         />
       </div>
 
@@ -257,30 +257,44 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Recent Transactions Widget */}
-      <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-200/80 mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h4 className="text-lg font-semibold font-display">Recent Transactions</h4>
-            <p className="text-sm text-slate-500">Last 6 platform transactions</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+        {/* Recent Transactions Widget */}
+        <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-200/80">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h4 className="text-lg font-semibold font-display">Recent Transactions</h4>
+              <p className="text-sm text-slate-500">Last 6 platform transactions</p>
+            </div>
+            <button className="text-xs font-semibold text-brand-primary uppercase tracking-widest hover:underline" onClick={() => window.location.href = '/admin/transactions'}>View All</button>
           </div>
-          <button className="text-xs font-semibold text-brand-primary uppercase tracking-widest hover:underline" onClick={() => window.location.href = '/admin/transactions'}>View All</button>
+          <div className="overflow-x-auto custom-scrollbar pb-2">
+            <table className="w-full text-left">
+               <thead className="bg-slate-50">
+                  <tr>
+                     <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID</th>
+                     <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Module</th>
+                     <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Amount</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-100">
+                  <RecentTransactionsTable />
+               </tbody>
+            </table>
+          </div>
         </div>
-        <div className="overflow-x-auto custom-scrollbar pb-2">
-          <table className="w-full text-left">
-             <thead className="bg-slate-50">
-                <tr>
-                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID</th>
-                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Module</th>
-                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Amount</th>
-                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Payment</th>
-                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Status</th>
-                </tr>
-             </thead>
-             <tbody className="divide-y divide-slate-100">
-                <RecentTransactionsTable />
-             </tbody>
-          </table>
+
+        {/* Live Staff Activity Widget */}
+        <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-200/80">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h4 className="text-lg font-semibold font-display">Live Staff Activity</h4>
+              <p className="text-sm text-slate-500">Currently clocked in members</p>
+            </div>
+            <button className="text-xs font-semibold text-brand-primary uppercase tracking-widest hover:underline" onClick={() => window.location.href = '/admin/staff'}>View All</button>
+          </div>
+          <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
+             <LiveStaffWidget />
+          </div>
         </div>
       </div>
     </div>
@@ -296,8 +310,8 @@ const RecentTransactionsTable = () => {
     }
   });
 
-  if (isLoading) return <tr><td colSpan={5} className="p-4 text-center text-slate-400 font-medium">Loading transactions...</td></tr>;
-  if (!orders || orders.length === 0) return <tr><td colSpan={5} className="p-4 text-center text-slate-400 font-medium">No recent transactions</td></tr>;
+  if (isLoading) return <tr><td colSpan={3} className="p-4 text-center text-slate-400 font-medium">Loading transactions...</td></tr>;
+  if (!orders || orders.length === 0) return <tr><td colSpan={3} className="p-4 text-center text-slate-400 font-medium">No recent transactions</td></tr>;
 
   return (
     <>
@@ -313,16 +327,44 @@ const RecentTransactionsTable = () => {
            <td className="px-6 py-4 text-center">
               <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md text-[10px] font-bold uppercase tracking-widest">{invoice.type}</span>
            </td>
-           <td className="px-6 py-4 text-center font-bold text-sm text-slate-900">₹{invoice.total?.toLocaleString() || invoice.amount?.toLocaleString()}</td>
-           <td className="px-6 py-4 text-center">
-              <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">{invoice.paymentMethod || 'Cash'}</span>
-           </td>
-           <td className="px-6 py-4 text-right">
-              <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${invoice.status === 'Completed' || invoice.status === 'Served' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{invoice.status}</span>
-           </td>
+           <td className="px-6 py-4 text-center font-bold text-sm text-emerald-600">₹{invoice.total?.toLocaleString() || invoice.amount?.toLocaleString()}</td>
         </tr>
-        );
+        )
       })}
+    </>
+  );
+};
+
+const LiveStaffWidget = () => {
+  const { data: staff, isLoading } = useQuery({
+    queryKey: ['staffActivityWidget'],
+    queryFn: async () => {
+      const res = await api.get('/staff');
+      return res.data.filter((s: any) => s.status === 'Clocked In' || s.status === 'On Break').slice(0, 5);
+    }
+  });
+
+  if (isLoading) return <div className="text-center text-slate-400 font-medium py-4">Loading staff activity...</div>;
+  if (!staff || staff.length === 0) return <div className="text-center text-slate-400 font-medium py-4">No staff currently clocked in</div>;
+
+  return (
+    <>
+      {staff.map((member: any) => (
+        <div key={member._id} className="flex items-center justify-between p-3 bg-stone-50 rounded-2xl border border-stone-200/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-brand-accent/10 border-2 border-white shadow-sm">
+              <img src={member.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`} alt={member.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900">{member.name}</p>
+              <p className="text-xs text-slate-500">{member.role}</p>
+            </div>
+          </div>
+          <span className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-widest ${member.status === 'Clocked In' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            {member.status}
+          </span>
+        </div>
+      ))}
     </>
   );
 };

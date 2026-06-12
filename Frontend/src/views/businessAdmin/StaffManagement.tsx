@@ -129,7 +129,13 @@ export const StaffManagement: React.FC = () => {
 
     const assignedRole = newRole || (staffCategories.length > 0 ? staffCategories[0] : 'Staff');
 
-    const seedName = newGender === 'Female' ? `Sophia-${newName}` : `Felix-${newName}`;
+    const isFemale = newGender === 'Female';
+    const seedName = isFemale ? `Sophia-${newName}` : `Felix-${newName}`;
+    
+    // Use explicit hair styles to guarantee gender appearance in avataaars
+    const avatarParams = isFemale 
+      ? `&hair=longHairStraight,longHairCurly,longHairMiaWallace&clothing=blazerAndSweater,collarAndSweater`
+      : `&hair=shortHairShortFlat,shortHairShortWaved,shortHairTheCaesar&clothing=blazerAndShirt,shirtCrewNeck&facialHairProbability=20`;
 
     addStaffMutation.mutate({
       name: newName,
@@ -140,7 +146,7 @@ export const StaffManagement: React.FC = () => {
       contact: newContact,
       email: newEmail || `${newName.toLowerCase().replace(/\s/g, '')}@indiserve.pro`,
       score: Number(newScore) || 5.0,
-      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}`
+      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}${avatarParams}`
     });
   };
 
