@@ -20,7 +20,8 @@ import {
   Building2,
   CreditCard,
   Menu,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -49,6 +50,8 @@ const businessNavItems = [
   { id: 'tables', label: 'Tables', icon: Table2 },
   { id: 'kds', label: 'Kitchen (KDS)', icon: ChefHat },
   { id: 'delivery', label: 'Online Orders', icon: ShoppingBag },
+  { id: 'transactions', label: 'Transactions', icon: FileText },
+  { id: 'messages', label: 'Message Center', icon: Bell },
   { id: 'inventory', label: 'Inventory', icon: ClipboardList },
   { id: 'staff', label: 'Staff Directory', icon: Users },
   { id: 'customers', label: 'Customer CRM', icon: Contact },

@@ -251,6 +251,69 @@ export const Dashboard: React.FC = () => {
            </div>
         </div>
       </div>
+
+      {/* Recent Transactions Widget */}
+      <div className="bg-white p-6 rounded-[32px] shadow-soft border border-stone-200/80 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h4 className="text-lg font-semibold font-display">Recent Transactions</h4>
+            <p className="text-sm text-slate-500">Last 6 platform transactions</p>
+          </div>
+          <button className="text-xs font-semibold text-brand-primary uppercase tracking-widest hover:underline" onClick={() => window.location.href = '/admin/transactions'}>View All</button>
+        </div>
+        <div className="overflow-x-auto custom-scrollbar pb-2">
+          <table className="w-full text-left">
+             <thead className="bg-slate-50">
+                <tr>
+                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID</th>
+                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Module</th>
+                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Amount</th>
+                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Payment</th>
+                   <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Status</th>
+                </tr>
+             </thead>
+             <tbody className="divide-y divide-slate-100">
+                <RecentTransactionsTable />
+             </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  );
+};
+
+const RecentTransactionsTable = () => {
+  const { data: orders, isLoading } = useQuery({
+    queryKey: ['recentOrdersWidget'],
+    queryFn: async () => {
+      const res = await api.get('/orders');
+      return res.data.slice(0, 6);
+    }
+  });
+
+  if (isLoading) return <tr><td colSpan={5} className="p-4 text-center text-slate-400 font-medium">Loading transactions...</td></tr>;
+  if (!orders || orders.length === 0) return <tr><td colSpan={5} className="p-4 text-center text-slate-400 font-medium">No recent transactions</td></tr>;
+
+  return (
+    <>
+      {orders.map((invoice: any) => (
+        <tr key={invoice._id} className="hover:bg-slate-50/50 transition-all group">
+           <td className="px-6 py-4">
+              <p className="text-sm font-semibold text-brand-primary">#{invoice._id.slice(-8).toUpperCase()}</p>
+              <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+           </td>
+           <td className="px-6 py-4 text-center">
+              <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md text-[10px] font-bold uppercase tracking-widest">{invoice.type}</span>
+           </td>
+           <td className="px-6 py-4 text-center font-bold text-sm text-slate-900">₹{invoice.total?.toLocaleString() || invoice.amount?.toLocaleString()}</td>
+           <td className="px-6 py-4 text-center">
+              <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">{invoice.paymentMethod || 'Cash'}</span>
+           </td>
+           <td className="px-6 py-4 text-right">
+              <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${invoice.status === 'Completed' || invoice.status === 'Served' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{invoice.status}</span>
+           </td>
+        </tr>
+      ))}
+    </>
   );
 };

@@ -22,6 +22,7 @@ import cafeBakeryRoutes from './routes/cafebakery.routes';
 import customerRoutes from './routes/customer.routes';
 import uploadRoutes from './routes/upload.routes';
 import reservationRoutes from './routes/reservation.routes';
+import messageRoutes from './routes/message.routes';
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/barlounge', barLoungeRoutes);
 app.use('/api/cafebakery', cafeBakeryRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

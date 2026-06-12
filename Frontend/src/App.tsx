@@ -28,6 +28,8 @@ import { Inventory } from './views/businessAdmin/Inventory';
 import { StaffManagement } from './views/businessAdmin/StaffManagement';
 import { Reports } from './views/businessAdmin/Reports';
 import { Settings as BusinessSettings } from './views/businessAdmin/Settings';
+import { Transactions } from './views/businessAdmin/Transactions';
+import { MessageCenter as BusinessMessageCenter } from './views/businessAdmin/MessageCenter';
 
 import { Customers } from './views/businessAdmin/Customers';
 
@@ -89,6 +91,8 @@ export default function App() {
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<BusinessSettings />} />
           <Route path="customers" element={<Customers />} />
+          <Route path="transactions" element={<Transactions />} />
+          <Route path="messages" element={<BusinessMessageCenter />} />
         </Route>
 
         {/* Fallback */}

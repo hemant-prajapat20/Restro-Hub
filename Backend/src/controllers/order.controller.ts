@@ -55,6 +55,16 @@ export const createOrder = async (req: Request, res: Response) => {
       io.emit('newOrder', populatedOrder);
     }
 
+    // Insert Message for the Message Center
+    import('../models/Message').then(({ default: Message }) => {
+       Message.create({
+         businessId,
+         action: 'New Transaction',
+         message: `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`,
+         type: 'success'
+       }).catch(err => console.error('Failed to log message:', err));
+    });
+
     res.status(201).json(populatedOrder);
   } catch (error) {
     res.status(500).json({ message: 'Server error creating order' });
