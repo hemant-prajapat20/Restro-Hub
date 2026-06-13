@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Search, MapPin, Star, User, LogOut } from 'lucide-react';
+import { Search, MapPin, Star, User, LogOut, UtensilsCrossed } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { logout } from '../../store/slices/authSlice';
@@ -62,88 +62,230 @@ export const CustomerPanel: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pb-24">
+    <div className="min-h-screen bg-[#f4f4f5] font-sans pb-12">
       {/* Header */}
-      <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-              <User className="text-white" size={20} />
+      <header className="bg-white shadow-sm sticky top-0 z-40">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+             <div className="w-12 h-12 bg-gradient-to-tr from-orange-600 to-orange-400 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
+              <UtensilsCrossed className="text-white" size={24} />
             </div>
-            <div>
-              <h1 className="font-bold text-slate-900 leading-tight">Welcome, {currentUser?.firstName}</h1>
-              <p className="text-[10px] text-slate-500 font-medium">What are you craving today?</p>
-            </div>
+            <h1 className="font-black text-slate-900 text-2xl tracking-tight">Restro<span className="text-orange-500">Hub</span></h1>
           </div>
           
-          <button onClick={handleLogout} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-full bg-slate-50 hover:bg-red-50">
-            <LogOut size={20} />
-          </button>
+          <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl text-slate-600 font-bold">
+                  <MapPin size={18} className="text-orange-500" />
+                  <span>Deliver to: <span className="text-slate-900">Home (Sector 6, Jaipur)</span></span>
+              </div>
+              <button onClick={handleLogout} className="flex items-center gap-2 text-slate-500 hover:text-red-600 font-bold bg-slate-50 hover:bg-red-50 px-4 py-2.5 rounded-xl transition-all">
+                <LogOut size={18} />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto mt-6">
-        {/* Search */}
-        <div className="px-4">
-          <div className="relative">
-            <input 
-              type="text" 
-              placeholder="Search for restaurants or locations..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all placeholder:text-slate-400"
-            />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          </div>
-        </div>
+      {/* Main Layout */}
+      <div className="w-full max-w-[1600px] mx-auto mt-6 px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        
+        {/* LEFT SIDEBAR - Navigation & Profile */}
+        <aside className="w-full lg:w-64 flex-shrink-0 space-y-6">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-tr from-orange-500 to-amber-400 rounded-full flex items-center justify-center shadow-md">
+                        <User className="text-white" size={28} />
+                    </div>
+                    <div>
+                        <h2 className="font-extrabold text-slate-900 text-lg leading-tight">{currentUser?.firstName} {currentUser?.lastName}</h2>
+                        <p className="text-xs text-slate-500 font-bold mt-1">{currentUser?.phone || 'Customer'}</p>
+                    </div>
+                </div>
+                
+                <nav className="space-y-2">
+                    <button className="w-full flex items-center gap-3 bg-orange-50 text-orange-600 font-bold px-4 py-3 rounded-xl transition-all">
+                        <Star size={20} />
+                        Home / Order
+                    </button>
+                    <button className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold px-4 py-3 rounded-xl transition-all">
+                        <UtensilsCrossed size={20} />
+                        Past Orders
+                    </button>
+                    <button className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold px-4 py-3 rounded-xl transition-all">
+                        <MapPin size={20} />
+                        Saved Addresses
+                    </button>
+                </nav>
+            </div>
 
-        {/* Restaurants List */}
-        <div className="px-4 mt-8">
-          <h2 className="text-xl font-bold text-slate-900 mb-4 tracking-tight">Restaurants near you</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredBusinesses.map(business => (
-              <motion.div 
-                whileHover={{ y: -4 }}
-                key={business._id}
-                onClick={() => navigate(`/customer/order/${business._id}`)}
-                className="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all flex gap-4"
-              >
-                <div className="w-24 h-24 bg-slate-100 rounded-2xl overflow-hidden shadow-inner flex-shrink-0">
-                   {business.logoUrl ? (
-                      <img src={business.logoUrl} alt={business.name} className="w-full h-full object-cover" />
-                   ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-orange-50">
-                          <Star size={24} className="text-orange-300 mb-1" />
-                      </div>
-                   )}
-                </div>
-                <div className="flex-1 py-1">
-                  <h3 className="font-bold text-slate-900 text-lg leading-tight">{business.name}</h3>
-                  <p className="text-xs text-slate-500 font-medium mt-1 flex items-center gap-1">
-                      <MapPin size={12} className="text-slate-400" />
-                      {business.address}, {business.district}
-                  </p>
-                  
-                  <div className="mt-3 flex items-center gap-3">
-                      <div className="bg-green-100 px-2 py-0.5 rounded flex items-center gap-1">
-                          <Star size={10} className="text-green-700 fill-green-700" />
-                          <span className="text-[10px] font-bold text-green-700">4.5</span>
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fast Delivery</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 shadow-sm text-white relative overflow-hidden">
+                 <div className="relative z-10">
+                     <h3 className="font-black text-lg mb-2">RestroHub Premium</h3>
+                     <p className="text-slate-300 text-sm font-medium mb-4">Get free delivery on all orders above $20.</p>
+                     <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-4 rounded-xl w-full transition-colors text-sm shadow-lg shadow-orange-500/20">
+                         Upgrade Now
+                     </button>
+                 </div>
+                 <Star size={100} className="absolute -bottom-6 -right-6 text-white opacity-5 rotate-12" />
+            </div>
+        </aside>
 
-            {filteredBusinesses.length === 0 && (
-                <div className="col-span-full py-12 text-center text-slate-500 font-medium bg-white rounded-3xl border border-slate-100">
-                    No restaurants found.
+        {/* CENTER CONTENT - Restaurants & Banner */}
+        <main className="flex-1 min-w-0">
+            {/* Promotional Banner */}
+            <div className="mb-8 rounded-[2rem] bg-slate-900 overflow-hidden relative shadow-lg h-64 flex items-center">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-500 opacity-90"></div>
+                <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070')] bg-cover bg-center mix-blend-overlay"></div>
+                <div className="relative z-10 p-8 sm:p-10 md:w-3/4">
+                    <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 leading-tight">Craving something delicious?</h2>
+                    <p className="text-orange-100 font-medium text-lg mb-6">Discover the best food & drinks in your area.</p>
+                    
+                    {/* Search */}
+                    <div className="relative max-w-md">
+                        <input 
+                        type="text" 
+                        placeholder="Search for restaurants or cuisines..." 
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full bg-white border-none rounded-2xl py-4 pl-12 pr-4 text-slate-900 font-semibold shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-500/50 transition-all placeholder:text-slate-400"
+                        />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500" size={20} />
+                    </div>
                 </div>
-            )}
-          </div>
-        </div>
-      </main>
+            </div>
+
+            {/* Restaurants List */}
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 mb-6 tracking-tight flex items-center gap-2">
+                <Star className="text-orange-500 fill-orange-500" size={24} />
+                Top Restaurants Near You
+              </h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredBusinesses.map(business => (
+                  <motion.div 
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    key={business._id}
+                    onClick={() => navigate(`/customer/order/${business._id}`)}
+                    className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100 cursor-pointer hover:shadow-xl hover:shadow-orange-500/10 transition-all group flex flex-col"
+                  >
+                    <div className="h-48 bg-slate-100 relative overflow-hidden flex-shrink-0">
+                       {business.logoUrl ? (
+                          <img src={business.logoUrl} alt={business.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                       ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                              <UtensilsCrossed size={48} className="text-orange-300 opacity-50" />
+                          </div>
+                       )}
+                       
+                       <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                           <Star size={12} className="text-green-600 fill-green-600" />
+                           <span className="text-xs font-extrabold text-slate-900">4.5</span>
+                       </div>
+                       
+                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12">
+                           <h3 className="font-extrabold text-white text-xl leading-tight truncate drop-shadow-md">{business.name}</h3>
+                       </div>
+                    </div>
+                    
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                          <p className="text-sm text-slate-500 font-medium flex items-center gap-1.5 mb-4">
+                              <MapPin size={14} className="text-slate-400" />
+                              <span className="truncate">{business.address}, {business.district}</span>
+                          </p>
+                          
+                          <div className="flex flex-wrap items-center gap-2">
+                              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Top Rated</span>
+                              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Fast Food</span>
+                          </div>
+                      </div>
+                      
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                              <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }}>
+                                  <Star size={12} className="text-orange-500" />
+                              </motion.div>
+                              Fast Delivery
+                          </span>
+                          <span className="text-sm font-bold text-orange-500 bg-orange-50 px-3 py-1.5 rounded-xl">Order Now</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {filteredBusinesses.length === 0 && (
+                    <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-slate-100 shadow-sm">
+                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Search className="text-slate-300" size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900">No restaurants found</h3>
+                        <p className="text-slate-500 font-medium mt-2">Try adjusting your search criteria.</p>
+                    </div>
+                )}
+              </div>
+            </div>
+        </main>
+
+        {/* RIGHT SIDEBAR - Active Orders & Offers */}
+        <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
+            
+            {/* Active Order Widget */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <h3 className="font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Active Orders
+                </h3>
+                
+                <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
+                    <div className="flex justify-between items-start mb-3">
+                        <div>
+                            <p className="font-bold text-slate-900 text-sm">Order #1042</p>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">Arriving in 15-20 mins</p>
+                        </div>
+                        <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-md uppercase">Preparing</span>
+                    </div>
+                    
+                    <div className="w-full bg-orange-200 rounded-full h-1.5 mb-4">
+                      <div className="bg-orange-500 h-1.5 rounded-full w-1/3"></div>
+                    </div>
+                    
+                    <button className="w-full text-center text-xs font-bold text-orange-600 hover:text-orange-700">
+                        Track Order
+                    </button>
+                </div>
+            </div>
+
+            {/* Top Offers Widget */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                <h3 className="font-extrabold text-slate-900 mb-4">Today's Offers</h3>
+                
+                <div className="space-y-4">
+                    <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors cursor-pointer">
+                        <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black text-xl">
+                            %
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-slate-900 text-sm">50% OFF up to $10</h4>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">Use code: WELCOME50</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors cursor-pointer">
+                        <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center font-black text-xl">
+                            $
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-slate-900 text-sm">Flat $5 Cashback</h4>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">On orders above $30</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </aside>
+
+      </div>
     </div>
   );
 };
