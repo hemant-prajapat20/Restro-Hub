@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { ShoppingBag, Search, Plus, Minus, ArrowRight, User, MapPin, Star, Clock } from 'lucide-react';
+import { Package, Clock, MapPin, Search, Star, ShoppingBag, Plus, Minus, User, ChevronDown, Mail, Phone, LogOut } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -21,14 +23,29 @@ interface MenuItem {
 
 export const CustomerDashboard: React.FC = () => {
   const { businessId } = useParams();
+  const dispatch = useDispatch();
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('All');
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/customer-login');
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<{item: MenuItem, quantity: number}[]>([]);
   const [showCart, setShowCart] = useState(false);
 
   // Check Auth
   const currentUser = useSelector((state: RootState) => state.auth.user);
+
+  const { data: addressesResponse } = useQuery({
+    queryKey: ['customerAddresses'],
+    queryFn: () => api.get('/customer-orders/addresses').then(res => res.data),
+    enabled: !!currentUser
+  });
+  
+  const defaultAddress = addressesResponse?.data?.find((a: any) => a.isDefault) || addressesResponse?.data?.[0];
 
   const token = useSelector((state: RootState) => state.auth.token);
 
@@ -132,21 +149,79 @@ export const CustomerDashboard: React.FC = () => {
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
               <ShoppingBag className="text-white" size={20} />
             </div>
             <div>
-              <h1 className="font-bold text-brand-primary leading-tight">Home</h1>
-              <p className="text-[10px] text-slate-500 flex items-center gap-1 font-medium"><MapPin size={10} className="text-brand-accent"/> Delivering to Current Location</p>
+              <h1 className="font-bold text-brand-primary leading-tight">
+                {defaultAddress ? defaultAddress.label : 'Home'}
+              </h1>
+              <p className="text-[10px] text-slate-500 flex items-center gap-1 font-medium">
+                <MapPin size={10} className="text-brand-accent"/> 
+                <span className="truncate max-w-[200px]">
+                  Delivering to: {defaultAddress ? `${defaultAddress.street}, ${defaultAddress.city}` : 'Current Location'}
+                </span>
+              </p>
             </div>
           </div>
           
           <div>
             {currentUser ? (
-              <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200">
-                <User size={20} className="text-slate-600" />
+              <div className="relative">
+                <button 
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-4 rounded-full transition-all"
+                >
+                  <div className="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center">
+                    <User size={18} />
+                  </div>
+                  <span className="font-bold text-sm text-slate-700 hidden sm:block">
+                    {currentUser?.firstName || 'Profile'}
+                  </span>
+                  <ChevronDown size={14} className="text-slate-400" />
+                </button>
+
+                {showProfileDropdown && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowProfileDropdown(false)}
+                    ></div>
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+                        <p className="font-bold text-brand-primary truncate">{currentUser?.firstName} {currentUser?.lastName}</p>
+                        <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{currentUser?.email || 'customer@example.com'}</p>
+                      </div>
+                      
+                      <div className="p-2">
+                        <div className="px-3 py-2 flex items-center gap-3 text-sm font-medium text-slate-600">
+                          <Phone size={14} className="text-slate-400" />
+                          {currentUser?.phone || '+91 -'}
+                        </div>
+                        <div className="px-3 py-2 flex items-center gap-3 text-sm font-medium text-slate-600">
+                          <MapPin size={14} className="text-slate-400" />
+                          <span className="truncate">
+                            {defaultAddress 
+                              ? `${defaultAddress.street}, ${defaultAddress.city}`
+                              : 'No saved address'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-2 border-t border-slate-100">
+                        <button 
+                          onClick={handleLogout} 
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                        >
+                          <LogOut size={16} />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <button onClick={() => navigate('/customer-login')} className="text-sm font-bold text-brand-accent hover:text-brand-accent transition-colors">
@@ -157,13 +232,18 @@ export const CustomerDashboard: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto">
+      <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-2">
         {/* Restaurant Info Banner */}
-        <div className="bg-white p-4 mx-4 mt-6 rounded-3xl shadow-sm border border-slate-100">
+        <div className="bg-white p-6 mt-6 rounded-3xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-2xl font-bold text-brand-primary tracking-tight">{business.name}</h2>
               <p className="text-sm text-slate-500 font-medium mt-1">Multi-Cuisine • Desserts • Beverages</p>
+              {(business.address || business.district) && (
+                <p className="text-xs text-slate-400 font-medium mt-2 flex items-center gap-1">
+                  <MapPin size={12} className="text-slate-400" /> {business.address || `${business.district}, ${business.state}`}
+                </p>
+              )}
             </div>
             <div className="bg-green-100 px-2 py-1 rounded-lg flex items-center gap-1">
               <Star size={12} className="text-green-700 fill-green-700" />
@@ -178,7 +258,7 @@ export const CustomerDashboard: React.FC = () => {
         </div>
 
         {/* Search */}
-        <div className="px-4 mt-6">
+        <div className="mt-6">
           <div className="relative">
             <input 
               type="text" 
@@ -192,7 +272,7 @@ export const CustomerDashboard: React.FC = () => {
         </div>
 
         {/* Categories */}
-        <div className="mt-6 px-4">
+        <div className="mt-6">
           <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2">
             {categories.map(cat => (
               <button
@@ -211,14 +291,14 @@ export const CustomerDashboard: React.FC = () => {
         </div>
 
         {/* Menu Items */}
-        <div className="mt-6 px-4 space-y-6">
-          <h3 className="font-bold text-brand-primary text-lg">Recommended ({filteredItems.length})</h3>
+        <div className="mt-8 space-y-6">
+          <h3 className="font-black text-brand-primary text-xl">Recommended ({filteredItems.length})</h3>
           
-          <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {filteredItems.map(item => {
               const cartItem = cart.find(c => c.item._id === item._id);
               return (
-                <div key={item._id} className="flex gap-4 items-start bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+                <div key={item._id} className="flex gap-3 items-start bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
                   <div className="flex-1">
                     <div className={`w-4 h-4 border-2 rounded-sm flex items-center justify-center mb-2 ${item.isVeg ? 'border-green-600' : 'border-red-600'}`}>
                       <div className={`w-2 h-2 rounded-full ${item.isVeg ? 'bg-green-600' : 'bg-red-600'}`} />
@@ -228,8 +308,8 @@ export const CustomerDashboard: React.FC = () => {
                     <p className="text-sm text-slate-500 mt-2 line-clamp-2 leading-relaxed">{item.description}</p>
                   </div>
                   
-                  <div className="relative w-[130px] h-[130px] flex-shrink-0">
-                    <div className="w-full h-full rounded-2xl bg-slate-100 overflow-hidden shadow-inner">
+                  <div className="relative w-[110px] h-[110px] flex-shrink-0">
+                    <div className="w-full h-full rounded-xl bg-slate-100 overflow-hidden shadow-inner">
                       {item.image ? (
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       ) : (

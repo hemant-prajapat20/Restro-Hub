@@ -16,7 +16,7 @@ export const getPublicMenu = async (req: Request, res: Response) => {
 
     const items = await MenuItem.find({ businessId, isAvailable: true }).sort({ category: 1, name: 1 });
     res.json({
-      business: { name: business.name },
+      business: { name: business.name, address: business.address, district: business.district, state: business.state },
       items
     });
   } catch (error) {
