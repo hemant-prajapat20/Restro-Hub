@@ -39,7 +39,7 @@ const PastOrdersTab = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
         <p className="text-slate-500 font-medium mt-4">Loading your orders...</p>
       </div>
     );
@@ -51,7 +51,7 @@ const PastOrdersTab = () => {
         <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
           <ShoppingBag className="text-slate-300" size={40} />
         </div>
-        <h3 className="text-2xl font-black text-slate-900 mb-2">No past orders</h3>
+        <h3 className="text-2xl font-black text-brand-primary mb-2">No past orders</h3>
         <p className="text-slate-500 font-medium max-w-sm">Looks like you haven't placed any orders yet. Discover top restaurants and place your first order!</p>
       </div>
     );
@@ -59,8 +59,8 @@ const PastOrdersTab = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-slate-900 mb-6 tracking-tight flex items-center gap-2">
-        <Clock className="text-orange-500" size={24} />
+      <h2 className="text-2xl font-black text-brand-primary mb-6 tracking-tight flex items-center gap-2">
+        <Clock className="text-brand-accent" size={24} />
         Your Past Orders
       </h2>
       
@@ -82,7 +82,7 @@ const PastOrdersTab = () => {
                     )}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-lg">{order.businessId?.name || 'Unknown Restaurant'}</h3>
+                  <h3 className="font-extrabold text-brand-primary text-lg">{order.businessId?.name || 'Unknown Restaurant'}</h3>
                   <p className="text-sm text-slate-500 font-medium">{new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   <p className="text-xs text-slate-400 font-bold mt-1">Order #{order._id.substring(order._id.length - 6).toUpperCase()}</p>
                 </div>
@@ -99,12 +99,12 @@ const PastOrdersTab = () => {
                            {order.status}
                        </span>
                    ) : (
-                       <span className="flex items-center gap-1 bg-orange-50 text-orange-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">
+                       <span className="flex items-center gap-1 bg-brand-accent/10 text-brand-accent px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">
                            <Clock3 size={14} /> {order.status}
                        </span>
                    )}
                 </div>
-                <p className="font-black text-slate-900 text-xl">${order.total.toFixed(2)}</p>
+                <p className="font-black text-brand-primary text-xl">${order.total.toFixed(2)}</p>
               </div>
             </div>
             
