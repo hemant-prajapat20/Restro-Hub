@@ -20,11 +20,15 @@ export interface IOrder extends Document {
   total: number;
   status: 'Pending' | 'In Kitchen' | 'Ready' | 'Completed' | 'Cancelled' | 'Out for Delivery';
   paymentMethod?: string;
-  source?: 'Zomato' | 'Swiggy' | 'Direct';
+  source?: 'Zomato' | 'Swiggy' | 'Direct' | 'Online';
   customerDetails?: {
     name: string;
     phone: string;
     address?: string;
+  };
+  driverDetails?: {
+    name: string;
+    phone: string;
   };
   estimatedPrepTime?: number;
   createdAt?: Date;
@@ -49,11 +53,15 @@ const OrderSchema = new Schema({
   total: { type: Number, required: true },
   status: { type: String, enum: ['Pending', 'In Kitchen', 'Ready', 'Completed', 'Cancelled', 'Out for Delivery'], default: 'Pending' },
   paymentMethod: { type: String },
-  source: { type: String, enum: ['Zomato', 'Swiggy', 'Direct'] },
+  source: { type: String, enum: ['Zomato', 'Swiggy', 'Direct', 'Online'] },
   customerDetails: {
     name: { type: String },
     phone: { type: String },
     address: { type: String }
+  },
+  driverDetails: {
+    name: { type: String },
+    phone: { type: String }
   },
   estimatedPrepTime: { type: Number }
 }, { timestamps: true });

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { Package, Clock, Activity, Search } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Package, Clock, Activity, Search, MapPin, Phone } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import toast from 'react-hot-toast';
 
 interface Order {
@@ -10,11 +10,17 @@ interface Order {
     _id: string;
     name: string;
     logoUrl?: string;
+    address?: string;
+    contactPhone?: string;
   };
   total: number;
   status: string;
   createdAt: string;
   items: any[];
+  driverDetails?: {
+    name: string;
+    phone: string;
+  };
 }
 
 interface Props {
@@ -24,6 +30,15 @@ interface Props {
 const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedInfo, setExpandedInfo] = useState<{ orderId: string, type: 'driver' | 'restaurant' } | null>(null);
+
+  const toggleInfo = (orderId: string, type: 'driver' | 'restaurant') => {
+    if (expandedInfo?.orderId === orderId && expandedInfo.type === type) {
+      setExpandedInfo(null);
+    } else {
+      setExpandedInfo({ orderId, type });
+    }
+  };
 
   useEffect(() => {
     fetchActiveOrders();
@@ -156,13 +171,62 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
             </div>
             
             <div className="mt-6 flex gap-3">
-                <button className="flex-1 bg-brand-accent/10 hover:bg-brand-accent/20 text-brand-accent font-bold py-2.5 rounded-xl transition-colors text-sm">
+                <button 
+                  onClick={() => toggleInfo(order._id, 'driver')}
+                  className="flex-1 bg-brand-accent/10 hover:bg-brand-accent/20 text-brand-accent font-bold py-2.5 rounded-xl transition-colors text-sm"
+                >
                     Track Driver
                 </button>
-                <button className="flex-1 bg-slate-50 hover:bg-slate-100 text-brand-primary font-bold py-2.5 rounded-xl transition-colors text-sm">
+                <button 
+                  onClick={() => toggleInfo(order._id, 'restaurant')}
+                  className="flex-1 bg-slate-50 hover:bg-slate-100 text-brand-primary font-bold py-2.5 rounded-xl transition-colors text-sm"
+                >
                     Contact Restaurant
                 </button>
             </div>
+            
+            <AnimatePresence>
+              {expandedInfo?.orderId === order._id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                  animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col gap-2">
+                    {expandedInfo.type === 'driver' ? (
+                      order.driverDetails?.name ? (
+                        <>
+                          <p className="font-bold text-brand-primary">Driver Details</p>
+                          <p className="text-sm text-slate-600">Name: <span className="font-semibold text-slate-800">{order.driverDetails.name}</span></p>
+                          <p className="text-sm text-slate-600">Phone: <span className="font-semibold text-slate-800">{order.driverDetails.phone}</span></p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-slate-600 font-medium flex items-center gap-2">
+                          <span className="text-xl">🚚</span> Driver will be assigned soon.
+                        </p>
+                      )
+                    ) : (
+                      order.businessId ? (
+                        <>
+                          <p className="font-bold text-brand-primary">{order.businessId.name}</p>
+                          <p className="text-sm text-slate-600 flex items-start gap-2">
+                              <MapPin size={16} className="mt-0.5 shrink-0 text-brand-accent" />
+                              <span>{order.businessId.address || 'Address unavailable'}</span>
+                          </p>
+                          <p className="text-sm text-slate-600 flex items-center gap-2">
+                              <Phone size={16} className="shrink-0 text-brand-accent" />
+                              <span>{order.businessId.contactPhone || 'Phone unavailable'}</span>
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-slate-500 font-medium">Restaurant details unavailable.</p>
+                      )
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         ))}
       </div>

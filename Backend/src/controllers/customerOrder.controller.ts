@@ -29,7 +29,7 @@ export const getPastOrders = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const populatedOrders = await Order.find({ 'customerDetails.phone': user.phone })
-        .populate('businessId', 'name logoUrl')
+        .populate('businessId', 'name logoUrl address contactPhone')
         .sort({ createdAt: -1 });
         
     res.json({ status: 'success', data: populatedOrders });
@@ -220,6 +220,7 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
 
     res.status(201).json({ status: 'success', data: savedOrder, message: 'Order placed successfully!' });
   } catch (error: any) {
+    console.error("Order placement error:", error);
     res.status(500).json({ status: 'error', message: error.message || 'Server error placing order' });
   }
 };
