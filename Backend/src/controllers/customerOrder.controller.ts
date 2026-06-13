@@ -3,6 +3,7 @@ import MenuItem from '../models/MenuItem';
 import Order from '../models/Order';
 import SystemSettings from '../models/SystemSettings';
 import Business from '../models/Business';
+import User from '../models/User';
 
 export const getPublicMenu = async (req: Request, res: Response) => {
   try {
@@ -19,7 +20,75 @@ export const getPublicMenu = async (req: Request, res: Response) => {
       items
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error fetching menu' });
+    res.status(500).json({ message: 'Server error placing order' });
+  }
+};
+
+export const getPastOrders = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const populatedOrders = await Order.find({ 'customerDetails.phone': user.phone })
+        .populate('businessId', 'name logoUrl')
+        .sort({ createdAt: -1 });
+        
+    res.json({ status: 'success', data: populatedOrders });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+export const getAddresses = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById((req as any).user._id);
+    res.json({ status: 'success', data: user?.savedAddresses || [] });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+export const saveAddress = async (req: Request, res: Response) => {
+  try {
+    const { label, street, city, state, zipCode, isDefault } = req.body;
+    const user = await User.findById((req as any).user._id);
+    
+    if (!user) {
+       res.status(404).json({ message: 'User not found' });
+       return;
+    }
+    
+    if (!user.savedAddresses) {
+        user.savedAddresses = [];
+    }
+    
+    if (isDefault) {
+        user.savedAddresses.forEach((addr: any) => addr.isDefault = false);
+    }
+    
+    user.savedAddresses.push({ label, street, city, state, zipCode, isDefault });
+    await user.save();
+    
+    res.json({ status: 'success', data: user.savedAddresses });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+export const deleteAddress = async (req: Request, res: Response) => {
+  try {
+    const { addressId } = req.params;
+    const user = await User.findById((req as any).user._id);
+    
+    if (!user || !user.savedAddresses) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+    }
+    
+    user.savedAddresses = user.savedAddresses.filter((addr: any) => addr._id?.toString() !== addressId);
+    await user.save();
+    
+    res.json({ status: 'success', data: user.savedAddresses });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 };
 

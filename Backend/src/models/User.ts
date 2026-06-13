@@ -24,6 +24,15 @@ export interface IUser extends Document {
   otpExpires?: Date;
   businessAdminCode?: string;
   isActive: boolean;
+  savedAddresses?: {
+    _id?: mongoose.Types.ObjectId;
+    label: string;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    isDefault: boolean;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +57,14 @@ const userSchema = new Schema<IUser>(
     otpExpires: { type: Date },
     businessAdminCode: { type: String, unique: true, sparse: true },
     isActive: { type: Boolean, default: true },
+    savedAddresses: [{
+      label: { type: String }, // 'Home', 'Work', 'Other'
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      zipCode: { type: String },
+      isDefault: { type: Boolean, default: false }
+    }]
   },
   { timestamps: true }
 );

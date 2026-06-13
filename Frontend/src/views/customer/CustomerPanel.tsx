@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Search, MapPin, Star, User, LogOut, UtensilsCrossed } from 'lucide-react';
+import { Search, MapPin, Star, User, LogOut, UtensilsCrossed, Clock } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { logout } from '../../store/slices/authSlice';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+import PastOrdersTab from './PastOrdersTab';
+import SavedAddressesTab from './SavedAddressesTab';
 
 interface Business {
   _id: string;
@@ -23,6 +27,7 @@ export const CustomerPanel: React.FC = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'home' | 'past_orders' | 'saved_addresses'>('home');
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== 'CUSTOMER') {
@@ -103,15 +108,24 @@ export const CustomerPanel: React.FC = () => {
                 </div>
                 
                 <nav className="space-y-2">
-                    <button className="w-full flex items-center gap-3 bg-orange-50 text-orange-600 font-bold px-4 py-3 rounded-xl transition-all">
+                    <button 
+                        onClick={() => setActiveTab('home')}
+                        className={`w-full flex items-center gap-3 font-bold px-4 py-3 rounded-xl transition-all ${activeTab === 'home' ? 'bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                    >
                         <Star size={20} />
                         Home / Order
                     </button>
-                    <button className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold px-4 py-3 rounded-xl transition-all">
-                        <UtensilsCrossed size={20} />
+                    <button 
+                        onClick={() => setActiveTab('past_orders')}
+                        className={`w-full flex items-center gap-3 font-bold px-4 py-3 rounded-xl transition-all ${activeTab === 'past_orders' ? 'bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                    >
+                        <Clock size={20} />
                         Past Orders
                     </button>
-                    <button className="w-full flex items-center gap-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-bold px-4 py-3 rounded-xl transition-all">
+                    <button 
+                        onClick={() => setActiveTab('saved_addresses')}
+                        className={`w-full flex items-center gap-3 font-bold px-4 py-3 rounded-xl transition-all ${activeTab === 'saved_addresses' ? 'bg-orange-50 text-orange-600' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                    >
                         <MapPin size={20} />
                         Saved Addresses
                     </button>
@@ -130,8 +144,10 @@ export const CustomerPanel: React.FC = () => {
             </div>
         </aside>
 
-        {/* CENTER CONTENT - Restaurants & Banner */}
+        {/* CENTER CONTENT */}
         <main className="flex-1 min-w-0">
+          {activeTab === 'home' && (
+            <>
             {/* Promotional Banner */}
             <div className="mb-8 rounded-[2rem] bg-slate-900 overflow-hidden relative shadow-lg h-64 flex items-center">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-500 opacity-90"></div>
@@ -226,6 +242,11 @@ export const CustomerPanel: React.FC = () => {
                 )}
               </div>
             </div>
+            </>
+          )}
+
+          {activeTab === 'past_orders' && <PastOrdersTab />}
+          {activeTab === 'saved_addresses' && <SavedAddressesTab />}
         </main>
 
         {/* RIGHT SIDEBAR - Active Orders & Offers */}

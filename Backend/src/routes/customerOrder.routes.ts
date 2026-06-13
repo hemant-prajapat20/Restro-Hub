@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPublicMenu, placeCustomerOrder } from '../controllers/customerOrder.controller';
+import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress } from '../controllers/customerOrder.controller';
 import { protect } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -7,7 +7,15 @@ const router = express.Router();
 // Public route to view menu
 router.get('/menu/:businessId', getPublicMenu);
 
-// Protected route to place order (customer must be logged in)
-router.post('/order/:businessId', protect, placeCustomerOrder);
+// Protected routes
+router.use(protect);
+
+router.post('/order/:businessId', placeCustomerOrder);
+
+// Customer Profile features
+router.get('/my-orders', getPastOrders);
+router.get('/addresses', getAddresses);
+router.post('/addresses', saveAddress);
+router.delete('/addresses/:addressId', deleteAddress);
 
 export default router;
