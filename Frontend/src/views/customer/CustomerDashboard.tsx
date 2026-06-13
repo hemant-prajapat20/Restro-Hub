@@ -59,10 +59,15 @@ export const CustomerDashboard: React.FC = () => {
   
   // Initialize selected address once addresses are loaded
   React.useEffect(() => {
+    if (!currentUser || currentUser.role !== 'CUSTOMER') {
+      navigate('/login', { replace: true });
+      return;
+    }
+
     if (defaultAddress && !selectedAddressId) {
       setSelectedAddressId(defaultAddress._id);
     }
-  }, [defaultAddress, selectedAddressId]);
+  }, [defaultAddress, selectedAddressId, currentUser, navigate]);
 
   const { data: notificationsResponse, refetch: refetchNotifications } = useQuery({
     queryKey: ['customerNotifications'],
@@ -117,6 +122,7 @@ export const CustomerDashboard: React.FC = () => {
       toast.success('Order placed successfully!');
       dispatch(clearCart());
       setShowCart(false);
+      navigate('/customer/dashboard?tab=active_orders');
     },
     onError: (error: any) => {
       if (error.response?.status === 401) {

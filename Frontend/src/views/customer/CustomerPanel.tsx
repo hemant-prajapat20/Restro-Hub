@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { io } from 'socket.io-client';
 import { useQuery } from '@tanstack/react-query';
@@ -34,7 +34,17 @@ export const CustomerPanel: React.FC = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'home' | 'active_orders' | 'past_orders' | 'saved_addresses'>('home');
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const tabFromUrl = queryParams.get('tab') as any;
+
+  const [activeTab, setActiveTab] = useState<'home' | 'active_orders' | 'past_orders' | 'saved_addresses'>(tabFromUrl || 'home');
+
+  useEffect(() => {
+    if (tabFromUrl && ['home', 'active_orders', 'past_orders', 'saved_addresses'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   const { data: addressesResponse } = useQuery({
     queryKey: ['customerAddresses'],
@@ -60,10 +70,10 @@ export const CustomerPanel: React.FC = () => {
   const defaultAddress = addressesResponse?.data?.find((a: any) => a.isDefault) || addressesResponse?.data?.[0];
 
   useEffect(() => {
-    if (!currentUser || currentUser.role !== 'CUSTOMER') {
-        navigate('/customer-login');
+      if (!currentUser || currentUser.role !== 'CUSTOMER') {
+        navigate('/login', { replace: true });
         return;
-    }
+      }
 
     const fetchBusinesses = async () => {
       try {

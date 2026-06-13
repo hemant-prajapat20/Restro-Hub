@@ -26,8 +26,9 @@ import {
   Zap
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { io } from 'socket.io-client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 
 const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => (
@@ -53,6 +54,17 @@ const StatCard = ({ title, value, subValue, trend, icon: Icon, color }: any) => 
 
 export const Dashboard: React.FC = () => {
   const [graphPeriod, setGraphPeriod] = React.useState<'Today' | 'This Week'>('Today');
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('newOrder', () => {
+      queryClient.invalidateQueries({ queryKey: ['businessAnalytics'] });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient]);
 
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['businessAnalytics'],

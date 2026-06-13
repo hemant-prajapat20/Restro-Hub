@@ -13,7 +13,8 @@ import {
   Printer, Send, X, Receipt, AlertCircle, PackageOpen
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { io } from 'socket.io-client';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import api from '../../utils/api';
 import { FilterBar } from '../../components/FilterBar';
@@ -25,6 +26,17 @@ export const Reports: React.FC = () => {
   const [month, setMonth] = useState('2026-04');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('newOrder', () => {
+      queryClient.invalidateQueries({ queryKey: ['businessReports', month] });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient, month]);
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ['businessReports', month],

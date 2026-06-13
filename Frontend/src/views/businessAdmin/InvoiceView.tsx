@@ -134,7 +134,9 @@ export const InvoiceView: React.FC = () => {
             </div>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-[10px] print:text-[8px] font-bold uppercase tracking-[0.2em] text-orange-200 mb-1">Tax Invoice</p>
+            <p className="text-[10px] print:text-[8px] font-bold uppercase tracking-[0.2em] text-orange-200 mb-1">
+              Tax Invoice {invoice.source === 'Online' && '• ONLINE ORDER'}
+            </p>
             <h2 className="text-2xl print:text-xl font-black tracking-wider">INV/2026/{invoiceId}</h2>
             <p className="text-[10px] print:text-[8px] font-bold tracking-[0.2em] text-orange-100 uppercase mt-2">Dated: {dateFormatted}</p>
           </div>

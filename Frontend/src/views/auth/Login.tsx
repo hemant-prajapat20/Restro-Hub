@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials } from '../../store/slices/authSlice';
+import { RootState } from '../../store';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +21,25 @@ export const Login: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'CUSTOMER') {
+        const lastBusinessId = localStorage.getItem('lastBusinessId');
+        if (lastBusinessId) {
+            navigate(`/customer/order/${lastBusinessId}`, { replace: true });
+        } else {
+            navigate('/customer/dashboard', { replace: true });
+        }
+      } else if (user.role === 'SUPER_ADMIN') {
+        navigate('/super-admin', { replace: true });
+      } else {
+        navigate('/admin/dashboard', { replace: true });
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

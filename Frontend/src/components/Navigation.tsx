@@ -21,7 +21,8 @@ import {
   CreditCard,
   Menu,
   X,
-  FileText
+  FileText,
+  Store
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -45,10 +46,10 @@ interface SidebarProps {
 
 const businessNavItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'pos', label: 'POS Billing', icon: UtensilsCrossed },
-  { id: 'restro', label: 'Restro Signature', icon: Crown },
-  { id: 'bar', label: 'Bar Lounge', icon: Wine },
-  { id: 'cafe', label: 'Cafe & Patisserie', icon: Coffee },
+  { id: 'pos', label: 'Point of Sale', icon: Store },
+  { id: 'restro', label: 'Restro Signature', icon: UtensilsCrossed, platform: 'Restro' },
+  { id: 'bar', label: 'Bar Lounge', icon: Wine, platform: 'Bar' },
+  { id: 'cafe', label: 'Cafe & Patisserie', icon: Coffee, platform: 'Cafe' },
   { id: 'menu', label: 'Menu Catalog', icon: Layers },
   { id: 'tables', label: 'Tables', icon: Table2 },
   { id: 'kds', label: 'Kitchen (KDS)', icon: ChefHat },
@@ -76,7 +77,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
   const user = useSelector((state: RootState) => state.auth.user);
   
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-  const navItems = isSuperAdmin ? superAdminNavItems : businessNavItems;
+  const userPlatforms = user?.businessData?.platforms || [];
+  
+  const filteredBusinessNavItems = businessNavItems.filter(item => {
+    if (item.platform) {
+      return userPlatforms.includes(item.platform);
+    }
+    return true;
+  });
+
+  const navItems = isSuperAdmin ? superAdminNavItems : filteredBusinessNavItems;
   const basePath = isSuperAdmin ? '/super-admin' : '/admin';
   const currentPath = location.pathname.split('/').pop();
 

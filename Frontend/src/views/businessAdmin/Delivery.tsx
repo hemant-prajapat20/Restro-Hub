@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { io } from 'socket.io-client';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -40,10 +41,29 @@ export const Delivery: React.FC = () => {
         items: order.items.map((i: any) => `${i.quantity}x ${i.name}`).join(', '),
         total: `₹${order.total}`,
         time: new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: new Date(order.createdAt).toLocaleDateString(),
+        customerName: order.customerDetails?.name || 'Guest',
+        customerPhone: order.customerDetails?.phone || 'N/A',
+        paymentMethod: order.paymentMethod || 'Cash',
         status: order.status
       }));
     }
   });
+
+  React.useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    
+    socket.on('newOrder', (order: any) => {
+      if (order.type === 'Delivery') {
+        queryClient.invalidateQueries({ queryKey: ['deliveryOrders'] });
+        toast.success(`New Delivery Order Received!`);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient]);
 
   const createDeliveryOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
@@ -216,9 +236,19 @@ export const Delivery: React.FC = () => {
                      <div className="flex-1">
                         <div className="flex items-center gap-3">
                            <h6 className="font-semibold text-slate-900">{order.id}</h6>
-                           <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{order.time}</span>
+                           <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{order.time} • {order.date}</span>
+                           <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                             order.paymentMethod === 'Online' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
+                           }`}>{order.paymentMethod}</span>
                         </div>
-                        <p className="text-sm font-medium text-slate-500 mt-1">{order.items}</p>
+                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                           <p className="text-sm font-medium text-slate-500">{order.items}</p>
+                           {order.source === 'Online' && (
+                             <p className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                               {order.customerName} ({order.customerPhone})
+                             </p>
+                           )}
+                        </div>
                      </div>
                      </div>
                      <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, CheckCircle, Info, AlertTriangle, XCircle, Search } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { io } from 'socket.io-client';
 import api from '../../utils/api';
 
 export const MessageCenter: React.FC = () => {
@@ -23,6 +24,16 @@ export const MessageCenter: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['businessMessages'] });
     }
   });
+
+  React.useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('newMessage', () => {
+      queryClient.invalidateQueries({ queryKey: ['businessMessages'] });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient]);
 
   const handleDoubleClick = (messageId: string, isRead: boolean) => {
     if (!isRead) {

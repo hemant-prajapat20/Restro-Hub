@@ -10,7 +10,8 @@ import {
   Download
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { io } from 'socket.io-client';
 import api from '../../utils/api';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import toast from 'react-hot-toast';
@@ -18,6 +19,17 @@ import toast from 'react-hot-toast';
 export const Transactions: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('newOrder', () => {
+      queryClient.invalidateQueries({ queryKey: ['businessReportsAll'] });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [queryClient]);
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ['businessReportsAll'],
@@ -97,7 +109,11 @@ export const Transactions: React.FC = () => {
                            <p className="text-[10px] font-semibold text-slate-400">{invoice.customerDetails?.phone || 'N/A'}</p>
                         </td>
                         <td className="px-6 py-4 text-center">
-                           <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md text-[10px] font-bold uppercase tracking-widest">{invoice.type}</span>
+                           <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
+                             invoice.source === 'Online' ? 'bg-indigo-50 text-indigo-600' : 'bg-blue-50 text-blue-600'
+                           }`}>
+                             {invoice.source === 'Online' ? 'ONLINE ORDER' : invoice.type}
+                           </span>
                         </td>
                         <td className="px-6 py-4 text-center font-bold text-sm text-slate-900">₹{invoice.amount.toLocaleString()}</td>
                         <td className="px-6 py-4 text-center">
