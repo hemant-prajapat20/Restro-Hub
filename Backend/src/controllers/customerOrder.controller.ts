@@ -92,10 +92,39 @@ export const deleteAddress = async (req: Request, res: Response) => {
   }
 };
 
+export const updateAddress = async (req: Request, res: Response) => {
+  try {
+    const { addressId } = req.params;
+    const { label, street, city, state, zipCode, isDefault } = req.body;
+    const user = await User.findById((req as any).user._id);
+    
+    if (!user || !user.savedAddresses) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+    }
+    
+    if (isDefault) {
+        user.savedAddresses.forEach((addr: any) => addr.isDefault = false);
+    }
+    
+    const addressIndex = user.savedAddresses.findIndex((addr: any) => addr._id?.toString() === addressId);
+    if (addressIndex !== -1) {
+       user.savedAddresses[addressIndex] = { ...user.savedAddresses[addressIndex], label, street, city, state, zipCode, isDefault } as any;
+    }
+    
+    await user.save();
+    
+    res.json({ status: 'success', data: user.savedAddresses });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+
 export const placeCustomerOrder = async (req: Request, res: Response) => {
   try {
     const { businessId } = req.params;
-    const { items, subtotal, tax, total, customerDetails } = req.body;
+    const { items, subtotal, tax, total, customerDetails, paymentMethod } = req.body;
 
     // customer details might include name and phone.
     // If the user is logged in, we have req.user from the protect middleware
@@ -115,7 +144,7 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
       subtotal,
       tax,
       total,
-      paymentMethod: 'Cash', // default to Cash on delivery for now
+      paymentMethod: paymentMethod || 'Cash',
       source: 'Online',
       customerDetails: finalCustomerDetails,
       status: 'Pending'
@@ -123,11 +152,24 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
 
     const savedOrder = await newOrder.save();
 
+    // Create a Message for the Business Admin
+    const Message = require('../models/Message').default;
+    const newNotif = new Message({
+      businessId,
+      action: 'New Online Order',
+      message: `New online order received from ${finalCustomerDetails.name} for ₹${total}.`,
+      type: 'success'
+    });
+    const savedNotif = await newNotif.save();
+
     // Emit socket event for KDS and Dashboard
     const settings = await SystemSettings.findOne();
     const io = req.app.get('io');
-    if (io && settings?.kdsWebhook !== false) {
-      io.emit('newOrder', savedOrder);
+    if (io) {
+      if (settings?.kdsWebhook !== false) {
+        io.emit('newOrder', savedOrder);
+      }
+      io.emit('newMessage', savedNotif);
     }
 
     res.status(201).json({ status: 'success', data: savedOrder, message: 'Order placed successfully!' });

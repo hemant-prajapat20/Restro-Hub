@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { Package, Clock, MapPin, Search, Star, ShoppingBag, Plus, Minus, User, ChevronDown, Mail, Phone, LogOut } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { Package, Clock, MapPin, Search, Star, ShoppingBag, Plus, Minus, User, ChevronDown, Mail, Phone, LogOut, ArrowLeft, ArrowRight } from 'lucide-react';
 import { logout } from '../../store/slices/authSlice';
 import toast from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import api from '../../utils/api';
+import { initializeRazorpayPayment } from '../../utils/razorpay';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
+import { addToCart as reduxAddToCart, removeFromCart as reduxRemoveFromCart, clearCart } from '../../store/slices/cartSlice';
 
 interface MenuItem {
   _id: string;
@@ -33,8 +35,11 @@ export const CustomerDashboard: React.FC = () => {
     navigate('/customer-login');
   };
   const [searchQuery, setSearchQuery] = useState('');
-  const [cart, setCart] = useState<{item: MenuItem, quantity: number}[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'Online'>('Cash');
+  const cartState = useSelector((state: RootState) => state.cart);
+  const cart = cartState.items;
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
 
   // Check Auth
   const currentUser = useSelector((state: RootState) => state.auth.user);
@@ -46,6 +51,13 @@ export const CustomerDashboard: React.FC = () => {
   });
   
   const defaultAddress = addressesResponse?.data?.find((a: any) => a.isDefault) || addressesResponse?.data?.[0];
+  
+  // Initialize selected address once addresses are loaded
+  React.useEffect(() => {
+    if (defaultAddress && !selectedAddressId) {
+      setSelectedAddressId(defaultAddress._id);
+    }
+  }, [defaultAddress, selectedAddressId]);
 
   const token = useSelector((state: RootState) => state.auth.token);
 
@@ -69,7 +81,7 @@ export const CustomerDashboard: React.FC = () => {
     },
     onSuccess: () => {
       toast.success('Order placed successfully!');
-      setCart([]);
+      dispatch(clearCart());
       setShowCart(false);
     },
     onError: (error: any) => {
@@ -98,28 +110,21 @@ export const CustomerDashboard: React.FC = () => {
   });
 
   const addToCart = (item: MenuItem) => {
-    setCart(prev => {
-      const existing = prev.find(p => p.item._id === item._id);
-      if (existing) {
-        return prev.map(p => p.item._id === item._id ? { ...p, quantity: p.quantity + 1 } : p);
+    if (cartState.businessId && cartState.businessId !== businessId && cart.length > 0) {
+      if (!window.confirm(`Your cart contains items from ${cartState.businessName}. Do you want to clear the cart and add items from this restaurant?`)) {
+        return;
       }
-      return [...prev, { item, quantity: 1 }];
-    });
+    }
+    dispatch(reduxAddToCart({ businessId: businessId!, businessName: business.name, item }));
     toast.success(`Added ${item.name} to cart`, { icon: '🍽️', position: 'bottom-center' });
   };
 
   const removeFromCart = (itemId: string) => {
-    setCart(prev => {
-      const existing = prev.find(p => p.item._id === itemId);
-      if (existing && existing.quantity > 1) {
-        return prev.map(p => p.item._id === itemId ? { ...p, quantity: p.quantity - 1 } : p);
-      }
-      return prev.filter(p => p.item._id !== itemId);
-    });
+    dispatch(reduxRemoveFromCart({ itemId }));
   };
 
   const cartTotal = cart.reduce((sum, {item, quantity}) => sum + (item.price * quantity), 0);
-  const cartTax = cart.reduce((sum, {item, quantity}) => sum + (item.price * item.taxRate * quantity), 0);
+  const cartTax = cart.reduce((sum, {item, quantity}) => sum + (item.price * (item.taxRate / 100) * quantity), 0);
   const finalTotal = cartTotal + cartTax;
 
   const handleCheckout = () => {
@@ -131,7 +136,9 @@ export const CustomerDashboard: React.FC = () => {
     
     if (cart.length === 0) return;
 
-    placeOrderMutation.mutate({
+    const addressToUse = addressesResponse?.data?.find((a: any) => a._id === selectedAddressId) || defaultAddress;
+
+    const placeOrderPayload = {
       items: cart.map(c => ({
         menuItem: c.item._id,
         name: c.item.name,
@@ -142,7 +149,33 @@ export const CustomerDashboard: React.FC = () => {
       subtotal: cartTotal,
       tax: cartTax,
       total: finalTotal,
-    });
+      paymentMethod,
+      customerDetails: {
+        address: addressToUse?.street,
+        city: addressToUse?.city,
+        state: addressToUse?.state,
+        zipCode: addressToUse?.zipCode,
+      }
+    };
+
+    if (paymentMethod === 'Online') {
+      initializeRazorpayPayment({
+        amount: finalTotal,
+        receiptId: `receipt_${Date.now()}`,
+        customerName: currentUser.firstName + ' ' + currentUser.lastName,
+        customerEmail: currentUser.email,
+        customerContact: currentUser.phone,
+        onSuccess: (paymentId) => {
+          toast.success(`Payment Successful! ID: ${paymentId}`);
+          placeOrderMutation.mutate(placeOrderPayload);
+        },
+        onFailure: (error) => {
+          toast.error('Payment Failed: ' + (error?.description || 'Unknown error'));
+        }
+      });
+    } else {
+      placeOrderMutation.mutate(placeOrderPayload);
+    }
   };
 
   return (
@@ -150,20 +183,29 @@ export const CustomerDashboard: React.FC = () => {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-sm">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
-              <ShoppingBag className="text-white" size={20} />
-            </div>
-            <div>
-              <h1 className="font-bold text-brand-primary leading-tight">
-                {defaultAddress ? defaultAddress.label : 'Home'}
-              </h1>
-              <p className="text-[10px] text-slate-500 flex items-center gap-1 font-medium">
-                <MapPin size={10} className="text-brand-accent"/> 
-                <span className="truncate max-w-[200px]">
-                  Delivering to: {defaultAddress ? `${defaultAddress.street}, ${defaultAddress.city}` : 'Current Location'}
-                </span>
-              </p>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('/customer/dashboard')}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors -ml-2"
+              aria-label="Go back"
+            >
+              <ArrowLeft size={20} className="text-slate-600" />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/20">
+                <ShoppingBag className="text-white" size={20} />
+              </div>
+              <div>
+                <h1 className="font-bold text-brand-primary leading-tight">
+                  {defaultAddress ? defaultAddress.label : 'Home'}
+                </h1>
+                <p className="text-[10px] text-slate-500 flex items-center gap-1 font-medium">
+                  <MapPin size={10} className="text-brand-accent"/> 
+                  <span className="truncate max-w-[200px]">
+                    Delivering to: {defaultAddress ? `${defaultAddress.street}, ${defaultAddress.city}` : 'Current Location'}
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
           
@@ -432,6 +474,48 @@ export const CustomerDashboard: React.FC = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-500 font-medium flex items-center gap-1">Taxes & Charges <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400">i</span></span>
                       <span className="text-slate-700 font-bold">₹{Math.round(cartTax)}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Delivery & Payment Settings */}
+                  <div className="mt-6 pt-6 border-t border-slate-100 space-y-6">
+                    <div>
+                      <h5 className="font-bold text-brand-primary text-sm mb-3">Delivery Address</h5>
+                      {addressesResponse?.data?.length > 0 ? (
+                        <select 
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent outline-none"
+                          value={selectedAddressId}
+                          onChange={(e) => setSelectedAddressId(e.target.value)}
+                        >
+                          {addressesResponse.data.map((addr: any) => (
+                            <option key={addr._id} value={addr._id}>
+                              {addr.street}, {addr.city} {addr.isDefault ? '(Default)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="bg-orange-50 text-orange-600 text-sm p-3 rounded-xl font-medium">
+                          No saved addresses found. Please add an address in your profile.
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-bold text-brand-primary text-sm mb-3">Payment Method</h5>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button 
+                          onClick={() => setPaymentMethod('Cash')}
+                          className={`py-3 px-4 rounded-xl border text-sm font-bold transition-all ${paymentMethod === 'Cash' ? 'bg-brand-accent/10 border-brand-accent text-brand-accent' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                        >
+                          Cash on Delivery
+                        </button>
+                        <button 
+                          onClick={() => setPaymentMethod('Online')}
+                          className={`py-3 px-4 rounded-xl border text-sm font-bold transition-all ${paymentMethod === 'Online' ? 'bg-brand-accent/10 border-brand-accent text-brand-accent' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                        >
+                          Pay Online
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

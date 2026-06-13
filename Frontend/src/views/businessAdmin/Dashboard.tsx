@@ -267,8 +267,8 @@ export const Dashboard: React.FC = () => {
             </div>
             <button className="text-xs font-semibold text-brand-primary uppercase tracking-widest hover:underline" onClick={() => window.location.href = '/admin/transactions'}>View All</button>
           </div>
-          <div className="overflow-x-auto custom-scrollbar pb-2">
-            <table className="w-full text-left">
+          <div className="overflow-x-auto custom-scrollbar w-full pb-2">
+            <table className="w-full min-w-[500px] text-left">
                <thead className="bg-slate-50">
                   <tr>
                      <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID</th>

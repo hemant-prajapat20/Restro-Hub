@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress } from '../controllers/customerOrder.controller';
+import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress, updateAddress } from '../controllers/customerOrder.controller';
 import { protect } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -16,6 +16,7 @@ router.post('/order/:businessId', placeCustomerOrder);
 router.get('/my-orders', getPastOrders);
 router.get('/addresses', getAddresses);
 router.post('/addresses', saveAddress);
+router.put('/addresses/:addressId', updateAddress);
 router.delete('/addresses/:addressId', deleteAddress);
 
 export default router;

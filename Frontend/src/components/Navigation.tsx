@@ -27,6 +27,7 @@ import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { RootState } from '../store';
@@ -211,6 +212,13 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     socket.on('newMessage', (newNotif) => {
       // Add the new notification to the top of the list
       setNotifications(prev => [newNotif, ...prev]);
+      
+      // Show toast notification
+      if (newNotif.type === 'success') {
+        toast.success(newNotif.message, { duration: 5000 });
+      } else {
+        toast(newNotif.message, { icon: '🔔' });
+      }
     });
 
     return () => {

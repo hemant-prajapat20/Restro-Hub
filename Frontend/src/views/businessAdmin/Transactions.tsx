@@ -68,8 +68,8 @@ export const Transactions: React.FC = () => {
                 />
              </div>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-             <table className="w-full text-left">
+          <div className="flex-1 overflow-auto custom-scrollbar">
+             <table className="w-full min-w-[1000px] text-left">
                 <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm">
                    <tr>
                       <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID & Date</th>

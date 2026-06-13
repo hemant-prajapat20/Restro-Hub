@@ -190,8 +190,8 @@ export const Reports: React.FC = () => {
                    />
                 </div>
              </div>
-             <div className="overflow-x-auto">
-                <table className="w-full text-left">
+             <div className="overflow-x-auto w-full custom-scrollbar">
+                <table className="w-full min-w-[800px] text-left">
                    <thead className="bg-slate-50">
                       <tr>
                          <th className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID</th>

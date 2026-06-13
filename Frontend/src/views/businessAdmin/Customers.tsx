@@ -111,8 +111,8 @@ export const Customers: React.FC = () => {
           </button>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto w-full custom-scrollbar">
+          <table className="w-full min-w-[1000px]">
             <thead className="bg-slate-50/50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer</th>

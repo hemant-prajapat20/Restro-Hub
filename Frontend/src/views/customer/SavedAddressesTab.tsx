@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { MapPin, Plus, Trash2, Home, Briefcase, Map } from 'lucide-react';
+import { MapPin, Plus, Trash2, Home, Briefcase, Map, Edit2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Address {
@@ -18,6 +18,7 @@ const SavedAddressesTab = () => {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newAddress, setNewAddress] = useState({
     label: 'Home',
     street: '',
@@ -45,14 +46,33 @@ const SavedAddressesTab = () => {
   const handleSaveAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/customer-orders/addresses', newAddress);
-      toast.success('Address saved successfully');
+      if (editingId) {
+        await api.put(`/customer-orders/addresses/${editingId}`, newAddress);
+        toast.success('Address updated successfully');
+      } else {
+        await api.post('/customer-orders/addresses', newAddress);
+        toast.success('Address saved successfully');
+      }
       setShowAddForm(false);
+      setEditingId(null);
       setNewAddress({ label: 'Home', street: '', city: '', state: '', zipCode: '', isDefault: false });
       fetchAddresses();
     } catch (error) {
-      toast.error('Failed to save address');
+      toast.error(editingId ? 'Failed to update address' : 'Failed to save address');
     }
+  };
+
+  const handleEdit = (address: Address) => {
+    setNewAddress({
+      label: address.label,
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode,
+      isDefault: address.isDefault
+    });
+    setEditingId(address._id);
+    setShowAddForm(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -91,7 +111,11 @@ const SavedAddressesTab = () => {
         
         {!showAddForm && (
           <button 
-            onClick={() => setShowAddForm(true)}
+            onClick={() => {
+                setEditingId(null);
+                setNewAddress({ label: 'Home', street: '', city: '', state: '', zipCode: '', isDefault: false });
+                setShowAddForm(true);
+            }}
             className="flex items-center gap-2 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 font-bold px-4 py-2 rounded-xl transition-all"
           >
             <Plus size={18} />
@@ -102,7 +126,7 @@ const SavedAddressesTab = () => {
       
       {showAddForm && (
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-brand-accent/30 mb-8">
-          <h3 className="font-extrabold text-brand-primary mb-4">Add a new delivery address</h3>
+          <h3 className="font-extrabold text-brand-primary mb-4">{editingId ? 'Edit delivery address' : 'Add a new delivery address'}</h3>
           <form onSubmit={handleSaveAddress} className="space-y-4">
             
             <div className="flex gap-4 mb-2">
@@ -145,9 +169,12 @@ const SavedAddressesTab = () => {
 
             <div className="flex gap-4 mt-6">
                 <button type="submit" className="flex-1 bg-brand-accent hover:bg-brand-accent text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand-accent/20">
-                    Save Address
+                    {editingId ? 'Update Address' : 'Save Address'}
                 </button>
-                <button type="button" onClick={() => setShowAddForm(false)} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">
+                <button type="button" onClick={() => {
+                    setShowAddForm(false);
+                    setEditingId(null);
+                }} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">
                     Cancel
                 </button>
             </div>
@@ -173,9 +200,14 @@ const SavedAddressesTab = () => {
                      <h3 className="font-black text-brand-primary text-lg flex items-center justify-between">
                          {address.label}
                          
-                         <button onClick={() => handleDelete(address._id)} className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                             <Trash2 size={18} />
-                         </button>
+                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button onClick={() => handleEdit(address)} className="text-slate-300 hover:text-blue-500 transition-colors p-1 bg-slate-50 hover:bg-blue-50 rounded-lg">
+                                 <Edit2 size={16} />
+                             </button>
+                             <button onClick={() => handleDelete(address._id)} className="text-slate-300 hover:text-red-500 transition-colors p-1 bg-slate-50 hover:bg-red-50 rounded-lg">
+                                 <Trash2 size={16} />
+                             </button>
+                         </div>
                      </h3>
                      <p className="text-slate-500 font-medium text-sm mt-1 leading-relaxed">
                          {address.street}<br/>
