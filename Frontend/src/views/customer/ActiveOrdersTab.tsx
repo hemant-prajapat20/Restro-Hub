@@ -21,6 +21,12 @@ interface Order {
     name: string;
     phone: string;
   };
+  paymentMethod?: string;
+  customerDetails?: {
+    name: string;
+    phone: string;
+    address?: string;
+  };
 }
 
 interface Props {
@@ -56,6 +62,17 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
       toast.error('Failed to load active orders');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMarkAsReceived = async (orderId: string) => {
+    if (!window.confirm('Are you sure you have received this order?')) return;
+    try {
+      await api.put(`/customer-orders/order/${orderId}/received`);
+      toast.success('Order marked as received!');
+      fetchActiveOrders(); // refresh the list
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update order status');
     }
   };
 
@@ -162,6 +179,40 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
                 </div>
             </div>
 
+            {/* Order Details */}
+            <div className="bg-slate-50/50 rounded-xl p-4 mb-4 border border-slate-100 space-y-3">
+               <div className="flex justify-between items-start">
+                   <div>
+                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Order ID</p>
+                       <p className="text-sm font-black text-brand-primary">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                   </div>
+                   <div className="text-right">
+                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment</p>
+                       <p className="text-sm font-bold text-slate-700">{order.paymentMethod || 'N/A'}</p>
+                   </div>
+               </div>
+               
+               {order.customerDetails && (
+                 <div className="pt-3 border-t border-slate-200/60">
+                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Delivery Details</p>
+                   <div className="flex items-start gap-2 mb-1.5">
+                       <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                           <span className="text-[10px]">👤</span>
+                       </div>
+                       <p className="text-sm font-semibold text-slate-700">{order.customerDetails.name} <span className="text-slate-400 font-normal">({order.customerDetails.phone})</span></p>
+                   </div>
+                   {order.customerDetails.address && (
+                     <div className="flex items-start gap-2">
+                         <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                             <MapPin size={10} className="text-brand-accent" />
+                         </div>
+                         <p className="text-sm text-slate-600 leading-tight">{order.customerDetails.address}</p>
+                     </div>
+                   )}
+                 </div>
+               )}
+            </div>
+
             <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-2 text-sm text-slate-600 font-medium">
               {order.items.map((item: any, idx: number) => (
                 <span key={idx} className="bg-brand-bg px-3 py-1.5 rounded-lg border border-slate-100">
@@ -183,6 +234,15 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
                 >
                     Contact Restaurant
                 </button>
+            </div>
+            
+            <div className="mt-3">
+               <button 
+                  onClick={() => handleMarkAsReceived(order._id)}
+                  className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white font-bold py-2.5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20"
+               >
+                  <span>✅</span> Mark as Received
+               </button>
             </div>
             
             <AnimatePresence>

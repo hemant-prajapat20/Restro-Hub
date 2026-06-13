@@ -150,7 +150,7 @@ export const InvoiceView: React.FC = () => {
               <h3 className="text-lg font-bold text-slate-900 mb-3">{invoice.customerDetails?.name || 'Walk-in Customer'}</h3>
               <div className="space-y-2 text-xs font-bold text-slate-500">
                 <p className="flex items-center gap-2"><Phone size={14} className="text-[#C5A059]"/> {invoice.customerDetails?.phone || 'N/A'}</p>
-                <p className="flex items-center gap-2"><MapPin size={14} className="text-[#C5A059]"/> N/A</p>
+                <p className="flex items-start gap-2"><MapPin size={14} className="text-[#C5A059] shrink-0 mt-0.5"/> <span className="leading-tight">{invoice.customerDetails?.address || 'N/A'}</span></p>
               </div>
             </div>
             <div className="bg-[#f8f9fc] rounded-2xl p-6 border border-slate-100">

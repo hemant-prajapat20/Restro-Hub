@@ -247,3 +247,44 @@ export const logPaymentFailed = async (req: Request, res: Response) => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
+export const markOrderAsReceived = async (req: Request, res: Response) => {
+  try {
+    const { orderId } = req.params;
+    const user = (req as any).user;
+
+    const order = await Order.findOne({ _id: orderId, 'customerDetails.phone': user.phone });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    order.status = 'Completed';
+    await order.save();
+
+    const notif = await CustomerNotification.create({
+      customerId: user._id,
+      title: 'Order Delivered Successfully',
+      message: `Your order #${order._id.toString().substring(order._id.toString().length - 8).toUpperCase()} has been delivered successfully. Enjoy your food!`,
+      type: 'order'
+    });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('newCustomerNotification', notif);
+      
+      const Message = require('../models/Message').default;
+      const businessNotif = new Message({
+        businessId: order.businessId,
+        action: 'Order Completed',
+        message: `Order #${order._id.toString().substring(order._id.toString().length - 8).toUpperCase()} was marked as received by the customer.`,
+        type: 'success'
+      });
+      await businessNotif.save();
+      io.emit('newMessage', businessNotif);
+    }
+
+    res.json({ status: 'success', data: order, message: 'Order marked as received' });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};

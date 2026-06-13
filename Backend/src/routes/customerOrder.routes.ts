@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress, updateAddress, getNotifications, markNotificationAsRead, markAllNotificationsAsRead, logPaymentFailed } from '../controllers/customerOrder.controller';
+import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress, updateAddress, getNotifications, markNotificationAsRead, markAllNotificationsAsRead, logPaymentFailed, markOrderAsReceived } from '../controllers/customerOrder.controller';
 import { protect } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/menu/:businessId', getPublicMenu);
 router.use(protect);
 
 router.post('/order/:businessId', placeCustomerOrder);
+router.put('/order/:orderId/received', markOrderAsReceived);
 router.post('/payment-failed', logPaymentFailed);
 
 // Customer Profile features

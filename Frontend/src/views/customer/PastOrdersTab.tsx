@@ -15,6 +15,12 @@ interface Order {
   status: string;
   createdAt: string;
   items: any[];
+  paymentMethod?: string;
+  customerDetails?: {
+    name: string;
+    phone: string;
+    address?: string;
+  };
 }
 
 const PastOrdersTab = () => {
@@ -28,7 +34,10 @@ const PastOrdersTab = () => {
   const fetchOrders = async () => {
     try {
       const response = await api.get('/customer-orders/my-orders');
-      setOrders(response.data.data);
+      const pastOrders = response.data.data.filter((order: Order) => 
+        ['Completed', 'Cancelled', 'Delivered'].includes(order.status)
+      );
+      setOrders(pastOrders);
     } catch (error) {
       toast.error('Failed to load past orders');
     } finally {
@@ -107,8 +116,42 @@ const PastOrdersTab = () => {
                 <p className="font-black text-brand-primary text-xl">₹{order.total.toFixed(2)}</p>
               </div>
             </div>
+
+            {/* Order Details */}
+            <div className="mt-6 bg-slate-50/50 rounded-xl p-4 border border-slate-100 space-y-3">
+               <div className="flex justify-between items-start">
+                   <div>
+                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Order ID</p>
+                       <p className="text-sm font-black text-brand-primary">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                   </div>
+                   <div className="text-right">
+                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment</p>
+                       <p className="text-sm font-bold text-slate-700">{order.paymentMethod || 'N/A'}</p>
+                   </div>
+               </div>
+               
+               {order.customerDetails && (
+                 <div className="pt-3 border-t border-slate-200/60">
+                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Delivery Details</p>
+                   <div className="flex items-start gap-2 mb-1.5">
+                       <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                           <span className="text-[10px]">👤</span>
+                       </div>
+                       <p className="text-sm font-semibold text-slate-700">{order.customerDetails.name} <span className="text-slate-400 font-normal">({order.customerDetails.phone})</span></p>
+                   </div>
+                   {order.customerDetails.address && (
+                     <div className="flex items-start gap-2">
+                         <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                             <MapPin size={10} className="text-brand-accent" />
+                         </div>
+                         <p className="text-sm text-slate-600 leading-tight">{order.customerDetails.address}</p>
+                     </div>
+                   )}
+                 </div>
+               )}
+            </div>
             
-            <div className="mt-6 pt-6 border-t border-slate-100">
+            <div className="mt-4 pt-4 border-t border-slate-100">
                <p className="text-sm text-slate-600 font-medium truncate">
                    {order.items.map(item => `${item.quantity} x ${item.name}`).join(', ')}
                </p>
