@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { io } from 'socket.io-client';
 import { useQuery } from '@tanstack/react-query';
-import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag, Bell, Calendar, Info } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { logout } from '../../store/slices/authSlice';
@@ -31,6 +32,7 @@ export const CustomerPanel: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'active_orders' | 'past_orders' | 'saved_addresses'>('home');
 
@@ -40,6 +42,21 @@ export const CustomerPanel: React.FC = () => {
     enabled: !!currentUser
   });
   
+  const { data: notificationsResponse, refetch: refetchNotifications } = useQuery({
+    queryKey: ['customerNotifications'],
+    queryFn: () => api.get('/customer-orders/notifications').then(res => res.data),
+    enabled: !!currentUser,
+    refetchInterval: 30000 // Poll every 30s
+  });
+
+  const notifications = notificationsResponse?.data || [];
+  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+
+  const handleOpenNotifications = async () => {
+    setShowNotifications(!showNotifications);
+    setShowProfileDropdown(false);
+  };
+
   const defaultAddress = addressesResponse?.data?.find((a: any) => a.isDefault) || addressesResponse?.data?.[0];
 
   useEffect(() => {
@@ -63,6 +80,18 @@ export const CustomerPanel: React.FC = () => {
     };
 
     fetchBusinesses();
+
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('newCustomerNotification', (notif: any) => {
+      if (notif.customerId === currentUser?._id) {
+        refetchNotifications();
+        toast(notif.message, { icon: '🔔' });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [currentUser, navigate]);
 
   const handleLogout = () => {
@@ -94,7 +123,68 @@ export const CustomerPanel: React.FC = () => {
           <div className="flex items-center gap-4">
               <div className="relative">
                 <button 
-                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  onClick={handleOpenNotifications}
+                  className="relative p-2 text-slate-500 hover:text-brand-primary transition-colors hover:bg-slate-100 rounded-full"
+                >
+                  <Bell size={22} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white shadow-sm transform translate-x-1 -translate-y-1">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {showNotifications && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)}></div>
+                    <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h3 className="font-bold text-brand-primary">Notifications</h3>
+                        {unreadCount > 0 && <span className="text-xs bg-brand-accent/10 text-brand-accent px-2 py-0.5 rounded-full font-bold">{unreadCount} new</span>}
+                      </div>
+                      <div className="max-h-[60vh] overflow-y-auto">
+                        {notifications.length > 0 ? (
+                          notifications.map((notif: any) => (
+                            <div 
+                              key={notif._id} 
+                              onClick={async () => {
+                                if (!notif.isRead) {
+                                  await api.put(`/customer-orders/notifications/${notif._id}/read`);
+                                  refetchNotifications();
+                                }
+                              }}
+                              className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer ${!notif.isRead ? 'bg-blue-50/30' : ''}`}
+                            >
+                              <div className="flex gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.type === 'order' ? 'bg-green-100 text-green-600' : notif.type === 'booking' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
+                                  {notif.type === 'order' ? <ShoppingBag size={14} /> : notif.type === 'booking' ? <Calendar size={14} /> : <Info size={14} />}
+                                </div>
+                                <div>
+                                  <h4 className={`text-sm ${!notif.isRead ? 'font-black text-slate-900' : 'font-semibold text-slate-700'}`}>{notif.title}</h4>
+                                  <p className={`text-xs mt-0.5 leading-relaxed ${!notif.isRead ? 'font-semibold text-slate-800' : 'text-slate-500'}`}>{notif.message}</p>
+                                  <p className="text-[10px] text-slate-400 mt-1.5 font-medium">{new Date(notif.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {new Date(notif.createdAt).toLocaleDateString()}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-8 text-center text-slate-400 flex flex-col items-center">
+                            <Bell size={32} className="text-slate-300 mb-3" />
+                            <p className="text-sm font-medium">No notifications yet</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="relative">
+                <button 
+                  onClick={() => {
+                    setShowProfileDropdown(!showProfileDropdown);
+                    setShowNotifications(false);
+                  }}
                   className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-4 rounded-full transition-all"
                 >
                   <div className="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center">

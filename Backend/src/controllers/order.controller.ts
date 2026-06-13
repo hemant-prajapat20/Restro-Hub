@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Order from '../models/Order';
 import SystemSettings from '../models/SystemSettings';
+import CustomerNotification from '../models/CustomerNotification';
 import { logMessage } from '../utils/messageLogger';
 
 // Get all orders for a business
@@ -90,6 +91,34 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 
     if (status === 'Completed' || status === 'Served') {
         await logMessage(businessId, 'Order Completed', `Order ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} status changed to ${status}.`, 'success');
+    }
+
+    if (updatedOrder.customerId) {
+      let title = 'Order Update';
+      let message = `Your order status has been updated to ${status}.`;
+      let type = 'order';
+
+      if (status === 'Cancelled') {
+        title = 'Order Cancelled';
+        message = 'Your order has been cancelled by the restaurant.';
+      } else if (status === 'Completed' || status === 'Served') {
+        title = 'Order Completed';
+        message = 'Your order is completed. Enjoy your meal!';
+      } else if (status === 'Out for Delivery') {
+        title = 'Order Dispatched';
+        message = 'Your order is out for delivery and will reach you soon!';
+      }
+
+      const notif = await CustomerNotification.create({
+        customerId: updatedOrder.customerId,
+        title,
+        message,
+        type
+      });
+
+      if (io) {
+        io.emit('newCustomerNotification', notif);
+      }
     }
 
     res.json(updatedOrder);

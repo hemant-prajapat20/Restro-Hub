@@ -4,6 +4,7 @@ import Order from '../models/Order';
 import SystemSettings from '../models/SystemSettings';
 import Business from '../models/Business';
 import User from '../models/User';
+import CustomerNotification from '../models/CustomerNotification';
 
 export const getPublicMenu = async (req: Request, res: Response) => {
   try {
@@ -120,6 +121,38 @@ export const updateAddress = async (req: Request, res: Response) => {
   }
 };
 
+export const getNotifications = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const notifications = await CustomerNotification.find({ customerId: user._id }).sort({ createdAt: -1 });
+    res.json({ status: 'success', data: notifications });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+export const markNotificationAsRead = async (req: Request, res: Response) => {
+  try {
+    const { notificationId } = req.params;
+    await CustomerNotification.findByIdAndUpdate(notificationId, { isRead: true });
+    res.json({ status: 'success' });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+export const markAllNotificationsAsRead = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    await CustomerNotification.updateMany(
+      { customerId: user._id, isRead: false },
+      { $set: { isRead: true } }
+    );
+    res.json({ status: 'success' });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
 
 export const placeCustomerOrder = async (req: Request, res: Response) => {
   try {
@@ -140,6 +173,7 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
     const newOrder = new Order({
       businessId,
       type: 'Delivery', // Since it's online, it defaults to delivery
+      customerId: user._id,
       items,
       subtotal,
       tax,
@@ -172,8 +206,43 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
       io.emit('newMessage', savedNotif);
     }
 
+    // Create a Notification for the Customer
+    const notif = await CustomerNotification.create({
+      customerId: user._id,
+      title: 'Order Placed Successfully',
+      message: `Your order for ₹${Math.round(total)} has been received and is being prepared.`,
+      type: 'order'
+    });
+
+    if (io) {
+       io.emit('newCustomerNotification', notif);
+    }
+
     res.status(201).json({ status: 'success', data: savedOrder, message: 'Order placed successfully!' });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message || 'Server error placing order' });
+  }
+};
+
+export const logPaymentFailed = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const { reason, amount } = req.body;
+    
+    const notif = await CustomerNotification.create({
+      customerId: user._id,
+      title: 'Payment Failed',
+      message: `Your payment of ₹${amount} failed. Reason: ${reason || 'Unknown'}`,
+      type: 'system'
+    });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('newCustomerNotification', notif);
+    }
+
+    res.json({ status: 'success' });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 };

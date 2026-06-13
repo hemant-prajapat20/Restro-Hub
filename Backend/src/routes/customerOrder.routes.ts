@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress, updateAddress } from '../controllers/customerOrder.controller';
+import { getPublicMenu, placeCustomerOrder, getPastOrders, getAddresses, saveAddress, deleteAddress, updateAddress, getNotifications, markNotificationAsRead, markAllNotificationsAsRead, logPaymentFailed } from '../controllers/customerOrder.controller';
 import { protect } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/menu/:businessId', getPublicMenu);
 router.use(protect);
 
 router.post('/order/:businessId', placeCustomerOrder);
+router.post('/payment-failed', logPaymentFailed);
 
 // Customer Profile features
 router.get('/my-orders', getPastOrders);
@@ -18,5 +19,10 @@ router.get('/addresses', getAddresses);
 router.post('/addresses', saveAddress);
 router.put('/addresses/:addressId', updateAddress);
 router.delete('/addresses/:addressId', deleteAddress);
+
+// Notifications
+router.get('/notifications', getNotifications);
+router.put('/notifications/mark-read', markAllNotificationsAsRead);
+router.put('/notifications/:notificationId/read', markNotificationAsRead);
 
 export default router;
