@@ -104,7 +104,7 @@ const PastOrdersTab = () => {
                        </span>
                    )}
                 </div>
-                <p className="font-black text-brand-primary text-xl">${order.total.toFixed(2)}</p>
+                <p className="font-black text-brand-primary text-xl">₹{order.total.toFixed(2)}</p>
               </div>
             </div>
             

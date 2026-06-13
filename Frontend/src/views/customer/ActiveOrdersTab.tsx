@@ -124,7 +124,7 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                   {order.status}
                 </span>
-                <p className="font-black text-brand-primary text-xl mt-2">${order.total.toFixed(2)}</p>
+                <p className="font-black text-brand-primary text-xl mt-2">₹{order.total.toFixed(2)}</p>
               </div>
             </div>
 

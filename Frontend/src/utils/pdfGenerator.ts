@@ -127,7 +127,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
     }
     doc.text(nameText, 5, y);
     doc.text(`${item.quantity}`, width - 25, y, { align: 'right' });
-    doc.text(`Rs. ${(item.price * item.quantity).toFixed(2)}`, width - 5, y, { align: 'right' });
+    doc.text(`₹ ${(item.price * item.quantity).toFixed(2)}`, width - 5, y, { align: 'right' });
     y += 4;
   });
 
@@ -140,16 +140,16 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   // Subtotal & GST
   y += 5;
   doc.text("Amount (Subtotal):", width - 30, y, { align: 'right' });
-  doc.text(`Rs. ${data.subtotal.toFixed(2)}`, width - 5, y, { align: 'right' });
+  doc.text(`₹ ${data.subtotal.toFixed(2)}`, width - 5, y, { align: 'right' });
 
   y += 4;
   doc.text("GST Offer (5%):", width - 30, y, { align: 'right' });
-  doc.text(`Rs. ${data.tax.toFixed(2)}`, width - 5, y, { align: 'right' });
+  doc.text(`₹ ${data.tax.toFixed(2)}`, width - 5, y, { align: 'right' });
 
   if (data.discount && data.discount > 0) {
     y += 4;
     doc.text(`Discount:`, width - 30, y, { align: 'right' });
-    doc.text(`-Rs. ${data.discount.toFixed(2)}`, width - 5, y, { align: 'right' });
+    doc.text(`-₹ ${data.discount.toFixed(2)}`, width - 5, y, { align: 'right' });
   }
 
   // Divider
@@ -169,7 +169,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   doc.setFontSize(9);
   doc.setTextColor(0, 0, 0); // MUST BE PURE BLACK
   doc.text("Total Amount (Kul Rashi):", width - 30, y, { align: 'right' });
-  doc.text(`Rs. ${data.total.toFixed(2)}`, width - 5, y, { align: 'right' });
+  doc.text(`₹ ${data.total.toFixed(2)}`, width - 5, y, { align: 'right' });
 
   // 7. Payment Status
   y += 6;

@@ -143,16 +143,6 @@ export const CustomerPanel: React.FC = () => {
                 </nav>
             </div>
 
-            <div className="bg-gradient-to-br from-brand-primary to-slate-800 rounded-3xl p-6 shadow-sm text-white relative overflow-hidden">
-                 <div className="relative z-10">
-                     <h3 className="font-black text-lg mb-2">RestroHub Premium</h3>
-                     <p className="text-slate-300 text-sm font-medium mb-4">Get free delivery on all orders above $20.</p>
-                     <button className="bg-brand-accent hover:bg-brand-accent text-white font-bold py-2.5 px-4 rounded-xl w-full transition-colors text-sm shadow-lg shadow-brand-accent/20">
-                         Upgrade Now
-                     </button>
-                 </div>
-                 <Star size={100} className="absolute -bottom-6 -right-6 text-white opacity-5 rotate-12" />
-            </div>
         </aside>
 
         {/* CENTER CONTENT */}
@@ -261,32 +251,58 @@ export const CustomerPanel: React.FC = () => {
           {activeTab === 'saved_addresses' && <SavedAddressesTab />}
         </main>
 
-        {/* RIGHT SIDEBAR - Offers */}
+        {/* RIGHT SIDEBAR - Offers & Premium */}
         <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
             
-            {/* Top Offers Widget */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <h3 className="font-extrabold text-brand-primary mb-4">Today's Offers</h3>
+            {/* Today's Offers Widget */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group">
+                <div className="absolute -right-6 -top-6 w-24 h-24 bg-brand-accent/5 rounded-full blur-2xl group-hover:bg-brand-accent/10 transition-colors"></div>
+                <h3 className="font-extrabold text-brand-primary mb-4 flex items-center justify-between relative z-10">
+                    Today's Offers
+                    <span className="text-[10px] font-bold bg-brand-accent/10 text-brand-accent px-2 py-1 rounded-md uppercase">2 New</span>
+                </h3>
                 
-                <div className="space-y-4">
-                    <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors cursor-pointer">
-                        <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black text-xl">
+                <div className="space-y-4 relative z-10">
+                    <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-brand-accent/30 hover:shadow-md hover:shadow-brand-accent/5 transition-all cursor-pointer group/item">
+                        <div className="w-12 h-12 bg-white text-brand-accent shadow-sm rounded-xl flex items-center justify-center font-black text-xl group-hover/item:scale-110 transition-transform">
                             %
                         </div>
-                        <div>
-                            <h4 className="font-bold text-brand-primary text-sm">50% OFF up to $10</h4>
-                            <p className="text-xs text-slate-500 font-medium mt-0.5">Use code: WELCOME50</p>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-brand-primary text-sm">50% OFF up to ₹10</h4>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">Code: <span className="font-bold text-brand-primary">WELCOME50</span></p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors cursor-pointer">
-                        <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center font-black text-xl">
-                            $
+                    <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-brand-accent/30 hover:shadow-md hover:shadow-brand-accent/5 transition-all cursor-pointer group/item">
+                        <div className="w-12 h-12 bg-white text-green-600 shadow-sm rounded-xl flex items-center justify-center font-black text-xl group-hover/item:scale-110 transition-transform">
+                            ₹
                         </div>
-                        <div>
-                            <h4 className="font-bold text-brand-primary text-sm">Flat $5 Cashback</h4>
-                            <p className="text-xs text-slate-500 font-medium mt-0.5">On orders above $30</p>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-brand-primary text-sm">Flat ₹5 Cashback</h4>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">On orders above ₹30</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* RestroHub Premium Widget */}
+            <div className="bg-brand-primary rounded-3xl p-6 shadow-lg shadow-brand-primary/20 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/20 to-transparent opacity-50"></div>
+                <div className="absolute -right-4 -top-4 w-32 h-32 bg-brand-accent/20 rounded-full blur-3xl group-hover:bg-brand-accent/30 transition-colors"></div>
+                
+                <div className="relative z-10">
+                    <div className="w-12 h-12 bg-gradient-to-tr from-brand-accent to-yellow-400 rounded-xl flex items-center justify-center shadow-lg shadow-brand-accent/30 mb-4 transform -rotate-3 group-hover:rotate-0 transition-transform">
+                        <Star className="text-white fill-white" size={24} />
+                    </div>
+                    
+                    <h3 className="font-black text-white text-xl tracking-tight mb-2">Restro<span className="text-brand-accent">Hub</span> Premium</h3>
+                    <p className="text-sm text-slate-400 font-medium mb-6 leading-relaxed">
+                        Get free delivery on every order, exclusive VIP discounts, and priority support.
+                    </p>
+                    
+                    <button className="w-full bg-brand-accent hover:bg-brand-accent/90 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-brand-accent/20 active:scale-95 flex items-center justify-center gap-2">
+                        Join Premium 
+                        <span className="text-xs font-black bg-white/20 px-2 py-0.5 rounded-md">₹9/mo</span>
+                    </button>
                 </div>
             </div>
             
