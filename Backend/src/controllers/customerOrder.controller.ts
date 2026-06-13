@@ -181,7 +181,8 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
       paymentMethod: paymentMethod || 'Cash',
       source: 'Online',
       customerDetails: finalCustomerDetails,
-      status: 'Pending'
+      status: 'Pending',
+      deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString()
     });
 
     const savedOrder = await newOrder.save();

@@ -22,6 +22,11 @@ export const Delivery: React.FC = () => {
   const [newCustomerName, setNewCustomerName] = useState('');
   const [newCustomerPhone, setNewCustomerPhone] = useState('');
   const [selectedItems, setSelectedItems] = useState<{item: any, quantity: number}[]>([]);
+  
+  const [selectedManageOrder, setSelectedManageOrder] = useState<any>(null);
+  const [otpInput, setOtpInput] = useState('');
+  const [driverName, setDriverName] = useState('');
+  const [driverPhone, setDriverPhone] = useState('');
 
   const { data: menu = [], isLoading: menuLoading } = useQuery({
     queryKey: ['menuItems'],
@@ -45,7 +50,10 @@ export const Delivery: React.FC = () => {
         customerName: order.customerDetails?.name || 'Guest',
         customerPhone: order.customerDetails?.phone || 'N/A',
         paymentMethod: order.paymentMethod || 'Cash',
-        status: order.status
+        status: order.status,
+        _id: order._id,
+        deliveryOtp: order.deliveryOtp,
+        driverDetails: order.driverDetails
       }));
     }
   });
@@ -78,6 +86,34 @@ export const Delivery: React.FC = () => {
       setSelectedItems([]);
     },
     onError: () => toast.error('Failed to create order')
+  });
+
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ id, status, driverDetails }: any) => {
+      const res = await api.put(`/orders/${id}`, { status, driverDetails });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success('Order updated');
+      queryClient.invalidateQueries({ queryKey: ['deliveryOrders'] });
+      if (selectedManageOrder && selectedManageOrder._id === data._id) {
+        setSelectedManageOrder((prev: any) => ({ ...prev, status: data.status, driverDetails: data.driverDetails }));
+      }
+    }
+  });
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: async ({ id, otp }: { id: string, otp: string }) => {
+      const res = await api.post(`/orders/${id}/verify-otp`, { otp });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('OTP Verified & Order Completed');
+      queryClient.invalidateQueries({ queryKey: ['deliveryOrders'] });
+      setSelectedManageOrder(null);
+      setOtpInput('');
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || 'Invalid OTP')
   });
 
   const handleAddItem = (item: any) => {
@@ -123,14 +159,7 @@ export const Delivery: React.FC = () => {
     <div className="p-5 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-             <div className="px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm font-semibold flex items-center gap-2">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Zomato_logo.png" className="w-5 h-5 rounded" alt="Zomato" />
-                Zomato: <span className="text-brand-success font-semibold">Connected</span>
-             </div>
-             <div className="px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm font-semibold flex items-center gap-2">
-                <img src="https://static.vecteezy.com/system/resources/previews/016/505/309/original/swiggy-logo-on-transparent-background-free-png.png" className="w-5 h-5 object-contain" alt="Swiggy" />
-                Swiggy: <span className="text-brand-success font-semibold">Connected</span>
-             </div>
+             {/* Portals badges removed */}
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <button className="flex items-center gap-2 px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
@@ -165,7 +194,7 @@ export const Delivery: React.FC = () => {
                      </div>
                      <div className="space-y-2">
                         <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-2">Phone</label>
-                        <input value={newCustomerPhone} onChange={(e) => setNewCustomerPhone(e.target.value)} type="tel" placeholder="+91 XXXX" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-semibold" />
+                        <input value={newCustomerPhone} onChange={(e) => setNewCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} type="tel" maxLength={10} placeholder="+91 XXXX" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-semibold" />
                      </div>
                   </div>
                   <div className="space-y-4">
@@ -259,7 +288,15 @@ export const Delivery: React.FC = () => {
                            {order.status}
                         </span>
                      </div>
-                     <button className="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-brand-accent transition-all cursor-pointer">
+                     <button 
+                        onClick={() => {
+                          setSelectedManageOrder(order);
+                          setDriverName(order.driverDetails?.name || '');
+                          setDriverPhone(order.driverDetails?.phone || '');
+                          setOtpInput('');
+                        }}
+                        className="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-brand-accent transition-all cursor-pointer"
+                     >
                         <ChevronRight size={20} />
                      </button>
                   </motion.div>
@@ -290,9 +327,92 @@ export const Delivery: React.FC = () => {
                    </div>
                 </div>
                 <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-brand-accent/20 rounded-full blur-3xl opacity-50" />
-             </div>
-          </div>
-       </div>
-    </div>
-  );
-};
+              </div>
+           </div>
+        </div>
+
+       {/* Delivery Manage Modal */}
+       {selectedManageOrder && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedManageOrder(null)} />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative bg-white w-full max-w-xl rounded-[32px] p-8 shadow-2xl overflow-hidden"
+            >
+               <h3 className="text-2xl font-semibold text-slate-900 mb-2">Manage Order {selectedManageOrder.id}</h3>
+               <p className="text-slate-500 font-medium mb-8">Status: <span className="font-bold text-brand-primary">{selectedManageOrder.status}</span></p>
+
+               {/* Timeline Buttons */}
+               <div className="flex gap-2 mb-8 bg-slate-50 p-2 rounded-2xl">
+                 <button 
+                   onClick={() => updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'In Kitchen' })}
+                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${selectedManageOrder.status === 'In Kitchen' ? 'bg-white shadow-sm text-brand-primary' : 'text-slate-400 hover:bg-slate-100'}`}
+                 >In Kitchen</button>
+                 <button 
+                   onClick={() => updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'Ready' })}
+                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${selectedManageOrder.status === 'Ready' ? 'bg-white shadow-sm text-brand-primary' : 'text-slate-400 hover:bg-slate-100'}`}
+                 >Ready</button>
+                 <button 
+                   onClick={() => {
+                     if (!driverName || !driverPhone) {
+                       toast.error('Please enter Driver Details first!');
+                       return;
+                     }
+                     updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'Out for Delivery', driverDetails: { name: driverName, phone: driverPhone } });
+                   }}
+                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${selectedManageOrder.status === 'Out for Delivery' ? 'bg-brand-accent text-white shadow-md' : 'text-slate-400 hover:bg-slate-100'}`}
+                 >Out for Delivery</button>
+               </div>
+
+               {/* Driver Details Input */}
+               <div className="space-y-4 mb-8">
+                 <h4 className="font-bold text-sm text-slate-900">Assign Driver</h4>
+                 <div className="grid grid-cols-2 gap-4">
+                   <input 
+                     type="text" 
+                     placeholder="Driver Name" 
+                     value={driverName}
+                     onChange={(e) => setDriverName(e.target.value)}
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-brand-accent/20 outline-none"
+                   />
+                   <input 
+                     type="tel" 
+                     maxLength={10}
+                     placeholder="Driver Phone" 
+                     value={driverPhone}
+                     onChange={(e) => setDriverPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-brand-accent/20 outline-none"
+                   />
+                 </div>
+               </div>
+
+               {/* OTP Verification */}
+               <div className="bg-brand-primary/5 rounded-2xl p-6 border border-brand-primary/10">
+                 <h4 className="font-bold text-sm text-brand-primary mb-4">Complete Delivery (Verify OTP)</h4>
+                 <p className="text-xs text-slate-500 mb-4 font-medium">Ask the driver for the 4-digit code provided by the customer.</p>
+                 <div className="flex gap-4">
+                   <input 
+                     type="text" 
+                     maxLength={4}
+                     placeholder="Enter 4-Digit OTP" 
+                     value={otpInput}
+                     onChange={(e) => setOtpInput(e.target.value)}
+                     className="flex-1 bg-white border border-brand-primary/20 rounded-xl px-4 py-3 text-center text-xl tracking-[0.5em] font-black focus:ring-2 focus:ring-brand-primary/20 outline-none"
+                   />
+                   <button 
+                     onClick={() => verifyOtpMutation.mutate({ id: selectedManageOrder._id, otp: otpInput })}
+                     disabled={otpInput.length !== 4 || verifyOtpMutation.isPending}
+                     className="bg-brand-success text-white px-8 font-bold rounded-xl shadow-md shadow-brand-success/20 disabled:opacity-50"
+                   >
+                     {verifyOtpMutation.isPending ? 'Verifying...' : 'Verify & Complete'}
+                   </button>
+                 </div>
+               </div>
+
+            </motion.div>
+         </div>
+       )}
+     </div>
+   );
+ };

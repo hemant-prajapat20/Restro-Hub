@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getOrders, createOrder, updateOrderStatus, updateOrder } from '../controllers/order.controller';
+import { getOrders, createOrder, updateOrderStatus, updateOrder, verifyOtp } from '../controllers/order.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -18,5 +18,8 @@ router.route('/:id')
 router.route('/:id/status')
   .patch(updateOrderStatus)
   .put(updateOrderStatus); // Support both PATCH and PUT
+
+router.route('/:id/verify-otp')
+  .post(verifyOtp);
 
 export default router;

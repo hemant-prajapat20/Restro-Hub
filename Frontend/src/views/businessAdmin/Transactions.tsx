@@ -66,7 +66,7 @@ export const Transactions: React.FC = () => {
           </div>
        </div>
 
-       <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden flex flex-col h-[calc(100vh-220px)]">
+       <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden flex flex-col mb-8">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
              <h5 className="font-semibold font-display text-slate-900 text-lg">Transaction History</h5>
              <div className="relative w-72">
@@ -80,7 +80,7 @@ export const Transactions: React.FC = () => {
                 />
              </div>
           </div>
-          <div className="flex-1 overflow-auto custom-scrollbar">
+          <div className="overflow-x-auto w-full">
              <table className="w-full min-w-[1000px] text-left">
                 <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm">
                    <tr>

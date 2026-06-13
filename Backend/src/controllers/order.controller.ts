@@ -154,3 +154,56 @@ export const updateOrder = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error updating order details' });
   }
 };
+
+export const verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { id } = req.params;
+    const { otp } = req.body;
+
+    const order = await Order.findOne({ _id: id, businessId });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (order.status === 'Completed') {
+      return res.status(400).json({ message: 'Order is already completed. OTP has expired.' });
+    }
+
+    if (order.deliveryOtp && order.deliveryOtp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    order.status = 'Completed';
+    order.deliveryOtp = ''; // Clear OTP so it can never be used again
+    await order.save();
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('orderStatusUpdated', { orderId: order._id, status: 'Completed' });
+      
+      const CustomerNotification = require('../models/CustomerNotification').default;
+      const notif = await CustomerNotification.create({
+        customerId: order.customerId,
+        title: 'Order Delivered Successfully',
+        message: `Your order #${order._id.toString().substring(order._id.toString().length - 8).toUpperCase()} has been delivered successfully. Enjoy your food!`,
+        type: 'order'
+      });
+      io.emit('newCustomerNotification', notif);
+
+      const Message = require('../models/Message').default;
+      const businessNotif = new Message({
+        businessId: order.businessId,
+        action: 'Order Completed',
+        message: `Order #${order._id.toString().substring(order._id.toString().length - 8).toUpperCase()} was delivered successfully via OTP.`,
+        type: 'success'
+      });
+      await businessNotif.save();
+      io.emit('newMessage', businessNotif);
+    }
+
+    res.json({ message: 'OTP Verified & Order Completed', order });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error verifying OTP' });
+  }
+};

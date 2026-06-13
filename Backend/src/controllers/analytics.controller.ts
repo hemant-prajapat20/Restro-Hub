@@ -311,7 +311,7 @@ export const getBusinessReports = async (req: Request, res: Response): Promise<v
         paymentMethodData,
         topFoodItems,
         inventoryAlerts,
-        recentInvoices: monthlyOrders.slice(0, 50).map(order => ({
+        recentInvoices: monthlyOrders.slice(0, 500).map(order => ({
           id: order._id,
           date: order.createdAt,
           type: order.type,

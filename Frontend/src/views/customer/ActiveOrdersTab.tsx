@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { Package, Clock, Activity, Search, MapPin, Phone } from 'lucide-react';
+import { Package, Clock, Activity, Search, MapPin, Phone, Bike } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import toast from 'react-hot-toast';
 
@@ -27,6 +27,7 @@ interface Order {
     phone: string;
     address?: string;
   };
+  deliveryOtp?: string;
 }
 
 interface Props {
@@ -65,25 +66,15 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
     }
   };
 
-  const handleMarkAsReceived = async (orderId: string) => {
-    if (!window.confirm('Are you sure you have received this order?')) return;
-    try {
-      await api.put(`/customer-orders/order/${orderId}/received`);
-      toast.success('Order marked as received!');
-      fetchActiveOrders(); // refresh the list
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update order status');
-    }
-  };
-
   const getStatusProgress = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return 25;
-      case 'preparing': return 50;
-      case 'ready': return 75;
-      case 'served': return 90;
-      case 'out_for_delivery': return 90;
-      default: return 10;
+      case 'pending': return 33;
+      case 'preparing':
+      case 'in kitchen': return 66;
+      case 'ready': return 66;
+      case 'out for delivery': return 100;
+      case 'served': return 100;
+      default: return 33;
     }
   };
 
@@ -161,18 +152,21 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
             </div>
 
             {/* Progress Bar */}
-            <div className="mb-6">
+            <div className="mb-6 relative">
                 <div className="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
                     <span className={order.status === 'Pending' ? 'text-brand-accent' : ''}>Order Placed</span>
-                    <span className={order.status === 'Preparing' ? 'text-brand-accent' : ''}>Preparing</span>
-                    <span className={['Ready', 'Served', 'Out_for_delivery'].includes(order.status) ? 'text-brand-accent' : ''}>On the way</span>
+                    <span className={['Preparing', 'In Kitchen', 'Ready'].includes(order.status) ? 'text-brand-accent' : ''}>Preparing</span>
+                    <span className={['Out for Delivery', 'Served'].includes(order.status) ? 'text-brand-accent flex items-center gap-1' : ''}>
+                      {order.status === 'Out for Delivery' && <Bike size={14} className="animate-bounce" />}
+                      On the way
+                    </span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                     <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${getStatusProgress(order.status)}%` }}
                         transition={{ duration: 1, ease: 'easeOut' }}
-                        className="bg-brand-accent h-2 rounded-full relative"
+                        className={`h-2 rounded-full relative ${order.status === 'Out for Delivery' ? 'bg-brand-success' : 'bg-brand-accent'}`}
                     >
                         <div className="absolute top-0 right-0 bottom-0 w-20 bg-gradient-to-r from-transparent to-white/30 animate-[shimmer_2s_infinite]"></div>
                     </motion.div>
@@ -236,13 +230,12 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
                 </button>
             </div>
             
-            <div className="mt-3">
-               <button 
-                  onClick={() => handleMarkAsReceived(order._id)}
-                  className="w-full bg-brand-primary hover:bg-brand-primary/90 text-white font-bold py-2.5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20"
-               >
-                  <span>✅</span> Mark as Received
-               </button>
+            <div className="mt-4 bg-brand-primary/5 rounded-xl border border-brand-primary/20 p-4 text-center">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Delivery Verification OTP</p>
+                <div className="text-3xl font-black text-brand-primary tracking-[0.25em]">
+                  {order.deliveryOtp || '----'}
+                </div>
+                <p className="text-[10px] text-slate-500 font-medium mt-2">Give this PIN to your driver when they arrive</p>
             </div>
             
             <AnimatePresence>
