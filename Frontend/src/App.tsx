@@ -34,10 +34,6 @@ import { InvoiceView } from './views/businessAdmin/InvoiceView';
 
 import { Customers } from './views/businessAdmin/Customers';
 
-
-
-import { CustomerLogin } from './views/customer/CustomerLogin';
-import { CustomerRegister } from './views/customer/CustomerRegister';
 import { CustomerDashboard } from './views/customer/CustomerDashboard';
 import { CustomerPanel } from './views/customer/CustomerPanel';
 
@@ -72,8 +68,6 @@ export default function App() {
         <Route path="/invoice/:id" element={<InvoiceView />} />
 
         {/* Customer Routes */}
-        <Route path="/customer-login" element={<CustomerLogin />} />
-        <Route path="/customer-register" element={<CustomerRegister />} />
         <Route path="/customer/dashboard" element={<CustomerPanel />} />
         <Route path="/customer/order/:businessId" element={<CustomerDashboard />} />
 
