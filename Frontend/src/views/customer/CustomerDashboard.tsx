@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
@@ -28,14 +28,17 @@ export const CustomerDashboard: React.FC = () => {
   const dispatch = useDispatch();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [showCart, setShowCart] = useState(() => {
+    return new URLSearchParams(location.search).get('cart') === 'true';
+  });
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/customer-login');
   };
   const [searchQuery, setSearchQuery] = useState('');
-  const [showCart, setShowCart] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'Cash' | 'Online'>('Cash');
   const cartState = useSelector((state: RootState) => state.cart);
   const cart = cartState.items;
@@ -431,18 +434,21 @@ export const CustomerDashboard: React.FC = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed bottom-0 left-0 right-0 bg-slate-50 rounded-t-3xl z-[101] max-h-[85vh] flex flex-col max-w-4xl mx-auto"
+              className="fixed inset-0 bg-slate-50 z-[101] flex flex-col w-full h-full overflow-hidden"
             >
-              <div className="p-4 border-b border-slate-200 bg-white rounded-t-3xl flex justify-between items-center sticky top-0 z-10">
-                <h3 className="font-bold text-brand-primary text-lg">Your Cart</h3>
-                <button onClick={() => setShowCart(false)} className="w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-200">
-                  <Minus size={16} />
-                </button>
+              <div className="p-4 border-b border-slate-200 bg-white flex justify-between items-center z-10 shadow-sm shrink-0">
+                <div className="flex items-center justify-between max-w-4xl mx-auto w-full">
+                  <h3 className="font-black text-brand-primary text-xl">Your Cart</h3>
+                  <button onClick={() => setShowCart(false)} className="w-10 h-10 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors">
+                    <Minus size={20} />
+                  </button>
+                </div>
               </div>
               
-              <div className="overflow-y-auto p-4 flex-1">
-                <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
-                  <h4 className="font-bold text-brand-primary mb-4">{business.name}</h4>
+              <div className="overflow-y-auto flex-1 w-full pb-20">
+                <div className="max-w-4xl mx-auto p-4 md:p-6 w-full">
+                  <div className="bg-white rounded-3xl p-4 md:p-6 shadow-sm border border-slate-100">
+                    <h4 className="font-bold text-brand-primary mb-4">{business.name}</h4>
                   <div className="space-y-4">
                     {cart.map(c => (
                       <div key={c.item._id} className="flex justify-between items-start gap-4">
@@ -464,6 +470,10 @@ export const CustomerDashboard: React.FC = () => {
                       </div>
                     ))}
                   </div>
+
+                  <button onClick={() => setShowCart(false)} className="mt-6 w-full border-2 border-dashed border-brand-accent/50 text-brand-accent rounded-2xl py-4 font-bold flex items-center justify-center gap-2 hover:bg-brand-accent/5 transition-colors">
+                    <Plus size={18} /> Add more items
+                  </button>
                   
                   <div className="mt-6 pt-6 border-t border-slate-100 border-dashed space-y-3">
                     <h5 className="font-bold text-brand-primary text-sm mb-4">Bill Details</h5>
@@ -520,9 +530,11 @@ export const CustomerDashboard: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="p-4 bg-white border-t border-slate-200 sticky bottom-0">
-                <button 
+              <div className="p-4 bg-white border-t border-slate-200 sticky bottom-0 shrink-0">
+                <div className="max-w-4xl mx-auto w-full">
+                  <button 
                   onClick={handleCheckout}
                   disabled={placeOrderMutation.isPending}
                   className="w-full bg-green-600 text-white rounded-2xl py-4 font-bold uppercase tracking-wider flex justify-between items-center px-6 shadow-lg shadow-green-600/30 hover:bg-green-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
@@ -535,6 +547,7 @@ export const CustomerDashboard: React.FC = () => {
                     {placeOrderMutation.isPending ? 'PROCESSING...' : 'PLACE ORDER'} <ArrowRight size={18}/>
                   </div>
                 </button>
+                </div>
               </div>
             </motion.div>
           </>

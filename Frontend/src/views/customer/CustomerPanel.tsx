@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
-import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight } from 'lucide-react';
+import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { logout } from '../../store/slices/authSlice';
@@ -200,6 +200,36 @@ export const CustomerPanel: React.FC = () => {
                     </button>
                 </nav>
             </div>
+
+            {/* Desktop Cart Widget */}
+            {cartState.items.length > 0 && cartState.businessId && (
+              <div className="hidden lg:flex bg-green-600 rounded-3xl p-6 shadow-lg shadow-green-600/20 relative overflow-hidden group h-auto min-h-[220px] flex-col justify-between cursor-pointer hover:bg-green-700 transition-colors"
+                onClick={() => navigate(`/customer/order/${cartState.businessId}?cart=true`)}
+              >
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-50"></div>
+                  <div className="absolute -right-4 -top-4 w-32 h-32 bg-green-400/20 rounded-full blur-3xl group-hover:bg-green-400/30 transition-colors"></div>
+                  
+                  <div className="relative z-10 flex flex-col h-full justify-between">
+                      <div>
+                          <div className="w-12 h-12 bg-white text-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-black/5 mb-4 transform -rotate-3 group-hover:rotate-0 transition-transform">
+                              <ShoppingBag className="fill-green-600/20" size={24} />
+                          </div>
+                          
+                          <h3 className="font-black text-white text-xl tracking-tight mb-2">Your Cart</h3>
+                          <p className="text-sm text-green-100 font-medium mb-1 leading-relaxed">
+                              {cartState.items.reduce((a, b) => a + b.quantity, 0)} items from
+                          </p>
+                          <p className="text-base text-white font-bold leading-relaxed truncate">
+                              {cartState.businessName}
+                          </p>
+                      </div>
+                      
+                      <button className="w-full bg-white hover:bg-slate-50 text-green-700 font-bold py-3 px-4 rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 mt-auto">
+                          View Cart <ArrowRight size={16} />
+                      </button>
+                  </div>
+              </div>
+            )}
         </aside>
 
         {/* CENTER CONTENT */}
@@ -370,11 +400,11 @@ export const CustomerPanel: React.FC = () => {
 
       </div>
 
-      {/* FLOATING GLOBAL CART BANNER (Swiggy Style) */}
+      {/* FLOATING GLOBAL CART BANNER (Mobile Only) */}
       {cartState.items.length > 0 && cartState.businessId && (
-        <div className="fixed bottom-20 lg:bottom-8 left-0 right-0 z-40 px-4 sm:px-6 pointer-events-none flex justify-center">
+        <div className="fixed bottom-20 left-0 right-0 z-40 px-4 sm:px-6 pointer-events-none flex justify-center lg:hidden">
           <div 
-            onClick={() => navigate(`/customer/order/${cartState.businessId}`)}
+            onClick={() => navigate(`/customer/order/${cartState.businessId}?cart=true`)}
             className="w-full max-w-lg bg-green-600 rounded-2xl shadow-2xl p-4 flex items-center justify-between pointer-events-auto cursor-pointer hover:bg-green-700 transition-colors"
           >
             <div className="text-white">
