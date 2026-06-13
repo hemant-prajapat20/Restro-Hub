@@ -23,6 +23,7 @@ import customerRoutes from './routes/customer.routes';
 import uploadRoutes from './routes/upload.routes';
 import reservationRoutes from './routes/reservation.routes';
 import messageRoutes from './routes/message.routes';
+import customerOrderRoutes from './routes/customerOrder.routes';
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/restro', restroSignatureRoutes);
 app.use('/api/barlounge', barLoungeRoutes);
 app.use('/api/cafebakery', cafeBakeryRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/customer-orders', customerOrderRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/messages', messageRoutes);
 

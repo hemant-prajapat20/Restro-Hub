@@ -190,3 +190,18 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
+// @desc    Get all active businesses for public customer view
+// @route   GET /api/businesses/public
+// @access  Public
+export const getPublicBusinesses = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const businesses = await Business.find({ status: BusinessStatus.ACTIVE }).select('name address district state logoUrl activeModules');
+    res.json({
+      status: 'success',
+      data: businesses
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};

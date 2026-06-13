@@ -36,13 +36,10 @@ import { Customers } from './views/businessAdmin/Customers';
 
 
 
-const CustomerPlaceholder = () => (
-  <div className="min-h-[112vh] bg-[#F8FAFC] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
-    <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
-    <h2 className="text-4xl font-bold text-slate-900 mb-4 z-10">Customer Panel</h2>
-    <p className="text-slate-500 z-10">View Menus, Place Orders, and Track Loyalty Points</p>
-  </div>
-);
+import { CustomerLogin } from './views/customer/CustomerLogin';
+import { CustomerRegister } from './views/customer/CustomerRegister';
+import { CustomerDashboard } from './views/customer/CustomerDashboard';
+import { CustomerPanel } from './views/customer/CustomerPanel';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -75,7 +72,10 @@ export default function App() {
         <Route path="/invoice/:id" element={<InvoiceView />} />
 
         {/* Customer Routes */}
-        <Route path="/customer" element={<CustomerPlaceholder />} />
+        <Route path="/customer-login" element={<CustomerLogin />} />
+        <Route path="/customer-register" element={<CustomerRegister />} />
+        <Route path="/customer/dashboard" element={<CustomerPanel />} />
+        <Route path="/customer/order/:businessId" element={<CustomerDashboard />} />
 
         {/* Business Admin / Staff Routes */}
         <Route path="/admin" element={<BusinessAdminLayout />}>

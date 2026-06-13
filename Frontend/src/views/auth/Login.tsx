@@ -56,7 +56,13 @@ export const Login: React.FC = () => {
 
       // Role-based routing
       if (data.data.role === 'CUSTOMER') {
-        navigate('/customer');
+        // Find business ID from localstorage or previous navigation if available
+        const lastBusinessId = localStorage.getItem('lastBusinessId');
+        if (lastBusinessId) {
+            navigate(`/customer/order/${lastBusinessId}`);
+        } else {
+            navigate('/customer/dashboard'); // default
+        }
       } else if (data.data.role === 'SUPER_ADMIN') {
         navigate('/super-admin');
       } else {
