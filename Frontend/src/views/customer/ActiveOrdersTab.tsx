@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 import { Package, Clock, Activity, Search, MapPin, Phone, Bike } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 
 interface Order {
@@ -49,6 +50,15 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
 
   useEffect(() => {
     fetchActiveOrders();
+
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('orderStatusUpdated', () => {
+      fetchActiveOrders();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const fetchActiveOrders = async () => {

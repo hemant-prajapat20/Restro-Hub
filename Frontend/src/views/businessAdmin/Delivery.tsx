@@ -8,7 +8,8 @@ import {
   ChevronRight,
   RefreshCw,
   Plus,
-  ExternalLink
+  ExternalLink,
+  CheckCircle2
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,6 +28,7 @@ export const Delivery: React.FC = () => {
   const [otpInput, setOtpInput] = useState('');
   const [driverName, setDriverName] = useState('');
   const [driverPhone, setDriverPhone] = useState('');
+  const [feedTab, setFeedTab] = useState<'Active' | 'Completed'>('Active');
 
   const { data: menu = [], isLoading: menuLoading } = useQuery({
     queryKey: ['menuItems'],
@@ -155,6 +157,10 @@ export const Delivery: React.FC = () => {
     });
   };
 
+  const activeOrders = deliveryOrders.filter((o: any) => !['Completed', 'Cancelled'].includes(o.status));
+  const completedOrders = deliveryOrders.filter((o: any) => o.status === 'Completed');
+  const pendingOrders = deliveryOrders.filter((o: any) => o.status === 'Pending');
+
   return (
     <div className="p-5 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -241,14 +247,31 @@ export const Delivery: React.FC = () => {
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2">
              <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
-                 <h4 className="text-xl font-semibold font-display flex items-center gap-2 text-slate-900 mb-6">
-                    <ShoppingBag className="text-brand-accent" />
-                    Live Feed
-                 </h4>
+                 <div className="flex items-center justify-between mb-6">
+                   <h4 className="text-xl font-semibold font-display flex items-center gap-2 text-slate-900">
+                      <ShoppingBag className="text-brand-accent" />
+                      Live Feed
+                   </h4>
+                   <div className="flex bg-slate-100 p-1 rounded-xl">
+                      <button 
+                         onClick={() => setFeedTab('Active')}
+                         className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${feedTab === 'Active' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                      >
+                         Active Orders
+                      </button>
+                      <button 
+                         onClick={() => setFeedTab('Completed')}
+                         className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${feedTab === 'Completed' ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                      >
+                         Completed
+                      </button>
+                   </div>
+                 </div>
+                 
                  <div className="space-y-4">
-                 {deliveryOrders.length === 0 ? (
-                    <div className="p-5 text-center text-slate-500 font-medium">No live delivery orders</div>
-                 ) : deliveryOrders.map((order: any) => (
+                 {(feedTab === 'Active' ? activeOrders : completedOrders).length === 0 ? (
+                    <div className="p-5 text-center text-slate-500 font-medium">No {feedTab.toLowerCase()} delivery orders</div>
+                 ) : (feedTab === 'Active' ? activeOrders : completedOrders).map((order: any) => (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -309,20 +332,43 @@ export const Delivery: React.FC = () => {
              <div className="bg-brand-primary p-5 rounded-[32px] text-white space-y-8 overflow-hidden relative shadow-2xl h-full flex flex-col justify-between">
                 <div className="relative z-10 space-y-8">
                    <div>
-                      <h4 className="text-2xl font-semibold font-display">Daily Delivery Heatmap</h4>
-                      <p className="text-slate-400 text-sm mt-1">High traffic zones for riders</p>
+                      <h4 className="text-2xl font-semibold font-display">Order Overview</h4>
+                      <p className="text-slate-400 text-sm mt-1">Pending and Completed Delivery Stats</p>
                    </div>
-                   <div className="aspect-square bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center italic text-slate-500 font-semibold">
-                      Map Visualization Placeholder
-                   </div>
+                   
                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                         <span className="text-sm font-semibold">Total Payouts</span>
-                         <span className="text-lg font-semibold">₹18,420</span>
+                      {/* Pending Orders Box */}
+                      <div className="bg-white/10 rounded-2xl p-5 border border-white/10">
+                         <h5 className="font-semibold text-slate-300 text-sm flex items-center gap-2">
+                            <Clock size={16} className="text-brand-accent" />
+                            Pending Orders
+                         </h5>
+                         <p className="text-4xl font-black mt-2">{pendingOrders.length}</p>
+                         <div className="mt-4 max-h-32 overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                            {pendingOrders.map((o: any) => (
+                               <div key={o.id} className="flex justify-between items-center bg-white/5 p-2 rounded-xl text-xs font-medium">
+                                  <span>{o.id}</span>
+                                  <span className="text-slate-400">{o.time}</span>
+                               </div>
+                            ))}
+                         </div>
                       </div>
-                      <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                         <span className="text-sm font-semibold">Rider Avg. Delay</span>
-                         <span className="text-lg font-semibold text-brand-accent">+2.4m</span>
+
+                      {/* Completed Orders Box */}
+                      <div className="bg-brand-success/20 rounded-2xl p-5 border border-brand-success/30">
+                         <h5 className="font-semibold text-brand-success text-sm flex items-center gap-2">
+                            <CheckCircle2 size={16} />
+                            Completed Today
+                         </h5>
+                         <p className="text-4xl font-black mt-2 text-white">{completedOrders.length}</p>
+                         <div className="mt-4 max-h-32 overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                            {completedOrders.map((o: any) => (
+                               <div key={o.id} className="flex justify-between items-center bg-black/10 p-2 rounded-xl text-xs font-medium text-slate-200">
+                                  <span>{o.id}</span>
+                                  <span className="text-emerald-400">{o.total}</span>
+                               </div>
+                            ))}
+                         </div>
                       </div>
                    </div>
                 </div>
@@ -347,11 +393,13 @@ export const Delivery: React.FC = () => {
                <div className="flex gap-2 mb-8 bg-slate-50 p-2 rounded-2xl">
                  <button 
                    onClick={() => updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'In Kitchen' })}
-                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${selectedManageOrder.status === 'In Kitchen' ? 'bg-white shadow-sm text-brand-primary' : 'text-slate-400 hover:bg-slate-100'}`}
+                   disabled={selectedManageOrder.status === 'Completed'}
+                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${selectedManageOrder.status === 'In Kitchen' ? 'bg-white shadow-sm text-brand-primary' : 'text-slate-400 hover:bg-slate-100'}`}
                  >In Kitchen</button>
                  <button 
                    onClick={() => updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'Ready' })}
-                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${selectedManageOrder.status === 'Ready' ? 'bg-white shadow-sm text-brand-primary' : 'text-slate-400 hover:bg-slate-100'}`}
+                   disabled={selectedManageOrder.status === 'Completed'}
+                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${selectedManageOrder.status === 'Ready' ? 'bg-white shadow-sm text-brand-primary' : 'text-slate-400 hover:bg-slate-100'}`}
                  >Ready</button>
                  <button 
                    onClick={() => {
@@ -361,7 +409,8 @@ export const Delivery: React.FC = () => {
                      }
                      updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'Out for Delivery', driverDetails: { name: driverName, phone: driverPhone } });
                    }}
-                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${selectedManageOrder.status === 'Out for Delivery' ? 'bg-brand-accent text-white shadow-md' : 'text-slate-400 hover:bg-slate-100'}`}
+                   disabled={selectedManageOrder.status === 'Completed'}
+                   className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${selectedManageOrder.status === 'Out for Delivery' ? 'bg-brand-accent text-white shadow-md' : 'text-slate-400 hover:bg-slate-100'}`}
                  >Out for Delivery</button>
                </div>
 
@@ -374,7 +423,8 @@ export const Delivery: React.FC = () => {
                      placeholder="Driver Name" 
                      value={driverName}
                      onChange={(e) => setDriverName(e.target.value)}
-                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-brand-accent/20 outline-none"
+                     disabled={selectedManageOrder.status === 'Completed'}
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-brand-accent/20 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                    />
                    <input 
                      type="tel" 
@@ -382,13 +432,14 @@ export const Delivery: React.FC = () => {
                      placeholder="Driver Phone" 
                      value={driverPhone}
                      onChange={(e) => setDriverPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-brand-accent/20 outline-none"
+                     disabled={selectedManageOrder.status === 'Completed'}
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:ring-2 focus:ring-brand-accent/20 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                    />
                  </div>
                </div>
 
                {/* OTP Verification */}
-               <div className="bg-brand-primary/5 rounded-2xl p-6 border border-brand-primary/10">
+               <div className={`bg-brand-primary/5 rounded-2xl p-6 border border-brand-primary/10 transition-opacity ${selectedManageOrder.status === 'Completed' ? 'opacity-50 pointer-events-none' : ''}`}>
                  <h4 className="font-bold text-sm text-brand-primary mb-4">Complete Delivery (Verify OTP)</h4>
                  <p className="text-xs text-slate-500 mb-4 font-medium">Ask the driver for the 4-digit code provided by the customer.</p>
                  <div className="flex gap-4">
@@ -398,11 +449,12 @@ export const Delivery: React.FC = () => {
                      placeholder="Enter 4-Digit OTP" 
                      value={otpInput}
                      onChange={(e) => setOtpInput(e.target.value)}
-                     className="flex-1 bg-white border border-brand-primary/20 rounded-xl px-4 py-3 text-center text-xl tracking-[0.5em] font-black focus:ring-2 focus:ring-brand-primary/20 outline-none"
+                     disabled={selectedManageOrder.status === 'Completed'}
+                     className="flex-1 bg-white border border-brand-primary/20 rounded-xl px-4 py-3 text-center text-xl tracking-[0.5em] font-black focus:ring-2 focus:ring-brand-primary/20 outline-none disabled:bg-slate-100"
                    />
                    <button 
                      onClick={() => verifyOtpMutation.mutate({ id: selectedManageOrder._id, otp: otpInput })}
-                     disabled={otpInput.length !== 4 || verifyOtpMutation.isPending}
+                     disabled={otpInput.length !== 4 || verifyOtpMutation.isPending || selectedManageOrder.status === 'Completed'}
                      className="bg-brand-success text-white px-8 font-bold rounded-xl shadow-md shadow-brand-success/20 disabled:opacity-50"
                    >
                      {verifyOtpMutation.isPending ? 'Verifying...' : 'Verify & Complete'}

@@ -50,6 +50,7 @@ const toWords = (num: number): string => {
 
 export const InvoiceView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const businessData = user?.businessData;
 
@@ -75,7 +76,13 @@ export const InvoiceView: React.FC = () => {
     <div className="bg-[#f8f9fc] min-h-screen font-sans text-slate-800 pb-10 print:bg-white print:pb-0 print:h-[297mm] print:overflow-hidden">
       
       {/* Top Action Bar */}
-      <div className="px-10 py-6 flex justify-end items-center print:hidden bg-white border-b border-slate-100 shadow-sm">
+      <div className="px-10 py-6 flex justify-between items-center print:hidden bg-white border-b border-slate-100 shadow-sm sticky top-0 z-50">
+        <button 
+          onClick={() => navigate('/business-admin?tab=transactions')} 
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold transition-colors"
+        >
+          <ChevronLeft size={20} /> Back to Transactions
+        </button>
         <div className="flex gap-4">
           <button 
              onClick={() => {
@@ -120,7 +127,7 @@ export const InvoiceView: React.FC = () => {
       </div>
 
       {/* Invoice Container */}
-      <div className="w-full bg-white min-h-screen print:min-h-0 print:h-full print:scale-[0.95] print:origin-top">
+      <div className="max-w-4xl mx-auto my-8 shadow-2xl rounded-2xl overflow-hidden bg-white print:shadow-none print:my-0 print:rounded-none print:w-full print:min-h-0 print:h-full print:scale-[0.95] print:origin-top">
         
         {/* Golden Header */}
         <div className="bg-[#C5A059] text-white px-10 py-12 print:px-6 print:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 print:gap-4">

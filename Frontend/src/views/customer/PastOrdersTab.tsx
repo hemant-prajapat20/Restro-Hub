@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { ShoppingBag, Clock, MapPin, ChevronRight, CheckCircle2, Clock3 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ShoppingBag, Clock, MapPin, ChevronRight, CheckCircle2, Clock3, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import toast from 'react-hot-toast';
 
 interface Order {
@@ -26,6 +26,19 @@ interface Order {
 const PastOrdersTab = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(new Set());
+
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrderIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -97,7 +110,7 @@ const PastOrdersTab = () => {
                 </div>
               </div>
               
-              <div className="flex flex-col md:items-end gap-2">
+              <div className="flex flex-col md:items-end gap-2 mt-4 md:mt-0">
                 <div className="flex items-center gap-2">
                    {order.status === 'Completed' || order.status === 'Delivered' ? (
                        <span className="flex items-center gap-1 bg-green-50 text-green-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">
@@ -113,49 +126,68 @@ const PastOrdersTab = () => {
                        </span>
                    )}
                 </div>
-                <p className="font-black text-brand-primary text-xl">₹{order.total.toFixed(2)}</p>
+                <div className="flex items-center gap-4">
+                  <p className="font-black text-brand-primary text-xl">₹{order.total.toFixed(2)}</p>
+                  <button 
+                    onClick={() => toggleOrderExpansion(order._id)}
+                    className="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-brand-primary"
+                  >
+                    {expandedOrderIds.has(order._id) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Order Details */}
-            <div className="mt-6 bg-slate-50/50 rounded-xl p-4 border border-slate-100 space-y-3">
-               <div className="flex justify-between items-start">
-                   <div>
-                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Order ID</p>
-                       <p className="text-sm font-black text-brand-primary">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
-                   </div>
-                   <div className="text-right">
-                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment</p>
-                       <p className="text-sm font-bold text-slate-700">{order.paymentMethod || 'N/A'}</p>
-                   </div>
-               </div>
-               
-               {order.customerDetails && (
-                 <div className="pt-3 border-t border-slate-200/60">
-                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Delivery Details</p>
-                   <div className="flex items-start gap-2 mb-1.5">
-                       <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                           <span className="text-[10px]">👤</span>
-                       </div>
-                       <p className="text-sm font-semibold text-slate-700">{order.customerDetails.name} <span className="text-slate-400 font-normal">({order.customerDetails.phone})</span></p>
-                   </div>
-                   {order.customerDetails.address && (
-                     <div className="flex items-start gap-2">
-                         <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                             <MapPin size={10} className="text-brand-accent" />
+            <AnimatePresence>
+              {expandedOrderIds.has(order._id) && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  {/* Order Details */}
+                  <div className="mt-6 bg-slate-50/50 rounded-xl p-4 border border-slate-100 space-y-3">
+                     <div className="flex justify-between items-start">
+                         <div>
+                             <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Order ID</p>
+                             <p className="text-sm font-black text-brand-primary">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
                          </div>
-                         <p className="text-sm text-slate-600 leading-tight">{order.customerDetails.address}</p>
+                         <div className="text-right">
+                             <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment</p>
+                             <p className="text-sm font-bold text-slate-700">{order.paymentMethod || 'N/A'}</p>
+                         </div>
                      </div>
-                   )}
-                 </div>
-               )}
-            </div>
-            
-            <div className="mt-4 pt-4 border-t border-slate-100">
-               <p className="text-sm text-slate-600 font-medium truncate">
-                   {order.items.map(item => `${item.quantity} x ${item.name}`).join(', ')}
-               </p>
-            </div>
+                     
+                     {order.customerDetails && (
+                       <div className="pt-3 border-t border-slate-200/60">
+                         <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Delivery Details</p>
+                         <div className="flex items-start gap-2 mb-1.5">
+                             <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                                 <span className="text-[10px]">👤</span>
+                             </div>
+                             <p className="text-sm font-semibold text-slate-700">{order.customerDetails.name} <span className="text-slate-400 font-normal">({order.customerDetails.phone})</span></p>
+                         </div>
+                         {order.customerDetails.address && (
+                           <div className="flex items-start gap-2">
+                               <div className="w-5 h-5 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                                   <MapPin size={10} className="text-brand-accent" />
+                               </div>
+                               <p className="text-sm text-slate-600 leading-tight">{order.customerDetails.address}</p>
+                           </div>
+                         )}
+                       </div>
+                     )}
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t border-slate-100">
+                     <p className="text-sm text-slate-600 font-medium truncate">
+                         {order.items.map(item => `${item.quantity} x ${item.name}`).join(', ')}
+                     </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         ))}
       </div>

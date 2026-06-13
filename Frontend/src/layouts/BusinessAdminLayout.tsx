@@ -1,14 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { Sidebar, Header } from '../components/Navigation';
 import { DesignProvider } from '../components/DesignProvider';
+import { io } from 'socket.io-client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const BusinessAdminLayout: React.FC = () => {
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const location = useLocation();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    
+    const handleGlobalUpdate = () => {
+      // Invalidate all queries to globally refresh dashboard, reports, transactions, crm, etc.
+      queryClient.invalidateQueries();
+    };
+
+    socket.on('newOrder', handleGlobalUpdate);
+    socket.on('orderUpdated', handleGlobalUpdate);
+    socket.on('orderStatusUpdated', handleGlobalUpdate);
+    socket.on('transactionUpdated', handleGlobalUpdate);
+    socket.on('newMessage', handleGlobalUpdate);
+    socket.on('newCustomerNotification', handleGlobalUpdate);
+    socket.on('newReservation', handleGlobalUpdate);
+    socket.on('reservationUpdated', handleGlobalUpdate);
+    socket.on('tablesMerged', handleGlobalUpdate);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [isAuthenticated, queryClient]);
 
   if (!isAuthenticated || (user?.role !== 'BUSINESS_ADMIN' && user?.role !== 'STAFF')) {
     return <Navigate to="/login" replace />;
