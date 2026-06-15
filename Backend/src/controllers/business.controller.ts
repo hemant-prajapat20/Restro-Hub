@@ -285,6 +285,41 @@ export const updateMyStoreStatus = async (req: Request, res: Response): Promise<
   }
 };
 
+// @desc    Update feature toggles (for BUSINESS_ADMIN)
+// @route   PUT /api/businesses/me/features
+// @access  Private/BUSINESS_ADMIN
+export const updateMyFeatureToggles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = (req as any).user;
+    if (!user || !user.businessId) {
+      res.status(403).json({ status: 'error', message: 'Not authorized or no business associated' });
+      return;
+    }
+
+    const { featureToggles } = req.body;
+    const business = await Business.findById(user.businessId);
+
+    if (!business) {
+      res.status(404).json({ status: 'error', message: 'Business not found' });
+      return;
+    }
+
+    // Merge existing toggles with new ones
+    business.featureToggles = {
+      ...business.featureToggles,
+      ...featureToggles
+    };
+    await business.save();
+
+    res.json({
+      status: 'success',
+      data: business
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
 // @desc    Update business logo (for BUSINESS_ADMIN)
 // @route   PUT /api/businesses/me/logo
 // @access  Private/BUSINESS_ADMIN

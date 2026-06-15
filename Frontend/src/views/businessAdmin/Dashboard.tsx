@@ -230,7 +230,7 @@ export const Dashboard: React.FC = () => {
                </ResponsiveContainer>
              </div>
              <div className="w-full space-y-4">
-               {categoryData.map((cat) => (
+               {categoryData.slice(0, 5).map((cat) => (
                  <div key={cat.name} className="flex items-center justify-between">
                    <div className="flex items-center gap-2">
                      <div className="w-3 h-3 rounded-full" style={{backgroundColor: cat.color}} />
@@ -247,7 +247,7 @@ export const Dashboard: React.FC = () => {
         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Top Performing Items</h4>
            <div className="space-y-4">
-              {topItems && topItems.length > 0 ? topItems.map((item: any) => (
+              {topItems && topItems.length > 0 ? topItems.slice(0, 5).map((item: any) => (
                 <div key={item.name} className="space-y-2">
                    <div className="flex justify-between items-end">
                       <div>
@@ -275,7 +275,7 @@ export const Dashboard: React.FC = () => {
         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Department Analytics</h4>
            <div className="space-y-4">
-              {moduleAnalytics && moduleAnalytics.length > 0 ? moduleAnalytics.map((mod: any) => {
+              {moduleAnalytics && moduleAnalytics.length > 0 ? moduleAnalytics.slice(0, 5).map((mod: any) => {
                  const totalRev = moduleAnalytics.reduce((sum: number, m: any) => sum + m.revenue, 0) || 1;
                  const progress = Math.round((mod.revenue / totalRev) * 100);
                  return (

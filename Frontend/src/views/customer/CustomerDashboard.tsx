@@ -103,7 +103,7 @@ export const CustomerDashboard: React.FC = () => {
   const { data: menuData, isLoading } = useQuery({
     queryKey: ['publicMenu', businessId],
     queryFn: async () => {
-      const response = await axios.get(`http://localhost:5000/api/customer-orders/menu/${businessId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/customer-orders/menu/${businessId}`);
       return response.data;
     },
     enabled: !!businessId
@@ -112,7 +112,7 @@ export const CustomerDashboard: React.FC = () => {
   const placeOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
       const response = await axios.post(
-        `http://localhost:5000/api/customer-orders/order/${businessId}`, 
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/customer-orders/order/${businessId}`, 
         orderData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

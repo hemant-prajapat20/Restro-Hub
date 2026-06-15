@@ -54,7 +54,7 @@ export const Businesses: React.FC = () => {
 
   const fetchBusinesses = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/businesses', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/businesses`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -72,7 +72,7 @@ export const Businesses: React.FC = () => {
 
   const fetchPricing = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/subscriptions', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/subscriptions`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await response.json();
@@ -153,7 +153,7 @@ export const Businesses: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/businesses', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/businesses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +201,7 @@ export const Businesses: React.FC = () => {
   const handleToggleBusinessStatus = async (businessId: string, currentStatus: string) => {
     try {
       const newStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-      const res = await fetch(`http://localhost:5000/api/businesses/${businessId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/businesses/${businessId}`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -243,7 +243,7 @@ export const Businesses: React.FC = () => {
     setError('');
     setIsSubmitting(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/businesses/${editingBusinessId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/businesses/${editingBusinessId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -278,7 +278,7 @@ export const Businesses: React.FC = () => {
 
   const toggleLoginAccess = async (userId: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${userId}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/users/${userId}/status`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -352,7 +352,7 @@ export const Businesses: React.FC = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto lg:overflow-visible w-full">
+        <div className="overflow-x-auto w-full custom-scrollbar pb-2">
           <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">

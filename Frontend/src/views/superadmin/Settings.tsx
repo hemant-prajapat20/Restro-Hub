@@ -17,7 +17,7 @@ export const Settings: React.FC = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/settings', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/settings`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const data = await response.json();
@@ -43,7 +43,7 @@ export const Settings: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/settings', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

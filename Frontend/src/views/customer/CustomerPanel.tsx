@@ -82,7 +82,7 @@ export const CustomerPanel: React.FC = () => {
 
     const fetchBusinesses = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/businesses/public');
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/businesses/public`);
         const data = await response.json();
         if (data.status === 'success') {
           setBusinesses(data.data);

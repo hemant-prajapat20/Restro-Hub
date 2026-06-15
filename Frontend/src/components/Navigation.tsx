@@ -81,11 +81,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
   
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const userPlatforms = user?.businessData?.platforms || [];
+  const toggles = user?.businessData?.featureToggles || {};
   
   const filteredBusinessNavItems = businessNavItems.filter(item => {
-    if (item.platform) {
-      return userPlatforms.includes(item.platform);
+    // 1. Must have purchased the platform
+    if (item.platform && !userPlatforms.includes(item.platform)) {
+      return false;
     }
+    // 2. Must not be temporarily disabled via toggles
+    if (item.id === 'restro' && toggles.restaurant === false) return false;
+    if (item.id === 'cafe' && toggles.cafe === false) return false;
+    // Note: Assuming 'bar' doesn't have a toggle yet, or it's always on if purchased
+    if (item.id === 'delivery' && toggles.onlineOrders === false) return false;
+    if (item.id === 'tables' && toggles.reservations === false) return false;
+    
     return true;
   });
 

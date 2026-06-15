@@ -31,6 +31,15 @@ export interface IBusiness extends Document {
   status: BusinessStatus;
   isActive: boolean; // Legacy flag, kept for backward compatibility if needed
   isStoreOpen: boolean;
+  featureToggles: {
+    notifications: boolean;
+    onlineOrders: boolean;
+    vip: boolean;
+    cafe: boolean;
+    restaurant: boolean;
+    cafeteria: boolean;
+    reservations: boolean;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -63,7 +72,16 @@ const businessSchema = new Schema<IBusiness>(
       default: BusinessStatus.ACTIVE
     },
     isActive: { type: Boolean, default: true },
-    isStoreOpen: { type: Boolean, default: true }
+    isStoreOpen: { type: Boolean, default: true },
+    featureToggles: {
+      notifications: { type: Boolean, default: true },
+      onlineOrders: { type: Boolean, default: true },
+      vip: { type: Boolean, default: true },
+      cafe: { type: Boolean, default: true },
+      restaurant: { type: Boolean, default: true },
+      cafeteria: { type: Boolean, default: true },
+      reservations: { type: Boolean, default: true }
+    }
   },
   { timestamps: true }
 );

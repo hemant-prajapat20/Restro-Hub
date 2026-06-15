@@ -22,7 +22,8 @@ import {
   Calendar,
   Camera,
   Trash2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Wine
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -61,14 +62,18 @@ export const Settings: React.FC = () => {
   const [isTogglingStore, setIsTogglingStore] = useState(false);
   
   // Local state for UI toggles (these would sync with backend in reality)
-  const [features, setFeatures] = useState({
-    notifications: true,
-    onlineOrders: false,
-    vip: true,
-    cafe: false,
-    restaurant: true,
-    cafeteria: false,
-    reservations: true
+  const [features, setFeatures] = useState(() => {
+    const backendToggles = user?.businessData?.featureToggles || {};
+    return {
+      notifications: backendToggles.notifications ?? true,
+      onlineOrders: backendToggles.onlineOrders ?? true,
+      vip: backendToggles.vip ?? true,
+      cafe: backendToggles.cafe ?? true,
+      restaurant: backendToggles.restaurant ?? true,
+      cafeteria: backendToggles.cafeteria ?? true,
+      bar: backendToggles.bar ?? true,
+      reservations: backendToggles.reservations ?? true
+    };
   });
 
   const dispatch = useDispatch();
@@ -157,8 +162,25 @@ export const Settings: React.FC = () => {
     } catch (error) { toast.error('Failed to remove picture'); }
   };
 
-  const toggleFeature = (key: keyof typeof features) => {
-    setFeatures(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleFeature = async (key: keyof typeof features) => {
+    const newValue = !features[key];
+    setFeatures(prev => ({ ...prev, [key]: newValue }));
+    
+    try {
+      await api.put('/businesses/me/features', { featureToggles: { [key]: newValue } });
+      const updatedUser = { 
+        ...user, 
+        businessData: { 
+          ...user?.businessData, 
+          featureToggles: { ...user?.businessData?.featureToggles, [key]: newValue } 
+        } 
+      } as any;
+      dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
+      toast.success('Feature setting saved');
+    } catch (error) {
+      toast.error('Failed to save feature setting');
+      setFeatures(prev => ({ ...prev, [key]: !newValue })); // revert
+    }
   };
 
   const handleStoreToggle = async () => {
@@ -377,27 +399,43 @@ export const Settings: React.FC = () => {
                 enabled={features.vip}
                 onToggle={() => toggleFeature('vip')}
               />
-              <FeatureToggle 
-                icon={Utensils} 
-                title="Restaurant (Restro)" 
-                description="Full dining experience with KDS and POS billing."
-                enabled={features.restaurant}
-                onToggle={() => toggleFeature('restaurant')}
-              />
-              <FeatureToggle 
-                icon={Coffee} 
-                title="Cafe & Patisserie" 
-                description="Quick service mode for cafes, bakeries, and coffee shops."
-                enabled={features.cafe}
-                onToggle={() => toggleFeature('cafe')}
-              />
-              <FeatureToggle 
-                icon={Store} 
-                title="Cafeteria" 
-                description="Token-based ordering for corporate cafeterias and canteens."
-                enabled={features.cafeteria}
-                onToggle={() => toggleFeature('cafeteria')}
-              />
+              {user?.businessData?.platforms?.includes('Restaurant') && (
+                <FeatureToggle 
+                  icon={Utensils} 
+                  title="Restaurant (Restro)" 
+                  description="Full dining experience with KDS and POS billing."
+                  enabled={features.restaurant}
+                  onToggle={() => toggleFeature('restaurant')}
+                />
+              )}
+              {user?.businessData?.platforms?.includes('Cafeteria') && (
+                <FeatureToggle 
+                  icon={Coffee} 
+                  title="Cafe & Patisserie" 
+                  description="Quick service mode for cafes, bakeries, and coffee shops."
+                  enabled={features.cafe}
+                  onToggle={() => toggleFeature('cafe')}
+                />
+              )}
+              {user?.businessData?.platforms?.includes('Bar') && (
+                <FeatureToggle 
+                  icon={Wine} 
+                  title="Bar Lounge" 
+                  description="Manage bar inventory, drink menus, and tabs."
+                  enabled={features.bar}
+                  onToggle={() => toggleFeature('bar')}
+                />
+              )}
+              {/* Optional: if there's a separate generic Cafeteria platform */}
+              {user?.businessData?.platforms?.includes('GenericCafeteria') && (
+                <FeatureToggle 
+                  icon={Store} 
+                  title="Cafeteria" 
+                  description="Token-based ordering for corporate cafeterias and canteens."
+                  enabled={features.cafeteria}
+                  onToggle={() => toggleFeature('cafeteria')}
+                />
+              )}
               <FeatureToggle 
                 icon={CalendarCheck} 
                 title="Table Booking" 

@@ -44,7 +44,7 @@ export const MessageCenter: React.FC = () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/activity`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}`}/activity`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -76,7 +76,7 @@ export const MessageCenter: React.FC = () => {
   const markAllRead = async () => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/activity/read`, {
+      await fetch(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}`}/activity/read`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -95,7 +95,7 @@ export const MessageCenter: React.FC = () => {
   const markOneRead = async (logId: string) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/activity/read`, {
+      await fetch(`${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}`}/activity/read`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
