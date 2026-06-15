@@ -106,3 +106,41 @@ export const mergeTables = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error merging tables' });
   }
 };
+
+export const splitTables = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { primaryTableId } = req.body;
+
+    if (!primaryTableId) {
+      return res.status(400).json({ message: 'Primary table ID required' });
+    }
+
+    const primaryTable = await Table.findOne({ _id: primaryTableId, businessId });
+    if (!primaryTable || !primaryTable.linkedTables || primaryTable.linkedTables.length === 0) {
+      return res.status(400).json({ message: 'Table is not merged' });
+    }
+
+    const secondaryTableIds = primaryTable.linkedTables;
+
+    // Reset primary table
+    primaryTable.linkedTables = [];
+    await primaryTable.save();
+
+    // Reset secondary tables to Available
+    await Table.updateMany(
+      { _id: { $in: secondaryTableIds }, businessId },
+      { $set: { status: 'Available' } }
+    );
+
+    // Emit event
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('tablesSplit', { primaryTableId, secondaryTableIds });
+    }
+
+    res.json(primaryTable);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error splitting tables' });
+  }
+};

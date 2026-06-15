@@ -146,6 +146,15 @@ export const Tables: React.FC = () => {
     }
   });
 
+  const splitTableMutation = useMutation({
+    mutationFn: async (primaryTableId: string) => await api.post('/tables/split', { primaryTableId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      toast.success('Tables Split Successfully');
+      setSelectedTableId(null);
+    }
+  });
+
   const updateTableStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: string }) => await api.put(`/tables/${id}`, { status }),
     onSuccess: () => {
@@ -515,7 +524,20 @@ export const Tables: React.FC = () => {
                           <h3 className="text-xl font-semibold text-slate-900">Table Billing & POS</h3>
                           <div className="flex items-center gap-2 mt-1">
                              <StatusBadge status={selectedTable.status} />
-                             <span className="text-xs font-bold text-slate-400 uppercase">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
+                             {selectedTable.status === 'Merged' && (
+                               <button
+                                 onClick={() => {
+                                   if (window.confirm('Are you sure you want to split these tables?')) {
+                                     splitTableMutation.mutate(selectedTable.id);
+                                   }
+                                 }}
+                                 disabled={splitTableMutation.isPending}
+                                 className="ml-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] px-2 py-0.5 rounded-md font-semibold transition-colors uppercase tracking-widest"
+                               >
+                                 {splitTableMutation.isPending ? 'Splitting...' : 'Split Tables'}
+                               </button>
+                             )}
+                             <span className="text-xs font-bold text-slate-400 uppercase ml-2">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>
                           </div>
                        </div>
                     </div>

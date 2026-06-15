@@ -11,7 +11,7 @@ export interface IOrderItem {
 
 export interface IOrder extends Document {
   businessId: mongoose.Types.ObjectId;
-  type: 'POS' | 'Delivery' | 'Signature' | 'Bar' | 'Cafe';
+  type: 'POS' | 'Delivery' | 'Signature' | 'Bar' | 'Cafe' | 'Dine-In' | 'Takeaway' | 'Online';
   tableId?: mongoose.Types.ObjectId;
   customerId?: mongoose.Types.ObjectId;
   items: IOrderItem[];
@@ -39,7 +39,7 @@ export interface IOrder extends Document {
 
 const OrderSchema = new Schema({
   businessId: { type: Schema.Types.ObjectId, ref: 'Business', required: true, index: true },
-  type: { type: String, required: true },
+  type: { type: String, required: true, enum: ['POS', 'Delivery', 'Signature', 'Bar', 'Cafe', 'Dine-In', 'Takeaway', 'Online'] },
   tableId: { type: Schema.Types.ObjectId, ref: 'Table' },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer' },
   items: [{

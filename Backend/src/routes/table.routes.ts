@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getTables, addTable, updateTable, deleteTable, mergeTables } from '../controllers/table.controller';
+import { getTables, addTable, updateTable, deleteTable, mergeTables, splitTables } from '../controllers/table.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -13,6 +13,7 @@ router.route('/')
   .post(addTable);
 
 router.post('/merge', mergeTables);
+router.post('/split', splitTables);
 
 router.route('/:id')
   .put(updateTable)

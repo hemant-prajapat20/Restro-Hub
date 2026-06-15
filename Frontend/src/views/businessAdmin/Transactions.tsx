@@ -2,55 +2,55 @@ import React, { useState } from 'react';
 import { 
   FileText, 
   Search,
-  Lock,
-  Receipt,
-  X,
-  Send,
-  Printer,
-  Download
+  CheckCircle,
+  XCircle,
+  Clock,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { io } from 'socket.io-client';
 import api from '../../utils/api';
-import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import toast from 'react-hot-toast';
 
-import { useNavigate } from 'react-router-dom';
-
 export const Transactions: React.FC = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
     const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
-    socket.on('newOrder', () => {
-      queryClient.invalidateQueries({ queryKey: ['businessReportsAll'] });
-    });
-    return () => {
-      socket.disconnect();
-    };
+    socket.on('newOrder', () => queryClient.invalidateQueries({ queryKey: ['ordersAll'] }));
+    socket.on('orderUpdated', () => queryClient.invalidateQueries({ queryKey: ['ordersAll'] }));
+    return () => { socket.disconnect(); };
   }, [queryClient]);
 
-  const { data: reports, isLoading } = useQuery({
-    queryKey: ['businessReportsAll'],
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ['ordersAll'],
     queryFn: async () => {
-      // Reusing the reports endpoint which fetches all recentInvoices
-      // In a real production app, this would be a paginated /api/orders endpoint
-      const response = await api.get('/analytics/business/reports');
-      return response.data.data;
+      const response = await api.get('/orders');
+      return response.data;
+    }
+  });
+
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => await api.patch(`/orders/${id}/status`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ordersAll'] });
+      toast.success('Order status updated');
     }
   });
 
   if (isLoading) {
-    return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Transactions...</div>;
+    return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Orders...</div>;
   }
 
-  const { recentInvoices } = reports || { recentInvoices: [] };
+  const activeOrders = orders.filter((o: any) => o.status !== 'Completed' && o.status !== 'Cancelled');
+  const historyOrders = orders.filter((o: any) => o.status === 'Completed' || o.status === 'Cancelled');
+  
+  const displayOrders = activeTab === 'active' ? activeOrders : historyOrders;
 
-  const filteredInvoices = recentInvoices.filter((inv: any) => {
+  const filteredOrders = displayOrders.filter((inv: any) => {
     const invId = inv._id || inv.id || '';
     return invId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (inv.type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -63,22 +63,40 @@ export const Transactions: React.FC = () => {
           <div>
              <h3 className="text-2xl font-semibold font-display text-slate-900 flex items-center gap-3">
                <FileText className="w-8 h-8 text-brand-primary" />
-               Transaction Ledger
+               Order Management
              </h3>
-             <p className="text-slate-500 font-medium">All historical platform transactions and digital invoices</p>
+             <p className="text-slate-500 font-medium">Manage active orders across all modules and track historical transactions</p>
           </div>
+       </div>
+
+       {/* Tabs */}
+       <div className="flex gap-4 border-b border-slate-200">
+         <button 
+           onClick={() => setActiveTab('active')}
+           className={`pb-4 px-4 text-sm tracking-widest uppercase font-bold transition-all ${activeTab === 'active' ? 'border-b-2 border-brand-primary text-brand-primary' : 'text-slate-400 hover:text-slate-600'}`}
+         >
+           Active Orders ({activeOrders.length})
+         </button>
+         <button 
+           onClick={() => setActiveTab('history')}
+           className={`pb-4 px-4 text-sm tracking-widest uppercase font-bold transition-all ${activeTab === 'history' ? 'border-b-2 border-brand-primary text-brand-primary' : 'text-slate-400 hover:text-slate-600'}`}
+         >
+           Order History ({historyOrders.length})
+         </button>
        </div>
 
        <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden flex flex-col mb-8">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-             <h5 className="font-semibold font-display text-slate-900 text-lg">Transaction History</h5>
+             <h5 className="font-semibold font-display text-slate-900 text-lg">
+               {activeTab === 'active' ? 'Currently Active Orders' : 'Past Transactions'}
+             </h5>
              <div className="relative w-72">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input 
                   type="text" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search Bill ID or Customer..." 
+                  placeholder="Search Order ID or Customer..." 
                   className="pl-12 pr-4 py-3 w-full bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-accent/20 outline-none transition-all"
                 />
              </div>
@@ -87,43 +105,72 @@ export const Transactions: React.FC = () => {
              <table className="w-full min-w-[1000px] text-left">
                 <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm">
                    <tr>
-                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Bill ID & Date</th>
+                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Order ID & Date</th>
                       <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Customer Details</th>
-                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Module</th>
+                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Module / Type</th>
                       <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Total Amount</th>
-                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Payment</th>
-                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Status</th>
+                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Status</th>
+                      <th className="px-6 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                    </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                   {filteredInvoices.length === 0 ? (
-                     <tr><td colSpan={6} className="p-8 text-center text-slate-500 font-medium">No transactions found</td></tr>
-                   ) : filteredInvoices.map((invoice: any) => {
-                     const invId = invoice._id || invoice.id || '';
-                     const shortId = invoice.transactionId ? invoice.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
+                   {filteredOrders.length === 0 ? (
+                     <tr><td colSpan={6} className="p-8 text-center text-slate-500 font-medium">No orders found</td></tr>
+                   ) : filteredOrders.map((order: any) => {
+                     const invId = order._id || order.id || '';
+                     const shortId = order.transactionId ? order.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
                      return (
-                     <tr key={invId} onClick={() => navigate(`/invoice/${invId}`)} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
+                     <tr key={invId} className="hover:bg-slate-50/50 transition-all group">
                         <td className="px-6 py-4">
                            <p className="text-sm font-semibold text-brand-primary">#{shortId}</p>
-                           <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt || invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                           <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(order.createdAt || order.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                         </td>
                         <td className="px-6 py-4">
-                           <p className="text-sm font-bold text-slate-900">{invoice.customerDetails?.name || 'Walk-in Customer'}</p>
-                           <p className="text-[10px] font-semibold text-slate-400">{invoice.customerDetails?.phone || 'N/A'}</p>
+                           <p className="text-sm font-bold text-slate-900">{order.customerDetails?.name || 'Walk-in Customer'}</p>
+                           <p className="text-[10px] font-semibold text-slate-400">{order.customerDetails?.phone || 'N/A'}</p>
                         </td>
                         <td className="px-6 py-4 text-center">
-                           <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
-                             invoice.source === 'Online' ? 'bg-indigo-50 text-indigo-600' : 'bg-blue-50 text-blue-600'
-                           }`}>
-                             {invoice.source === 'Online' ? 'ONLINE ORDER' : invoice.type}
+                           <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest bg-blue-50 text-blue-600`}>
+                             {order.type}
                            </span>
                         </td>
-                        <td className="px-6 py-4 text-center font-bold text-sm text-slate-900">₹{invoice.amount.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-center font-bold text-sm text-slate-900">₹{(order.total || order.amount || 0).toLocaleString()}</td>
                         <td className="px-6 py-4 text-center">
-                           <span className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">{invoice.paymentMethod || 'Cash'}</span>
+                           <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
+                             order.status === 'Completed' || order.status === 'Served' ? 'bg-emerald-50 text-emerald-600' : 
+                             order.status === 'Cancelled' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-500'
+                           }`}>
+                             {order.status}
+                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                           <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${invoice.status === 'Completed' || invoice.status === 'Served' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{invoice.status}</span>
+                        <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                           {activeTab === 'active' && (
+                             <>
+                               {order.status !== 'Ready' && order.status !== 'Served' && (
+                                 <button 
+                                   onClick={() => updateOrderStatusMutation.mutate({ id: invId, status: 'Ready' })}
+                                   className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-md transition-colors"
+                                   title="Mark Ready"
+                                 >
+                                   <CheckCircle size={16} />
+                                 </button>
+                               )}
+                               <button 
+                                 onClick={() => {
+                                   if (window.confirm('Are you sure you want to cancel this order?')) {
+                                     updateOrderStatusMutation.mutate({ id: invId, status: 'Cancelled' });
+                                   }
+                                 }}
+                                 className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-md transition-colors"
+                                 title="Cancel Order"
+                               >
+                                 <XCircle size={16} />
+                               </button>
+                             </>
+                           )}
+                           {activeTab === 'history' && order.status !== 'Cancelled' && (
+                             <button className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-primary">View Receipt</button>
+                           )}
                         </td>
                      </tr>
                      );
