@@ -16,10 +16,6 @@ export const MessageCenter: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
-
   const fetchLogs = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -34,6 +30,19 @@ export const MessageCenter: React.FC = () => {
       console.error('Error fetching logs', error);
     }
   };
+
+  useEffect(() => {
+    fetchLogs();
+    
+    // Listen for real-time messages
+    import('socket.io-client').then(({ io }) => {
+      const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+      socket.on('newMessage', (newNotif) => {
+        setLogs(prev => [newNotif, ...prev]);
+      });
+      return () => socket.disconnect();
+    });
+  }, []);
 
   const handleDoubleClick = async (logId: string, isRead: boolean) => {
     if (isRead) return; // Already read

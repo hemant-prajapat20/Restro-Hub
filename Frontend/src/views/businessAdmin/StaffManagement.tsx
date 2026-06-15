@@ -37,6 +37,27 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 
+// Helper to check if current IST time falls inside a shift
+const isStaffActiveIST = (shift: string): boolean => {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const istDate = new Date(utc + (3600000 * 5.5));
+  const currentHour = istDate.getHours() + (istDate.getMinutes() / 60);
+
+  switch (shift) {
+    case 'Morning (6 AM - 2 PM)':
+      return currentHour >= 6 && currentHour < 14;
+    case 'Evening (2 PM - 10 PM)':
+      return currentHour >= 14 && currentHour < 22;
+    case 'Night (10 PM - 6 AM)':
+      return currentHour >= 22 || currentHour < 6;
+    case 'General (10 AM - 7 PM)':
+      return currentHour >= 10 && currentHour < 19;
+    default:
+      return false;
+  }
+};
+
 export const StaffManagement: React.FC = () => {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,10 +83,14 @@ export const StaffManagement: React.FC = () => {
     queryKey: ['staff'],
     queryFn: async () => {
       const response = await api.get('/staff');
-      return response.data.map((item: any) => ({
-        ...item,
-        id: item._id
-      }));
+      return response.data.map((item: any) => {
+        const isActive = isStaffActiveIST(item.shift);
+        return {
+          ...item,
+          id: item._id,
+          dynamicStatus: isActive ? 'ACTIVE' : 'INACTIVE'
+        };
+      });
     }
   });
 
@@ -108,7 +133,7 @@ export const StaffManagement: React.FC = () => {
       setNewSalary('');
       setNewContact('');
       setNewEmail('');
-      setNewGender('Male');
+      setNewScore('5.0');
       setShowAddModal(false);
       setEditingStaffId(null);
     },
@@ -138,7 +163,7 @@ export const StaffManagement: React.FC = () => {
     // Use explicit hair styles to guarantee gender appearance in avataaars
     const avatarParams = isFemale 
       ? `&hair=longHairStraight,longHairCurly,longHairMiaWallace&clothing=blazerAndSweater,collarAndSweater`
-      : `&hair=shortHairShortFlat,shortHairShortWaved,shortHairTheCaesar&clothing=blazerAndShirt,shirtCrewNeck&facialHairProbability=20`;
+      : `&hair=shortHairShortFlat,shortHairShortRound,shortHairFrizzle&facialHairProbability=20&clothing=hoodie,shirtCrewNeck`;
 
     const staffData = {
       name: newName,
@@ -146,7 +171,7 @@ export const StaffManagement: React.FC = () => {
       shift: newShift,
       salary: Number(newSalary),
       contact: newContact,
-      email: newEmail || `${newName.toLowerCase().replace(/\s/g, '')}@indiserve.pro`,
+      email: newEmail,
       score: Number(newScore) || 5.0,
       image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}${avatarParams}`
     };
@@ -173,12 +198,8 @@ export const StaffManagement: React.FC = () => {
     setNewEmail(staff.email);
     setNewScore(staff.score.toString());
     
-    // Infer gender from image URL (since we used Sophia or Felix)
-    if (staff.image && staff.image.includes('Sophia')) {
-       setNewGender('Female');
-    } else {
-       setNewGender('Male');
-    }
+    // We cannot reliably guess gender from avatar seed without storing it, but we can default.
+    setNewGender('Male'); 
     
     setShowAddModal(true);
   };
@@ -203,6 +224,8 @@ export const StaffManagement: React.FC = () => {
     return <div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
+  const activeStaffCount = crew.filter((m: any) => m.dynamicStatus === 'ACTIVE').length;
+
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
       {/* Golden Staff Header */}
@@ -225,7 +248,7 @@ export const StaffManagement: React.FC = () => {
              <div>
                 <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Active On-Duty Brigade</p>
                 <p className="text-lg font-semibold text-white font-mono">
-                   {crew.filter(m => m.status === 'Clocked In').length} / {crew.length} Crew
+                   {activeStaffCount} / {crew.length} Crew
                 </p>
              </div>
           </div>
@@ -308,10 +331,10 @@ export const StaffManagement: React.FC = () => {
                         </div>
                         <div className="flex flex-col items-end">
                            <span className={`px-2.5 py-1 rounded-full text-[8px] font-semibold uppercase tracking-wider ${
-                              member.status === 'Clocked In' ? 'bg-green-50 text-green-700 border border-green-200/40' : 
-                              member.status === 'On Break' ? 'bg-amber-50 text-amber-700 border border-amber-200/40' : 'bg-stone-100 text-stone-500 border border-stone-200/40'
+                              (member as any).dynamicStatus === 'ACTIVE' ? 'bg-green-50 text-green-700 border border-green-200/40' : 
+                              'bg-stone-100 text-stone-500 border border-stone-200/40'
                            } border`}>
-                              {member.status}
+                              {(member as any).dynamicStatus}
                            </span>
                            <span className="text-[10px] font-mono text-amber-500 font-semibold tracking-tight mt-1 flex items-center gap-1">
                               <Smile size={10} />
@@ -361,30 +384,9 @@ export const StaffManagement: React.FC = () => {
                         <p className="text-sm font-semibold text-stone-800">₹{member.salary.toLocaleString()} / mo</p>
                      </div>
                      <div className="flex gap-1">
-                        {member.status !== 'Clocked In' && (
-                           <button 
-                             onClick={() => handleUpdateStatus(member.id, 'Clocked In')}
-                             className="p-2 bg-green-50 border border-green-200 text-green-700 rounded-xl hover:bg-green-100 transition-all text-[10px] font-semibold"
-                           >
-                             CLOCK IN
-                           </button>
-                        )}
-                        {member.status === 'Clocked In' && (
-                           <button 
-                             onClick={() => handleUpdateStatus(member.id, 'On Break')}
-                             className="p-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl hover:bg-amber-100 transition-all text-[10px] font-semibold"
-                           >
-                             BREAK
-                           </button>
-                        )}
-                        {member.status !== 'Off-Duty' && (
-                           <button 
-                             onClick={() => handleUpdateStatus(member.id, 'Off-Duty')}
-                             className="p-2 bg-stone-50 border border-stone-200 text-stone-600 rounded-xl hover:bg-stone-100 transition-all text-[10px] font-semibold"
-                           >
-                             EXIT
-                           </button>
-                        )}
+                        <span className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2 py-1 bg-stone-50 rounded-lg">
+                           Auto-Managed by Shift
+                        </span>
                      </div>
                   </div>
                </motion.div>
