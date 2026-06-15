@@ -219,7 +219,7 @@ export const Reports: React.FC = () => {
                       ) : recentInvoices.map((invoice: any) => (
                         <tr key={invoice.id} onClick={() => setSelectedInvoice(invoice)} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
                            <td className="px-6 py-4">
-                              <p className="text-sm font-semibold text-brand-primary">#{invoice.id.slice(-8).toUpperCase()}</p>
+                              <p className="text-sm font-semibold text-brand-primary">#{invoice.transactionId ? invoice.transactionId : invoice.id.slice(-8).toUpperCase()}</p>
                               <p className="text-[10px] font-semibold text-slate-400 mt-0.5">{new Date(invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                            </td>
                            <td className="px-6 py-4">
@@ -262,7 +262,7 @@ export const Reports: React.FC = () => {
                     <Receipt className="text-brand-accent" />
                     Transaction Details
                   </h3>
-                  <p className="text-xs font-mono text-slate-500 mt-1">ID: {selectedInvoice.id.slice(-8).toUpperCase()}</p>
+                  <p className="text-xs font-mono text-slate-500 mt-1">ID: {selectedInvoice.transactionId ? selectedInvoice.transactionId : selectedInvoice.id.slice(-8).toUpperCase()}</p>
                 </div>
                 <button onClick={() => setSelectedInvoice(null)} className="p-2 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-full transition-all">
                   <X size={20} />
@@ -325,7 +325,7 @@ export const Reports: React.FC = () => {
                   onClick={() => {
                     generateReceiptPDF({
                       title: "RESTROHUB TRANSACTION",
-                      invoiceNumber: selectedInvoice.id.slice(-8).toUpperCase(),
+                      invoiceNumber: selectedInvoice.transactionId ? selectedInvoice.transactionId : selectedInvoice.id.slice(-8).toUpperCase(),
                       timestamp: new Date(selectedInvoice.date).toLocaleString(),
                       items: selectedInvoice.items || [],
                       subtotal: selectedInvoice.subtotal || (selectedInvoice.amount - selectedInvoice.tax),

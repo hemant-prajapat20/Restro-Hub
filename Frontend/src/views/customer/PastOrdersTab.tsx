@@ -106,7 +106,7 @@ const PastOrdersTab = () => {
                 <div>
                   <h3 className="font-extrabold text-brand-primary text-lg">{order.businessId?.name || 'Unknown Restaurant'}</h3>
                   <p className="text-sm text-slate-500 font-medium">{new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                  <p className="text-xs text-slate-400 font-bold mt-1">Order #{order._id.substring(order._id.length - 6).toUpperCase()}</p>
+                  <p className="text-xs text-slate-400 font-bold mt-1">Order #{order.transactionId ? order.transactionId : order._id.substring(order._id.length - 8).toUpperCase()}</p>
                 </div>
               </div>
               
@@ -151,7 +151,7 @@ const PastOrdersTab = () => {
                      <div className="flex justify-between items-start">
                          <div>
                              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Order ID</p>
-                             <p className="text-sm font-black text-brand-primary">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                             <p className="text-sm font-black text-brand-primary">#{order.transactionId ? order.transactionId : order._id.substring(order._id.length - 8).toUpperCase()}</p>
                          </div>
                          <div className="text-right">
                              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment</p>

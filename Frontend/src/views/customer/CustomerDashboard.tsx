@@ -207,7 +207,7 @@ export const CustomerDashboard: React.FC = () => {
         customerContact: currentUser.phone,
         onSuccess: (paymentId) => {
           toast.success(`Payment Successful! ID: ${paymentId}`);
-          placeOrderMutation.mutate(placeOrderPayload);
+          placeOrderMutation.mutate({ ...placeOrderPayload, transactionId: paymentId });
         },
         onFailure: async (error) => {
           toast.error('Payment Failed: ' + (error?.description || 'Unknown error'));

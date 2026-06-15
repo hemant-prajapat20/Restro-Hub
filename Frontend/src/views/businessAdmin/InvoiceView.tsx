@@ -69,7 +69,7 @@ export const InvoiceView: React.FC = () => {
   const subtotal = invoice.subtotal || (grandTotal - (invoice.tax || 0));
   const tax = invoice.tax || 0;
   
-  const invoiceId = invoice._id?.slice(-8).toUpperCase() || invoice.id?.slice(-8).toUpperCase();
+  const invoiceId = invoice.transactionId ? invoice.transactionId : (invoice._id?.slice(-8).toUpperCase() || invoice.id?.slice(-8).toUpperCase());
   const dateFormatted = new Date(invoice.createdAt || invoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
   
   return (

@@ -97,7 +97,7 @@ export const Transactions: React.FC = () => {
                      <tr><td colSpan={6} className="p-8 text-center text-slate-500 font-medium">No transactions found</td></tr>
                    ) : filteredInvoices.map((invoice: any) => {
                      const invId = invoice._id || invoice.id || '';
-                     const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
+                     const shortId = invoice.transactionId ? invoice.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
                      return (
                      <tr key={invId} onClick={() => window.open(`/invoice/${invId}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
                         <td className="px-6 py-4">

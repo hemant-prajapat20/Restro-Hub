@@ -157,7 +157,7 @@ export const markAllNotificationsAsRead = async (req: Request, res: Response) =>
 export const placeCustomerOrder = async (req: Request, res: Response) => {
   try {
     const { businessId } = req.params;
-    const { items, subtotal, tax, total, customerDetails, paymentMethod } = req.body;
+    const { items, subtotal, tax, total, customerDetails, paymentMethod, transactionId } = req.body;
 
     // customer details might include name and phone.
     // If the user is logged in, we have req.user from the protect middleware
@@ -179,6 +179,7 @@ export const placeCustomerOrder = async (req: Request, res: Response) => {
       tax,
       total,
       paymentMethod: paymentMethod || 'Cash',
+      transactionId: transactionId || '',
       source: 'Online',
       customerDetails: finalCustomerDetails,
       status: 'Pending',

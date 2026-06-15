@@ -329,7 +329,7 @@ const RecentTransactionsTable = () => {
     <>
       {orders.map((invoice: any) => {
         const invId = invoice._id || invoice.id || '';
-        const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
+        const shortId = invoice.transactionId ? invoice.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
         return (
           <tr key={invId} onClick={() => window.open(`/invoice/${invId}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
              <td className="px-6 py-4">

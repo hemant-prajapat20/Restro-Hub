@@ -20,6 +20,7 @@ export interface IOrder extends Document {
   total: number;
   status: 'Pending' | 'In Kitchen' | 'Ready' | 'Completed' | 'Cancelled' | 'Out for Delivery';
   paymentMethod?: string;
+  transactionId?: string;
   source?: 'Zomato' | 'Swiggy' | 'Direct' | 'Online';
   customerDetails?: {
     name: string;
@@ -54,6 +55,7 @@ const OrderSchema = new Schema({
   total: { type: Number, required: true },
   status: { type: String, enum: ['Pending', 'In Kitchen', 'Ready', 'Completed', 'Cancelled', 'Out for Delivery'], default: 'Pending' },
   paymentMethod: { type: String },
+  transactionId: { type: String },
   source: { type: String, enum: ['Zomato', 'Swiggy', 'Direct', 'Online'] },
   customerDetails: {
     name: { type: String },
