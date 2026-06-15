@@ -19,6 +19,10 @@ export interface MenuItem {
   isVeg: boolean;
   isAvailable: boolean;
   taxRate: number; // e.g., 0.05 for 5% GST
+  variants?: { name: string; price: number }[];
+  addons?: { name: string; price: number }[];
+  isCombo?: boolean;
+  comboItems?: string[];
 }
 
 export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Served' | 'Completed' | 'Cancelled';

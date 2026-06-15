@@ -29,7 +29,8 @@ export const MenuManagement: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({
-    name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5
+    name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5,
+    variants: [], addons: [], isCombo: false, comboItems: []
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -102,7 +103,7 @@ export const MenuManagement: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setFormData({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5 });
+    setFormData({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5, variants: [], addons: [], isCombo: false, comboItems: [] });
     setImageFile(null);
   };
 
@@ -150,9 +151,38 @@ export const MenuManagement: React.FC = () => {
       isVeg: item.isVeg,
       isAvailable: item.isAvailable,
       taxRate: item.taxRate || 5,
-      image: item.image
+      image: item.image,
+      variants: item.variants || [],
+      addons: item.addons || [],
+      isCombo: item.isCombo || false,
+      comboItems: item.comboItems || []
     });
     setIsModalOpen(true);
+  };
+
+  const handleVariantChange = (index: number, field: string, value: string | number) => {
+    const newVariants = [...formData.variants];
+    newVariants[index] = { ...newVariants[index], [field]: value };
+    setFormData({ ...formData, variants: newVariants });
+  };
+  const addVariant = () => setFormData({ ...formData, variants: [...formData.variants, { name: '', price: 0 }] });
+  const removeVariant = (index: number) => setFormData({ ...formData, variants: formData.variants.filter((_:any, i:number) => i !== index) });
+
+  const handleAddonChange = (index: number, field: string, value: string | number) => {
+    const newAddons = [...formData.addons];
+    newAddons[index] = { ...newAddons[index], [field]: value };
+    setFormData({ ...formData, addons: newAddons });
+  };
+  const addAddon = () => setFormData({ ...formData, addons: [...formData.addons, { name: '', price: 0 }] });
+  const removeAddon = (index: number) => setFormData({ ...formData, addons: formData.addons.filter((_:any, i:number) => i !== index) });
+  
+  const toggleComboItem = (itemId: string) => {
+    const current = formData.comboItems;
+    if (current.includes(itemId)) {
+      setFormData({ ...formData, comboItems: current.filter((id: string) => id !== itemId) });
+    } else {
+      setFormData({ ...formData, comboItems: [...current, itemId] });
+    }
   };
 
   const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
@@ -208,7 +238,7 @@ export const MenuManagement: React.FC = () => {
             )}
           </div>
           <button 
-            onClick={() => { setEditingId(null); setFormData({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5 }); setIsModalOpen(true); }}
+            onClick={() => { setEditingId(null); setFormData({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5, variants: [], addons: [], isCombo: false, comboItems: [] }); setIsModalOpen(true); }}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-brand-accent text-white rounded-2xl text-sm font-semibold shadow-xl shadow-brand-accent/25 hover:scale-105 active:scale-95 transition-all"
           >
             <Plus size={18} strokeWidth={3} />
@@ -321,7 +351,7 @@ export const MenuManagement: React.FC = () => {
 
         {/* Add New Placeholder Card */}
         <div 
-          onClick={() => { setEditingId(null); setFormData({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5 }); setIsModalOpen(true); }}
+          onClick={() => { setEditingId(null); setFormData({ name: '', category: '', price: '', description: '', isVeg: true, isAvailable: true, taxRate: 5, variants: [], addons: [], isCombo: false, comboItems: [] }); setIsModalOpen(true); }}
           className="bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:border-brand-accent/50 transition-all min-h-[280px] h-full"
         >
            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
@@ -388,6 +418,63 @@ export const MenuManagement: React.FC = () => {
                   <input type="checkbox" checked={formData.isAvailable} onChange={e => setFormData({...formData, isAvailable: e.target.checked})} className="w-4 h-4 rounded text-brand-accent focus:ring-brand-accent" />
                   Available
                 </label>
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                  <input type="checkbox" checked={formData.isCombo} onChange={e => setFormData({...formData, isCombo: e.target.checked})} className="w-4 h-4 rounded text-brand-accent focus:ring-brand-accent" />
+                  Is Combo Meal
+                </label>
+              </div>
+
+              {/* Combo Items Selection */}
+              {formData.isCombo && (
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Select Combo Items</label>
+                  <div className="max-h-40 overflow-y-auto space-y-2 custom-scrollbar">
+                    {menuItems.filter(i => !i.isCombo && (i.id || (i as any)._id) !== editingId).map((item: any) => {
+                      const itemId = item.id || item._id;
+                      return (
+                        <label key={itemId} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.comboItems.includes(itemId)} 
+                            onChange={() => toggleComboItem(itemId)}
+                            className="w-4 h-4 rounded text-brand-accent focus:ring-brand-accent"
+                          />
+                          <span className="text-sm font-semibold text-slate-700">{item.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Variants Section */}
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Variants (e.g., Small, Large)</label>
+                  <button type="button" onClick={addVariant} className="text-xs font-bold text-brand-accent flex items-center gap-1 hover:text-brand-primary"><Plus size={14}/> ADD VARIANT</button>
+                </div>
+                {formData.variants.map((variant: any, idx: number) => (
+                  <div key={idx} className="flex gap-2 mb-2 items-center">
+                    <input type="text" placeholder="Name" value={variant.name} onChange={e => handleVariantChange(idx, 'name', e.target.value)} className="flex-[2] p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
+                    <input type="number" placeholder="Price (₹)" value={variant.price} onChange={e => handleVariantChange(idx, 'price', Number(e.target.value))} className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
+                    <button type="button" onClick={() => removeVariant(idx)} className="text-red-400 hover:text-red-600 p-2"><Trash2 size={16}/></button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Addons Section */}
+              <div className="pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Add-ons (e.g., Extra Cheese)</label>
+                  <button type="button" onClick={addAddon} className="text-xs font-bold text-brand-accent flex items-center gap-1 hover:text-brand-primary"><Plus size={14}/> ADD ADD-ON</button>
+                </div>
+                {formData.addons.map((addon: any, idx: number) => (
+                  <div key={idx} className="flex gap-2 mb-2 items-center">
+                    <input type="text" placeholder="Name" value={addon.name} onChange={e => handleAddonChange(idx, 'name', e.target.value)} className="flex-[2] p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
+                    <input type="number" placeholder="Price (₹)" value={addon.price} onChange={e => handleAddonChange(idx, 'price', Number(e.target.value))} className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
+                    <button type="button" onClick={() => removeAddon(idx)} className="text-red-400 hover:text-red-600 p-2"><Trash2 size={16}/></button>
+                  </div>
+                ))}
               </div>
 
               <button 

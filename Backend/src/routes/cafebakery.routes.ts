@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getCafeItems, addCafeItem, updateCafeStock, checkoutCafe, updateCafeItem, deleteCafeItem } from '../controllers/cafebakery.controller';
+import { getCafeItems, addCafeItem, updateCafeStock, checkoutCafe, updateCafeItem, deleteCafeItem, getCafeteriaUsers, addCafeteriaUser } from '../controllers/cafebakery.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -18,9 +18,12 @@ router.route('/items/:id/stock')
 router.route('/checkout')
   .post(checkoutCafe);
 
-
 router.route('/items/:id')
   .put(updateCafeItem)
   .delete(deleteCafeItem);
+
+router.route('/users')
+  .get(getCafeteriaUsers)
+  .post(addCafeteriaUser);
 
 export default router;

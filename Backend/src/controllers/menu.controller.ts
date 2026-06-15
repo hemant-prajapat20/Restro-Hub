@@ -17,7 +17,7 @@ export const getMenuItems = async (req: Request, res: Response) => {
 export const addMenuItem = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
-    const { name, description, price, category, image, isVeg, isAvailable, taxRate } = req.body;
+    const { name, description, price, category, image, isVeg, isAvailable, taxRate, variants, addons, isCombo, comboItems } = req.body;
 
     const newItem = new MenuItem({
       businessId,
@@ -28,7 +28,11 @@ export const addMenuItem = async (req: Request, res: Response) => {
       image,
       isVeg,
       isAvailable,
-      taxRate
+      taxRate,
+      variants,
+      addons,
+      isCombo,
+      comboItems
     });
 
     const savedItem = await newItem.save();

@@ -8,6 +8,7 @@ export interface IInventoryItem extends Document {
   unit: string;
   reorderThreshold: number;
   supplier: string;
+  status?: 'In Stock' | 'Low Stock' | 'Out of Stock';
 }
 
 const InventoryItemSchema = new Schema({
@@ -17,7 +18,8 @@ const InventoryItemSchema = new Schema({
   quantityInStock: { type: Number, required: true, default: 0 },
   unit: { type: String, required: true },
   reorderThreshold: { type: Number, required: true, default: 10 },
-  supplier: { type: String, default: '' }
+  supplier: { type: String, default: '' },
+  status: { type: String, enum: ['In Stock', 'Low Stock', 'Out of Stock'], default: 'In Stock' }
 }, { timestamps: true });
 
 export default mongoose.model<IInventoryItem>('InventoryItem', InventoryItemSchema);

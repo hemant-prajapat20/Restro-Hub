@@ -25,6 +25,7 @@ export const Inventory: React.FC = () => {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [activeTab, setActiveTab] = useState<'Stock' | 'Logs'>('Stock');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -182,8 +183,23 @@ export const Inventory: React.FC = () => {
         </div>
       </div>
 
-      {/* Actions & Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-stone-150 shadow-soft">
+      {/* Tabs */}
+      <div className="flex items-center gap-4 border-b border-stone-200">
+        {['Stock', 'Logs'].map(tab => (
+          <button 
+            key={tab}
+            onClick={() => setActiveTab(tab as any)}
+            className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-brand-primary text-brand-primary' : 'border-transparent text-stone-400 hover:text-stone-600'}`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'Stock' && (
+        <>
+          {/* Actions & Filters */}
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-stone-150 shadow-soft">
         <div className="relative flex-1 w-full xl:w-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
           <input 
@@ -462,6 +478,15 @@ export const Inventory: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+      </>
+      )}
+
+      {activeTab === 'Logs' && (
+        <div className="p-8 bg-white rounded-2xl border border-stone-200 shadow-soft">
+          <h3 className="text-xl font-bold text-stone-800">Inventory Logs</h3>
+          <p className="text-stone-500 mt-2">View history of stock adjustments and wastage.</p>
+        </div>
+      )}
     </div>
   );
 };

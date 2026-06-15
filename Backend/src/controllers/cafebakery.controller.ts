@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import CafeItem from '../models/CafeItem';
+import CafeteriaUser from '../models/CafeteriaUser';
 
 export const getCafeItems = async (req: Request, res: Response) => {
   try {
@@ -92,5 +93,26 @@ export const deleteCafeItem = async (req: Request, res: Response) => {
     res.json({ message: 'cafe item deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting cafe item' });
+  }
+};
+
+export const getCafeteriaUsers = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const users = await CafeteriaUser.find({ businessId }).sort({ name: 1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching cafeteria users' });
+  }
+};
+
+export const addCafeteriaUser = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const newUser = new CafeteriaUser({ ...req.body, businessId });
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error adding cafeteria user' });
   }
 };

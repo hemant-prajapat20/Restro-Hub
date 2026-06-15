@@ -33,6 +33,8 @@ interface LiquorItem {
   pricePerGlass: number;
   stockBottles: number;
   capacityMl: number;
+  stockMl?: number;
+  variants?: { sizeMl: number; price: number }[];
   origin: string;
   image: string;
 }
@@ -156,6 +158,10 @@ export const BarLounge: React.FC = () => {
 
   // Helper calculations
   const getItemPrice = (cartItem: any) => {
+    if (cartItem.item.variants && cartItem.item.variants.length > 0) {
+      const variant = cartItem.item.variants.find((v: any) => v.sizeMl + 'ml' === cartItem.pourSize);
+      if (variant) return variant.price;
+    }
     if (cartItem.pourSize === 'Double') return cartItem.item.pricePerGlass * 1.8;
     if (cartItem.pourSize === 'Full Bottle') return cartItem.item.pricePerGlass * 6; // Rough estimate
     return cartItem.item.pricePerGlass;
@@ -164,11 +170,12 @@ export const BarLounge: React.FC = () => {
 
   // Cart actions
   const addToCart = (item: LiquorItem) => {
-    const existing = cart.find(c => c.item.id === item.id && c.pourSize === 'Standard' && c.mixer === 'Neat');
+    const defaultPourSize = item.variants && item.variants.length > 0 ? `${item.variants[0].sizeMl}ml` : 'Single';
+    const existing = cart.find(c => c.item.id === item.id && c.pourSize === defaultPourSize && c.mixer === 'Neat');
     if (existing) {
       setCart(cart.map(c => c === existing ? { ...c, quantity: c.quantity + 1 } : c));
     } else {
-      setCart([...cart, { item, quantity: 1, pourSize: 'Standard', mixer: 'Neat', notes: '' }]);
+      setCart([...cart, { item, quantity: 1, pourSize: defaultPourSize, mixer: 'Neat', notes: '' }]);
     }
   };
 
@@ -363,7 +370,7 @@ export const BarLounge: React.FC = () => {
       type: 'Bar',
       items: cart.map((c: any) => ({
         menuItem: c.item.id || c.item._id,
-        name: c.item.name + (c.pourSize !== 'Standard' ? ` (${c.pourSize})` : ''),
+        name: c.item.name + (c.pourSize !== 'Single' ? ` (${c.pourSize})` : ''),
         category: c.item.category || 'Bar',
         quantity: c.quantity,
         price: getItemPrice(c),
@@ -805,9 +812,19 @@ export const BarLounge: React.FC = () => {
                                 onChange={(e: any) => updateCartModifier(cartItem.item.id, 'pourSize', e.target.value)}
                                 className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-extrabold text-stone-700 focus:outline-none"
                               >
-                                <option value="Single">Single Pour (30ml)</option>
-                                <option value="Double">Double Premium (60ml, 1.8x)</option>
-                                <option value="Full Bottle">Full Collector Bottle (5x)</option>
+                                {cartItem.item.variants && cartItem.item.variants.length > 0 ? (
+                                  cartItem.item.variants.map((v: any) => (
+                                    <option key={v.sizeMl} value={`${v.sizeMl}ml`}>
+                                      {v.sizeMl}ml Pour (₹{v.price})
+                                    </option>
+                                  ))
+                                ) : (
+                                  <>
+                                    <option value="Single">Single Pour (30ml)</option>
+                                    <option value="Double">Double Premium (60ml, 1.8x)</option>
+                                    <option value="Full Bottle">Full Collector Bottle (5x)</option>
+                                  </>
+                                )}
                               </select>
                             </div>
                           </div>
@@ -1299,8 +1316,8 @@ export const BarLounge: React.FC = () => {
                       const processOrder = () => {
                         const receiptItems = cart.map((c: any) => ({
                           itemId: c.item.id,
-                          name: c.item.name + (c.pourSize !== 'Standard' ? ` (${c.pourSize})` : ''),
-                          price: c.pourSize === 'Double' ? c.item.pricePerGlass * 1.8 : c.pourSize === 'Full Bottle' ? c.item.pricePerGlass * 6 : c.item.pricePerGlass,
+                          name: c.item.name + (c.pourSize !== 'Single' ? ` (${c.pourSize})` : ''),
+                          price: getItemPrice(c),
                           quantity: c.quantity
                         }));
 

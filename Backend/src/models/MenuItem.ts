@@ -10,6 +10,10 @@ export interface IMenuItem extends Document {
   isVeg: boolean;
   isAvailable: boolean;
   taxRate: number;
+  variants?: { name: string; price: number }[];
+  addons?: { name: string; price: number }[];
+  isCombo?: boolean;
+  comboItems?: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +29,10 @@ const MenuItemSchema: Schema = new Schema(
     isVeg: { type: Boolean, default: true },
     isAvailable: { type: Boolean, default: true },
     taxRate: { type: Number, default: 0.05 },
+    variants: [{ name: { type: String }, price: { type: Number } }],
+    addons: [{ name: { type: String }, price: { type: Number } }],
+    isCombo: { type: Boolean, default: false },
+    comboItems: [{ type: Schema.Types.ObjectId, ref: 'MenuItem' }]
   },
   { timestamps: true }
 );
