@@ -458,6 +458,10 @@ export const RestroSignature: React.FC = () => {
       paymentMethod: paymentMethod || 'Cash',
       status: 'Completed',
       customerDetails: { name: customerName || 'Walk-in VIP', phone: customerPhone || 'N/A' }
+    }).then(res => {
+      if (res.data && res.data._id) {
+        window.open(`/invoice/${res.data._id}`, '_blank');
+      }
     }).catch(err => console.error('Error saving global transaction:', err));
 
     // Generate Imperial fine-dining receipt
@@ -932,7 +936,7 @@ export const RestroSignature: React.FC = () => {
                     <div className="flex-1 space-y-1">
                       <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Payment Tender</label>
                       <select 
-                        value={paymentMethod}
+                        value={paymentMethod || ''}
                         onChange={(e: any) => setPaymentMethod(e.target.value)}
                         className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800"
                       >
@@ -1649,19 +1653,6 @@ export const RestroSignature: React.FC = () => {
                           price: c.dish.price,
                           quantity: c.quantity
                         }));
-
-                        generateReceiptPDF({
-                          invoiceNumber: invoiceNum,
-                          timestamp: new Date().toLocaleString(),
-                          customerName,
-                          customerPhone,
-                          paymentMethod: paymentMethod || 'Cash',
-                          items: receiptItems,
-                          subtotal: cartSubtotal,
-                          tax: cgst + sgst,
-                          total: cartTotal,
-                          type: 'Restro Signature'
-                        });
 
                         handleRestroCheckout(); // reuse existing logic
                         setShowCheckout(false);

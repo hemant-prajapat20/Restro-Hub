@@ -47,9 +47,12 @@ export const POS: React.FC = () => {
       const response = await api.post('/orders', orderData);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('Order completed successfully!');
       setOrderState('submitted');
+      if (data && data._id) {
+        window.open(`/invoice/${data._id}`, '_blank');
+      }
     },
     onError: () => {
       toast.error('Failed to create order');
@@ -416,20 +419,6 @@ export const POS: React.FC = () => {
                           price: item.price,
                           quantity: item.quantity
                         }));
-
-                        // Generate enhanced car-wash style invoice PDF
-                        generateReceiptPDF({
-                          invoiceNumber: invoiceNum,
-                          timestamp: new Date().toLocaleString(),
-                          customerName,
-                          customerPhone,
-                          paymentMethod: paymentMethod || 'Cash',
-                          items: receiptItems,
-                          subtotal: subTotal,
-                          tax: sgst + cgst,
-                          total: total,
-                          type: 'POS Billing'
-                        });
 
                         orderMutation.mutate({
                           type: 'POS',

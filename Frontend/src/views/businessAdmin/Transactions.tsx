@@ -15,7 +15,6 @@ import toast from 'react-hot-toast';
 
 export const Transactions: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -45,12 +44,9 @@ export const Transactions: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Orders...</div>;
   }
 
-  const activeOrders = orders.filter((o: any) => o.status !== 'Completed' && o.status !== 'Cancelled');
-  const historyOrders = orders.filter((o: any) => o.status === 'Completed' || o.status === 'Cancelled');
+  const historyOrders = orders.filter((o: any) => o.status === 'Completed' || o.status === 'Cancelled' || o.status === 'Served');
   
-  const displayOrders = activeTab === 'active' ? activeOrders : historyOrders;
-
-  const filteredOrders = displayOrders.filter((inv: any) => {
+  const filteredOrders = historyOrders.filter((inv: any) => {
     const invId = inv._id || inv.id || '';
     return invId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (inv.type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,26 +65,10 @@ export const Transactions: React.FC = () => {
           </div>
        </div>
 
-       {/* Tabs */}
-       <div className="flex gap-4 border-b border-slate-200">
-         <button 
-           onClick={() => setActiveTab('active')}
-           className={`pb-4 px-4 text-sm tracking-widest uppercase font-bold transition-all ${activeTab === 'active' ? 'border-b-2 border-brand-primary text-brand-primary' : 'text-slate-400 hover:text-slate-600'}`}
-         >
-           Active Orders ({activeOrders.length})
-         </button>
-         <button 
-           onClick={() => setActiveTab('history')}
-           className={`pb-4 px-4 text-sm tracking-widest uppercase font-bold transition-all ${activeTab === 'history' ? 'border-b-2 border-brand-primary text-brand-primary' : 'text-slate-400 hover:text-slate-600'}`}
-         >
-           Order History ({historyOrders.length})
-         </button>
-       </div>
-
-       <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden flex flex-col mb-8">
+       <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden flex flex-col mb-8 mt-4">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
              <h5 className="font-semibold font-display text-slate-900 text-lg">
-               {activeTab === 'active' ? 'Currently Active Orders' : 'Past Transactions'}
+               Past Transactions
              </h5>
              <div className="relative w-72">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -122,7 +102,12 @@ export const Transactions: React.FC = () => {
                      return (
                      <tr key={invId} className="hover:bg-slate-50/50 transition-all group">
                         <td className="px-6 py-4">
-                           <p className="text-sm font-semibold text-brand-primary">#{shortId}</p>
+                           <button 
+                             onClick={() => window.open(`/invoice/${invId}`, '_blank')}
+                             className="text-sm font-semibold text-brand-primary hover:underline hover:text-brand-accent transition-colors text-left"
+                           >
+                             #{shortId}
+                           </button>
                            <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(order.createdAt || order.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                         </td>
                         <td className="px-6 py-4">
@@ -144,32 +129,13 @@ export const Transactions: React.FC = () => {
                            </span>
                         </td>
                         <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                           {activeTab === 'active' && (
-                             <>
-                               {order.status !== 'Ready' && order.status !== 'Served' && (
-                                 <button 
-                                   onClick={() => updateOrderStatusMutation.mutate({ id: invId, status: 'Ready' })}
-                                   className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-md transition-colors"
-                                   title="Mark Ready"
-                                 >
-                                   <CheckCircle size={16} />
-                                 </button>
-                               )}
-                               <button 
-                                 onClick={() => {
-                                   if (window.confirm('Are you sure you want to cancel this order?')) {
-                                     updateOrderStatusMutation.mutate({ id: invId, status: 'Cancelled' });
-                                   }
-                                 }}
-                                 className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-md transition-colors"
-                                 title="Cancel Order"
-                               >
-                                 <XCircle size={16} />
-                               </button>
-                             </>
-                           )}
-                           {activeTab === 'history' && order.status !== 'Cancelled' && (
-                             <button className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-primary">View Receipt</button>
+                           {order.status !== 'Cancelled' && (
+                             <button 
+                               onClick={() => window.open(`/invoice/${invId}`, '_blank')}
+                               className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-primary transition-colors"
+                             >
+                               View Receipt
+                             </button>
                            )}
                         </td>
                      </tr>
