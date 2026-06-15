@@ -45,13 +45,13 @@ export const BusinessAdminLayout: React.FC = () => {
   const userPlatforms = user?.businessData?.platforms || [];
   const currentPath = location.pathname.split('/').pop();
 
-  if (currentPath === 'restro' && !userPlatforms.includes('Restro')) {
+  if (currentPath === 'restro' && !userPlatforms.includes('Restaurant')) {
     return <Navigate to="/admin/dashboard" replace />;
   }
   if (currentPath === 'bar' && !userPlatforms.includes('Bar')) {
     return <Navigate to="/admin/dashboard" replace />;
   }
-  if (currentPath === 'cafe' && !userPlatforms.includes('Cafe')) {
+  if (currentPath === 'cafe' && !userPlatforms.includes('Cafeteria')) {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

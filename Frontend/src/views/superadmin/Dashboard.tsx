@@ -28,62 +28,178 @@ const getPlatformColor = (platform: string) => {
 
 const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClose }) => {
   const invoiceNo = `RH-${txn.businessAdminCode}-${new Date(txn.createdAt).getFullYear()}`;
+  const expiryStr = txn.subscriptionExpiry
+    ? new Date(txn.subscriptionExpiry).toLocaleDateString('en-IN', { dateStyle: 'long' })
+    : 'N/A';
+
+  const handlePrint = () => {
+    const printContents = document.getElementById('invoice-print-area')?.innerHTML;
+    const win = window.open('', '_blank', 'width=700,height=900');
+    if (win && printContents) {
+      win.document.write(`
+        <html><head><title>Invoice ${invoiceNo}</title>
+        <style>
+          body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px; color: #1e293b; }
+          .header { background: #0f172a; color: white; padding: 32px; border-radius: 16px 16px 0 0; }
+          .brand { font-size: 24px; font-weight: 900; } .brand span { color: #f59e0b; }
+          .subtitle { color: #94a3b8; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; }
+          .meta { display: flex; justify-content: space-between; margin-top: 24px; }
+          .meta-label { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+          .meta-value { color: white; font-weight: 700; font-family: monospace; margin-top: 4px; }
+          .body { padding: 32px; border: 1px solid #f1f5f9; border-top: none; border-radius: 0 0 16px 16px; }
+          .row { display: flex; gap: 48px; margin-bottom: 24px; }
+          .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: #94a3b8; margin-bottom: 8px; }
+          .biz-name { font-size: 18px; font-weight: 800; } .detail { color: #64748b; font-size: 13px; margin-top: 2px; }
+          .code { font-family: monospace; font-size: 18px; font-weight: 800; color: #f59e0b; }
+          .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #ecfdf5; color: #059669; }
+          .divider { border: none; border-top: 1px solid #f1f5f9; margin: 16px 0; }
+          .line-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+          .tags { display: flex; gap: 4px; margin-top: 6px; }
+          .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: #f1f5f9; color: #475569; }
+          .total-box { background: #f8fafc; padding: 20px 24px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+          .total-label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #475569; }
+          .total-value { font-size: 28px; font-weight: 900; }
+          .amount { font-weight: 700; font-size: 16px; }
+          .footer { text-align: center; margin-top: 32px; font-size: 12px; color: #94a3b8; }
+        </style></head><body>
+        <div class="header">
+          <div class="brand">Restro<span>Hub</span></div>
+          <div class="subtitle">Platform Invoice</div>
+          <div class="meta">
+            <div><div class="meta-label">Invoice No.</div><div class="meta-value">${invoiceNo}</div></div>
+            <div style="text-align:right"><div class="meta-label">Date</div><div class="meta-value">${new Date(txn.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="row">
+            <div>
+              <div class="section-label">Bill To</div>
+              <div class="biz-name">${txn.businessName}</div>
+              <div class="detail">${txn.ownerName}</div>
+              <div class="detail">${txn.ownerEmail}</div>
+              <div class="detail">${txn.ownerPhone}</div>
+            </div>
+            <div>
+              <div class="section-label">Business Code</div>
+              <div class="code">${txn.businessAdminCode}</div>
+              <div class="detail" style="margin-top:8px">Subscription Status</div>
+              <div class="badge">${txn.status}</div>
+            </div>
+          </div>
+          <hr class="divider" />
+          <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:8px">
+            <span>Description</span><span>Amount</span>
+          </div>
+          <div class="line-item">
+            <div>
+              <div style="font-weight:700">Platform Subscription</div>
+              <div class="tags">${txn.platforms.map((p: string) => `<span class="tag">${p}</span>`).join('')}</div>
+            </div>
+            <div class="amount">₹${txn.amount.toLocaleString('en-IN')}</div>
+          </div>
+          <div class="line-item">
+            <div style="color:#64748b">Valid Until</div>
+            <div style="font-weight:600">${expiryStr}</div>
+          </div>
+          <div class="total-box">
+            <div class="total-label">Total Paid</div>
+            <div class="total-value">₹${txn.amount.toLocaleString('en-IN')}</div>
+          </div>
+          <div class="footer">Thank you for choosing RestroHub &bull; support@restrohub.com</div>
+        </div>
+        </body></html>
+      `);
+      win.document.close();
+      win.focus();
+      win.print();
+    }
+  };
+
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(
+      `📋 *RestroHub Platform Invoice*\n\n` +
+      `Invoice No: ${invoiceNo}\n` +
+      `Business: ${txn.businessName}\n` +
+      `Owner: ${txn.ownerName}\n` +
+      `Phone: ${txn.ownerPhone}\n` +
+      `Platforms: ${txn.platforms.join(', ')}\n` +
+      `Amount Paid: ₹${txn.amount.toLocaleString('en-IN')}\n` +
+      `Valid Until: ${expiryStr}\n` +
+      `Status: ${txn.status}\n\n` +
+      `Thank you for choosing RestroHub! 🙏`
+    );
+    window.open(`https://wa.me/${txn.ownerPhone?.replace(/\D/g, '')}?text=${msg}`, '_blank');
+  };
+
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden"
+          className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col"
         >
           {/* Invoice Header */}
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-brand-accent/10 rounded-full -mr-10 -mt-10" />
-            <div className="relative z-10 flex justify-between items-start">
-              <div>
-                <h2 className="text-2xl font-bold font-display"><span className="text-white">Restro</span><span className="text-brand-accent">Hub</span></h2>
-                <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mt-1">Platform Invoice</p>
-              </div>
-              <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
-                <X size={20} />
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-white relative overflow-hidden shrink-0">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-brand-accent/10 rounded-full -mr-16 -mt-16" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-10 -mb-10" />
+            {/* Top bar: Back + Title */}
+            <div className="relative z-10 flex items-center justify-between mb-6">
+              <button
+                onClick={onClose}
+                className="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-semibold transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Back
+              </button>
+              <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Platform Invoice</span>
+              <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-xl transition-colors">
+                <X size={18} />
               </button>
             </div>
-            <div className="relative z-10 mt-6 flex justify-between items-end">
+            {/* Brand */}
+            <div className="relative z-10">
+              <h2 className="text-3xl font-black font-display tracking-tight">
+                <span className="text-white">Restro</span><span className="text-brand-accent">Hub</span>
+              </h2>
+            </div>
+            {/* Invoice meta */}
+            <div className="relative z-10 mt-5 flex justify-between items-end">
               <div>
-                <p className="text-slate-400 text-xs uppercase tracking-widest">Invoice No.</p>
-                <p className="text-white font-bold font-mono mt-1">{invoiceNo}</p>
+                <p className="text-slate-400 text-[10px] uppercase tracking-widest font-semibold">Invoice No.</p>
+                <p className="text-white font-bold font-mono text-base mt-1">{invoiceNo}</p>
               </div>
               <div className="text-right">
-                <p className="text-slate-400 text-xs uppercase tracking-widest">Date</p>
+                <p className="text-slate-400 text-[10px] uppercase tracking-widest font-semibold">Date</p>
                 <p className="text-white font-semibold mt-1">{new Date(txn.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</p>
               </div>
             </div>
           </div>
 
           {/* Invoice Body */}
-          <div className="p-8 space-y-6">
-            {/* Bill To */}
-            <div className="flex gap-8">
+          <div className="p-7 space-y-5 overflow-y-auto custom-scrollbar flex-1" id="invoice-print-area">
+            {/* Bill To / Business Code */}
+            <div className="flex gap-6">
               <div className="flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Bill To</p>
-                <p className="font-bold text-slate-900">{txn.businessName}</p>
-                <p className="text-sm text-slate-500">{txn.ownerName}</p>
+                <p className="font-bold text-slate-900 text-base">{txn.businessName}</p>
+                <p className="text-sm text-slate-500 mt-0.5">{txn.ownerName}</p>
                 <p className="text-sm text-slate-500">{txn.ownerEmail}</p>
                 <p className="text-sm text-slate-500">{txn.ownerPhone}</p>
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Business Code</p>
-                <p className="font-mono font-bold text-brand-accent text-lg">{txn.businessAdminCode}</p>
-                <p className="text-[10px] text-slate-400 mt-1">Subscription Status</p>
-                <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                <p className="font-mono font-black text-brand-accent text-xl">{txn.businessAdminCode}</p>
+                <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold">Status</p>
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full inline-block mt-1 ${
                   txn.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
                 }`}>{txn.status}</span>
               </div>
@@ -93,40 +209,63 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
 
             {/* Line Items */}
             <div>
-              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3 px-1">
                 <span>Description</span>
                 <span>Amount</span>
               </div>
-              <div className="flex justify-between items-center py-3 border-b border-slate-100">
+              <div className="flex justify-between items-start py-3 border-b border-slate-100 px-1">
                 <div>
-                  <p className="font-semibold text-slate-900">Platform Subscription</p>
-                  <div className="flex gap-1 mt-1">
+                  <p className="font-bold text-slate-900">Platform Subscription</p>
+                  <div className="flex flex-wrap gap-1 mt-1.5">
                     {txn.platforms.map((p: string) => (
                       <span key={p} className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${getPlatformColor(p)}`}>{p}</span>
                     ))}
                   </div>
                 </div>
-                <p className="font-bold text-slate-900">₹{txn.amount.toLocaleString('en-IN')}</p>
+                <p className="font-bold text-slate-900 text-base">₹{txn.amount.toLocaleString('en-IN')}</p>
               </div>
-              <div className="flex justify-between items-center py-3 border-b border-slate-100">
+              <div className="flex justify-between items-center py-3 px-1">
                 <p className="text-slate-500 text-sm">Valid Until</p>
-                <p className="font-semibold text-slate-700 text-sm">
-                  {txn.subscriptionExpiry ? new Date(txn.subscriptionExpiry).toLocaleDateString('en-IN', { dateStyle: 'long' }) : 'N/A'}
-                </p>
+                <p className="font-semibold text-slate-700 text-sm">{expiryStr}</p>
               </div>
             </div>
 
             {/* Total */}
-            <div className="bg-slate-50 rounded-2xl p-5 flex justify-between items-center">
-              <p className="font-bold text-slate-700 uppercase tracking-wider text-sm">Total Paid</p>
-              <p className="text-2xl font-bold text-slate-900">₹{txn.amount.toLocaleString('en-IN')}</p>
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 flex justify-between items-center">
+              <p className="font-bold text-slate-300 uppercase tracking-wider text-xs">Total Paid</p>
+              <p className="text-2xl font-black text-white">₹{txn.amount.toLocaleString('en-IN')}</p>
             </div>
 
+            <p className="text-center text-[11px] text-slate-400">Thank you for choosing RestroHub • support@restrohub.com</p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="p-5 border-t border-slate-100 grid grid-cols-3 gap-3 shrink-0 bg-slate-50/50">
+            {/* Back */}
             <button
-              onClick={() => window.print()}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-brand-accent text-white rounded-2xl font-semibold hover:bg-brand-accent/90 transition-colors"
+              onClick={onClose}
+              className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors font-semibold text-xs"
             >
-              <Printer size={16} /> Print / Download Invoice
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              Back
+            </button>
+            {/* WhatsApp */}
+            <button
+              onClick={handleWhatsApp}
+              className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl bg-[#25D366] hover:bg-[#20bc5a] text-white transition-colors font-semibold text-xs shadow-lg shadow-green-500/20"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              WhatsApp
+            </button>
+            {/* Print */}
+            <button
+              onClick={handlePrint}
+              className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl bg-brand-accent hover:bg-brand-accent/90 text-white transition-colors font-semibold text-xs shadow-lg shadow-brand-accent/20"
+            >
+              <Printer size={20} />
+              Print
             </button>
           </div>
         </motion.div>
@@ -134,6 +273,9 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
     </AnimatePresence>
   );
 };
+
+
+
 
 export const SuperAdminDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState({
@@ -150,6 +292,7 @@ export const SuperAdminDashboard: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState('Last 6 Months');
   const [selectedTxn, setSelectedTxn] = useState<any>(null);
   const [txnSearch, setTxnSearch] = useState('');
+  const [showAllTxns, setShowAllTxns] = useState(false);
   const timeOptions = ['Last 7 Days', 'Last 30 Days', 'Last 6 Months', 'Last Year'];
 
   useEffect(() => {
@@ -193,6 +336,8 @@ export const SuperAdminDashboard: React.FC = () => {
     t.ownerName?.toLowerCase().includes(txnSearch.toLowerCase()) ||
     t.businessAdminCode?.toLowerCase().includes(txnSearch.toLowerCase())
   );
+
+  const displayedTxns = showAllTxns ? filteredTxns : filteredTxns.slice(0, 6);
 
   return (
     <div className="p-4 sm:p-8 pb-24 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
@@ -367,7 +512,7 @@ export const SuperAdminDashboard: React.FC = () => {
                   <Receipt className="w-10 h-10 text-slate-200 mx-auto mb-3" />
                   No subscription transactions found
                 </td></tr>
-              ) : filteredTxns.map((txn, idx) => {
+              ) : displayedTxns.map((txn, idx) => {
                 const expiryDate = txn.subscriptionExpiry ? new Date(txn.subscriptionExpiry) : null;
                 const isExpired = expiryDate && expiryDate < new Date();
                 const isExpiringSoon = expiryDate && !isExpired && (expiryDate.getTime() - Date.now()) < 7 * 24 * 60 * 60 * 1000;
@@ -430,6 +575,22 @@ export const SuperAdminDashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* View All / Show Less footer */}
+        {filteredTxns.length > 6 && (
+          <div className="p-4 border-t border-slate-100 text-center bg-slate-50/50">
+            <button
+              onClick={() => setShowAllTxns(prev => !prev)}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white border border-slate-200 hover:border-brand-accent hover:text-brand-accent text-slate-600 text-sm font-bold transition-all"
+            >
+              {showAllTxns ? (
+                <><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg> Show Less</>
+              ) : (
+                <><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg> View All {filteredTxns.length} Transactions</>
+              )}
+            </button>
+          </div>
+        )}
       </motion.div>
 
       {/* Invoice Modal */}

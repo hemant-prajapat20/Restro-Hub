@@ -50,9 +50,9 @@ interface SidebarProps {
 const businessNavItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'pos', label: 'Point of Sale', icon: Store },
-  { id: 'restro', label: 'Restro Signature', icon: UtensilsCrossed, platform: 'Restro' },
+  { id: 'restro', label: 'Restro Signature', icon: UtensilsCrossed, platform: 'Restaurant' },
   { id: 'bar', label: 'Bar Lounge', icon: Wine, platform: 'Bar' },
-  { id: 'cafe', label: 'Cafe & Patisserie', icon: Coffee, platform: 'Cafe' },
+  { id: 'cafe', label: 'Cafe & Patisserie', icon: Coffee, platform: 'Cafeteria' },
   { id: 'menu', label: 'Menu Catalog', icon: Layers },
   { id: 'tables', label: 'Tables', icon: Table2 },
   { id: 'kds', label: 'Kitchen (KDS)', icon: ChefHat },
