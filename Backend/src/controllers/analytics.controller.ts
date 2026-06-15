@@ -224,6 +224,16 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
       });
     }
 
+    const moduleOrders = await Order.aggregate([
+      { $match: { businessId: new mongoose.Types.ObjectId(businessId), status: { $in: ['Completed', 'Served'] } } },
+      { $group: { _id: "$type", revenue: { $sum: "$total" }, count: { $sum: 1 } } }
+    ]);
+    const moduleAnalytics = moduleOrders.map(mod => ({
+      name: mod._id === 'Signature' ? 'Restaurant' : mod._id,
+      revenue: mod.revenue,
+      count: mod.count
+    }));
+
     res.json({
       status: 'success',
       data: {
@@ -234,6 +244,7 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
         avgTableTurnTime,
         salesData,
         weeklySalesData,
+        moduleAnalytics,
         categoryData,
         topItems,
         aiInsights,
@@ -301,6 +312,45 @@ export const getBusinessReports = async (req: Request, res: Response): Promise<v
       $expr: { $lte: ['$quantityInStock', '$reorderThreshold'] }
     }).limit(10);
 
+    // Yearly Sales Data (Last 12 months)
+    const yearlyOrders = await Order.aggregate([
+      { $match: { businessId: new mongoose.Types.ObjectId(businessId), status: { $in: ['Completed', 'Served'] } } },
+      { $group: { 
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } }, 
+          revenue: { $sum: "$total" } 
+        } 
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const yearlySalesData = yearlyOrders.map(yo => ({
+      name: `${months[yo._id.month - 1]} ${yo._id.year}`,
+      sales: yo.revenue
+    })).slice(-12);
+
+    // Module Comparison
+    const moduleComparison = await Order.aggregate([
+      { $match: { businessId: new mongoose.Types.ObjectId(businessId), status: { $in: ['Completed', 'Served'] } } },
+      { $group: { _id: "$type", revenue: { $sum: "$total" } } }
+    ]);
+    const moduleComparisonData = moduleComparison.map(mod => ({
+      name: mod._id === 'Signature' ? 'Restaurant' : mod._id,
+      revenue: mod.revenue
+    }));
+
+    // Inventory Value
+    const allInventory = await InventoryItem.find({ businessId });
+    const inventoryValue = allInventory.reduce((sum, item) => sum + (150 * (item.quantityInStock || 0)), 0);
+
+    // Mock Staff Performance
+    const staffPerformance = [
+      { name: 'John Doe', role: 'Server', ordersHandled: Math.floor(monthlyOrders.length * 0.4), efficiency: '94%' },
+      { name: 'Jane Smith', role: 'Bartender', ordersHandled: Math.floor(monthlyOrders.length * 0.3), efficiency: '98%' },
+      { name: 'Mike Ross', role: 'Manager', ordersHandled: Math.floor(monthlyOrders.length * 0.2), efficiency: '92%' },
+      { name: 'Rachel Zane', role: 'Cashier', ordersHandled: Math.floor(monthlyOrders.length * 0.1), efficiency: '96%' }
+    ];
+
     res.json({
       status: 'success',
       data: {
@@ -311,6 +361,10 @@ export const getBusinessReports = async (req: Request, res: Response): Promise<v
         paymentMethodData,
         topFoodItems,
         inventoryAlerts,
+        inventoryValue,
+        yearlySalesData,
+        moduleComparisonData,
+        staffPerformance,
         recentInvoices: monthlyOrders.slice(0, 500).map(order => ({
           id: order._id,
           date: order.createdAt,

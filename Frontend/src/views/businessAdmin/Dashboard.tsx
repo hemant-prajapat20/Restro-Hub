@@ -78,7 +78,7 @@ export const Dashboard: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Dashboard...</div>;
   }
 
-  const { dailyRevenue, totalRevenue, totalOrders, activeTotalStaff, avgTableTurnTime, salesData, weeklySalesData, categoryData, topItems, aiInsights } = analytics;
+  const { dailyRevenue, totalRevenue, totalOrders, activeTotalStaff, avgTableTurnTime, salesData, weeklySalesData, categoryData, topItems, aiInsights, moduleAnalytics } = analytics;
 
   const currentGraphData = graphPeriod === 'Today' ? salesData : weeklySalesData;
 
@@ -203,7 +203,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Category Breakdown */}
         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
            <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
@@ -213,6 +213,8 @@ export const Dashboard: React.FC = () => {
                  <PieChart>
                    <Pie
                      data={categoryData}
+                     cx="50%"
+                     cy="50%"
                      innerRadius={60}
                      outerRadius={80}
                      paddingAngle={5}
@@ -264,6 +266,38 @@ export const Dashboard: React.FC = () => {
                 </div>
               )) : (
                 <p className="text-sm text-slate-500 font-medium">No sales data available yet.</p>
+              )}
+           </div>
+        </div>
+
+        {/* Module Performance */}
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
+           <h4 className="text-lg font-semibold font-display mb-6">Department Analytics</h4>
+           <div className="space-y-4">
+              {moduleAnalytics && moduleAnalytics.length > 0 ? moduleAnalytics.map((mod: any) => {
+                 const totalRev = moduleAnalytics.reduce((sum: number, m: any) => sum + m.revenue, 0) || 1;
+                 const progress = Math.round((mod.revenue / totalRev) * 100);
+                 return (
+                 <div key={mod.name} className="space-y-2">
+                   <div className="flex justify-between items-end">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{mod.name}</p>
+                        <p className="text-xs text-slate-500">{mod.count} orders processed</p>
+                      </div>
+                      <p className="text-sm font-semibold text-emerald-600">₹{mod.revenue.toLocaleString()}</p>
+                   </div>
+                   <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        className="h-full bg-emerald-500 rounded-full"
+                      />
+                   </div>
+                </div>
+                 );
+              }) : (
+                <p className="text-sm text-slate-500 font-medium">No department data available yet.</p>
               )}
            </div>
         </div>

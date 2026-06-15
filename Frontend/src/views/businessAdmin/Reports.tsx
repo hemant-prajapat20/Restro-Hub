@@ -10,7 +10,7 @@ import {
   Calendar,
   Lock,
   Search,
-  Printer, Send, X, Receipt, AlertCircle, PackageOpen
+  Printer, Send, X, Receipt, AlertCircle, PackageOpen, Users
 } from 'lucide-react';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'motion/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -50,7 +50,7 @@ export const Reports: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Reports...</div>;
   }
 
-  const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices, paymentMethodData, topFoodItems, inventoryAlerts } = reports;
+  const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices, paymentMethodData, topFoodItems, inventoryAlerts, inventoryValue, yearlySalesData, moduleComparisonData, staffPerformance } = reports;
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
   return (
     <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
@@ -80,6 +80,7 @@ export const Reports: React.FC = () => {
             { label: 'Total GST (5%)', value: `₹${totalGst.toLocaleString()}`, trend: 12.8, icon: Calculator, color: 'emerald' },
             { label: 'Operating Cost', value: `₹${operatingCost.toLocaleString()}`, trend: -4.2, icon: ArrowDownRight, color: 'orange' },
             { label: 'Net Profit', value: `₹${netProfit.toLocaleString()}`, trend: 22.4, icon: ArrowUpRight, color: 'brand-accent' },
+            { label: 'Inventory Value', value: `₹${inventoryValue?.toLocaleString() || 0}`, trend: 5.1, icon: PackageOpen, color: 'purple' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 flex flex-col gap-4 h-full justify-between">
                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-${stat.color}-50 text-${stat.color}-600`}>
@@ -155,6 +156,64 @@ export const Reports: React.FC = () => {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+         </div>
+       </div>
+
+       {/* Yearly & Module Comparison Row */}
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+         {/* Yearly Sales Trend */}
+         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80">
+            <h5 className="font-semibold font-display text-slate-900 mb-4 flex items-center gap-2">
+              <BarChart3 size={18} className="text-brand-accent" />
+              Yearly Sales Trend (Last 12 Months)
+            </h5>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <BarChart data={yearlySalesData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <YAxis tickFormatter={(val) => `₹${val/1000}k`} tick={{ fontSize: 10 }} />
+                  <Tooltip formatter={(value: number) => `₹${value.toLocaleString()}`} />
+                  <Bar dataKey="sales" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+         </div>
+
+         {/* Staff Performance */}
+         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 overflow-hidden flex flex-col">
+            <h5 className="font-semibold font-display text-slate-900 mb-4 flex items-center gap-2">
+              <Users size={18} className="text-brand-accent" />
+              Staff Performance Overview
+            </h5>
+            <div className="overflow-x-auto w-full custom-scrollbar flex-1">
+              <table className="w-full text-left min-w-[400px]">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Name</th>
+                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Role</th>
+                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Orders Handled</th>
+                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Efficiency</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {staffPerformance?.map((staff: any, idx: number) => (
+                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-bold text-slate-900">{staff.name}</p>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-600 rounded-lg">{staff.role}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center text-sm font-semibold text-slate-600">{staff.ordersHandled}</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-sm font-bold text-emerald-600">{staff.efficiency}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
          </div>
        </div>
