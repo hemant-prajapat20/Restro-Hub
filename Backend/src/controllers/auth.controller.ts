@@ -150,6 +150,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        profilePhoto: user.profilePhoto,
         businessId: user.businessId,
         businessData,
         token: await generateToken(user._id.toString()),
@@ -252,6 +253,7 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        profilePhoto: user.profilePhoto,
         businessId: user.businessId,
         token: await generateToken(user._id.toString()),
       }
@@ -309,6 +311,7 @@ export const secretLogin = async (req: Request, res: Response): Promise<void> =>
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        profilePhoto: user.profilePhoto,
         businessId: user.businessId,
         token: await generateToken(user._id.toString()),
       }

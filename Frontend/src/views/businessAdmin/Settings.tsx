@@ -99,7 +99,7 @@ export const Settings: React.FC = () => {
       const updateRes = await api.put('/auth/profile/photo', { profilePhoto: imageUrl });
       
       dispatch(setCredentials({
-        user: updateRes.data.data,
+        user: { ...user, profilePhoto: updateRes.data.data.profilePhoto } as any,
         token: localStorage.getItem('token') || ''
       }));
       toast.success('Profile photo updated');
@@ -145,7 +145,7 @@ export const Settings: React.FC = () => {
     e.stopPropagation();
     try {
       const updateRes = await api.put('/auth/profile/photo', { profilePhoto: null });
-      dispatch(setCredentials({ user: updateRes.data.data, token: localStorage.getItem('token') || '' }));
+      dispatch(setCredentials({ user: { ...user, profilePhoto: null } as any, token: localStorage.getItem('token') || '' }));
       toast.success('Profile photo removed');
     } catch (error) { toast.error('Failed to remove photo'); }
   };

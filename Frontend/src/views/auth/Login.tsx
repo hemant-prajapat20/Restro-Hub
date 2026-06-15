@@ -66,6 +66,7 @@ export const Login: React.FC = () => {
           lastName: data.data.lastName,
           email: data.data.email,
           role: data.data.role,
+          profilePhoto: data.data.profilePhoto,
           businessId: data.data.businessId,
           outletId: data.data.outletId,
           phone: data.data.phone,

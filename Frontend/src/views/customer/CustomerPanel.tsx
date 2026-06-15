@@ -145,7 +145,7 @@ export const CustomerPanel: React.FC = () => {
       
       // 3. Update Redux state
       dispatch(setCredentials({
-        user: updateRes.data.data,
+        user: { ...user, profilePhoto: updateRes.data.data.profilePhoto } as any,
         token: localStorage.getItem('token') || ''
       }));
 
@@ -162,7 +162,7 @@ export const CustomerPanel: React.FC = () => {
     try {
       const updateRes = await api.put('/auth/profile/photo', { profilePhoto: null });
       dispatch(setCredentials({
-        user: updateRes.data.data,
+        user: { ...user, profilePhoto: null } as any,
         token: localStorage.getItem('token') || ''
       }));
       toast.success('Profile photo removed');
