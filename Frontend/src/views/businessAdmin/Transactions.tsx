@@ -16,7 +16,10 @@ import api from '../../utils/api';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import toast from 'react-hot-toast';
 
+import { useNavigate } from 'react-router-dom';
+
 export const Transactions: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const queryClient = useQueryClient();
@@ -99,7 +102,7 @@ export const Transactions: React.FC = () => {
                      const invId = invoice._id || invoice.id || '';
                      const shortId = invoice.transactionId ? invoice.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
                      return (
-                     <tr key={invId} onClick={() => window.open(`/invoice/${invId}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
+                     <tr key={invId} onClick={() => navigate(`/invoice/${invId}`)} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
                         <td className="px-6 py-4">
                            <p className="text-sm font-semibold text-brand-primary">#{shortId}</p>
                            <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt || invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>

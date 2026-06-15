@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -51,6 +51,7 @@ const toWords = (num: number): string => {
 export const InvoiceView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state: RootState) => state.auth.user);
   const businessData = user?.businessData;
 
@@ -61,6 +62,14 @@ export const InvoiceView: React.FC = () => {
       return res.data.find((order: any) => order._id === id) || res.data.find((order: any) => order.id === id);
     }
   });
+
+  React.useEffect(() => {
+    if (invoice && location.search.includes('print=true')) {
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+  }, [invoice, location]);
 
   if (isLoading) return <div className="p-10 text-center font-semibold text-slate-500">Loading Invoice Data...</div>;
   if (!invoice) return <div className="p-10 text-center font-semibold text-red-500">Invoice not found!</div>;
@@ -78,10 +87,16 @@ export const InvoiceView: React.FC = () => {
       {/* Top Action Bar */}
       <div className="px-10 py-6 flex justify-between items-center print:hidden bg-white border-b border-slate-100 shadow-sm sticky top-0 z-50">
         <button 
-          onClick={() => navigate('/business-admin?tab=transactions')} 
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/business-admin?tab=transactions');
+            }
+          }} 
           className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold transition-colors"
         >
-          <ChevronLeft size={20} /> Back to Transactions
+          <ChevronLeft size={20} /> Back
         </button>
         <div className="flex gap-4">
           <button 

@@ -386,6 +386,18 @@ export const CustomerDashboard: React.FC = () => {
       <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-2">
         {/* Restaurant Info Banner */}
         <div className="bg-white p-6 mt-6 rounded-3xl shadow-sm border border-slate-100">
+          {business.hotelImages && business.hotelImages.length > 0 && (
+            <div className="mb-6 flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
+              {business.hotelImages.map((img: string, idx: number) => (
+                <img 
+                  key={idx} 
+                  src={img} 
+                  alt={`${business.name} image ${idx + 1}`} 
+                  className="h-48 w-72 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-200" 
+                />
+              ))}
+            </div>
+          )}
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-2xl font-bold text-brand-primary tracking-tight">{business.name}</h2>

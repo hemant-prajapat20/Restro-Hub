@@ -103,7 +103,7 @@ export const Settings: React.FC = () => {
     }
   };
 
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHotelImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
@@ -114,17 +114,19 @@ export const Settings: React.FC = () => {
     try {
       const uploadRes = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       const imageUrl = uploadRes.data.url;
-      const updateRes = await api.put('/businesses/me/logo', { logoUrl: imageUrl });
+      const currentImages = user?.businessData?.hotelImages || [];
+      const newImages = [...currentImages, imageUrl];
       
-      // Update local redux state for businessData
-      const updatedUser = { ...user, businessData: { ...user?.businessData, logoUrl: imageUrl } } as any;
+      await api.put('/businesses/me/hotel-images', { hotelImages: newImages });
+      
+      const updatedUser = { ...user, businessData: { ...user?.businessData, hotelImages: newImages } } as any;
       dispatch(setCredentials({
         user: updatedUser,
         token: localStorage.getItem('token') || ''
       }));
-      toast.success('Business hotel picture updated');
+      toast.success('Hotel picture added');
     } catch (error: any) {
-      toast.error('Failed to upload business picture');
+      toast.error('Failed to upload picture');
     } finally {
       setIsUploadingLogo(false);
       if (logoInputRef.current) logoInputRef.current.value = '';
@@ -140,13 +142,15 @@ export const Settings: React.FC = () => {
     } catch (error) { toast.error('Failed to remove photo'); }
   };
 
-  const handleRemoveLogo = async (e: React.MouseEvent) => {
+  const handleRemoveHotelImage = async (urlToRemove: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await api.put('/businesses/me/logo', { logoUrl: null });
-      const updatedUser = { ...user, businessData: { ...user?.businessData, logoUrl: null } } as any;
+      const currentImages = user?.businessData?.hotelImages || [];
+      const newImages = currentImages.filter((url: string) => url !== urlToRemove);
+      await api.put('/businesses/me/hotel-images', { hotelImages: newImages });
+      const updatedUser = { ...user, businessData: { ...user?.businessData, hotelImages: newImages } } as any;
       dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
-      toast.success('Business picture removed');
+      toast.success('Picture removed');
     } catch (error) { toast.error('Failed to remove picture'); }
   };
 
@@ -216,42 +220,43 @@ export const Settings: React.FC = () => {
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Business Name</p>
                   <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'IndiServe Prime'}</p>
                   
-                  {/* Business Hotel Picture */}
-                  <div className="relative group inline-block w-full max-w-[200px] aspect-video bg-slate-100 rounded-xl overflow-hidden border border-slate-200 cursor-pointer shadow-sm">
-                    {user?.businessData?.logoUrl ? (
-                      <img 
-                        src={user.businessData.logoUrl} 
-                        alt="Hotel Picture" 
-                        className="w-full h-full object-cover"
-                        onClick={() => setViewingImage({url: user.businessData.logoUrl, alt: 'Hotel Picture'})}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-                        <ImageIcon size={24} className="mb-1 opacity-50" />
-                        <span className="text-[10px] font-medium">No hotel picture</span>
+                  {/* Business Hotel Pictures Gallery */}
+                  <div className="mt-2 space-y-3">
+                    <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Hotel Pictures Gallery</p>
+                    <div className="flex flex-wrap gap-3">
+                      {user?.businessData?.hotelImages?.map((url: string, index: number) => (
+                        <div key={index} className="relative group w-24 h-24 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 cursor-pointer shadow-sm">
+                          <img 
+                            src={url} 
+                            alt={`Hotel Picture ${index + 1}`} 
+                            className="w-full h-full object-cover"
+                            onClick={() => setViewingImage({url, alt: `Hotel Picture ${index + 1}`})}
+                          />
+                          <button 
+                            onClick={(e) => handleRemoveHotelImage(url, e)} 
+                            className="absolute top-1 right-1 p-1 bg-red-100/90 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Add New Picture Button */}
+                      <div 
+                        onClick={() => logoInputRef.current?.click()}
+                        className="w-24 h-24 bg-slate-50 hover:bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center cursor-pointer transition-colors"
+                      >
+                        {isUploadingLogo ? (
+                          <div className="w-5 h-5 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            <Camera size={20} className="text-slate-400 mb-1" />
+                            <span className="text-slate-500 text-[10px] font-bold">Add Photo</span>
+                          </>
+                        )}
                       </div>
-                    )}
-                    
-                    <div 
-                      onClick={() => logoInputRef.current?.click()}
-                      className={`absolute inset-0 bg-black/50 flex flex-col items-center justify-center transition-opacity ${isUploadingLogo ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                    >
-                      {isUploadingLogo ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <Camera size={20} className="text-white mb-1" />
-                          <span className="text-white text-[10px] font-bold">Update Picture</span>
-                        </>
-                      )}
+                      <input type="file" ref={logoInputRef} onChange={handleHotelImageUpload} className="hidden" accept="image/*" />
                     </div>
-                    <input type="file" ref={logoInputRef} onChange={handleLogoUpload} className="hidden" accept="image/*" />
-                    
-                    {user?.businessData?.logoUrl && (
-                      <button onClick={handleRemoveLogo} className="absolute top-2 right-2 p-1.5 bg-red-100/90 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm">
-                        <Trash2 size={12} />
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>

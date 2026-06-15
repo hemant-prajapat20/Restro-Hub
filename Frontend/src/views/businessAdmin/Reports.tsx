@@ -22,7 +22,10 @@ import { Button } from '../../components/Button';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import toast from 'react-hot-toast';
 
+import { useNavigate } from 'react-router-dom';
+
 export const Reports: React.FC = () => {
+  const navigate = useNavigate();
   const [month, setMonth] = useState('2026-04');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
@@ -74,7 +77,7 @@ export const Reports: React.FC = () => {
          onMonthChange={setMonth}
        />
 
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
             { label: 'Net Revenue', value: `₹${netRevenue.toLocaleString()}`, trend: 15.2, icon: BarChart3, color: 'blue' },
             { label: 'Total GST (5%)', value: `₹${totalGst.toLocaleString()}`, trend: 12.8, icon: Calculator, color: 'emerald' },
@@ -160,8 +163,8 @@ export const Reports: React.FC = () => {
          </div>
        </div>
 
-       {/* Yearly & Module Comparison Row */}
-       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+       {/* Yearly Comparison Row */}
+       <div className="mb-8">
          {/* Yearly Sales Trend */}
          <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80">
             <h5 className="font-semibold font-display text-slate-900 mb-4 flex items-center gap-2">
@@ -178,42 +181,6 @@ export const Reports: React.FC = () => {
                   <Bar dataKey="sales" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-         </div>
-
-         {/* Staff Performance */}
-         <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 overflow-hidden flex flex-col">
-            <h5 className="font-semibold font-display text-slate-900 mb-4 flex items-center gap-2">
-              <Users size={18} className="text-brand-accent" />
-              Staff Performance Overview
-            </h5>
-            <div className="overflow-x-auto w-full custom-scrollbar flex-1">
-              <table className="w-full text-left min-w-[400px]">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Name</th>
-                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Role</th>
-                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-center">Orders Handled</th>
-                    <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-widest text-right">Efficiency</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {staffPerformance?.map((staff: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="text-sm font-bold text-slate-900">{staff.name}</p>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-600 rounded-lg">{staff.role}</span>
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm font-semibold text-slate-600">{staff.ordersHandled}</td>
-                      <td className="px-4 py-3 text-right">
-                        <span className="text-sm font-bold text-emerald-600">{staff.efficiency}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
          </div>
        </div>
@@ -382,19 +349,8 @@ export const Reports: React.FC = () => {
                 </button>
                 <button 
                   onClick={() => {
-                    generateReceiptPDF({
-                      title: "RESTROHUB TRANSACTION",
-                      invoiceNumber: selectedInvoice.transactionId ? selectedInvoice.transactionId : selectedInvoice.id.slice(-8).toUpperCase(),
-                      timestamp: new Date(selectedInvoice.date).toLocaleString(),
-                      items: selectedInvoice.items || [],
-                      subtotal: selectedInvoice.subtotal || (selectedInvoice.amount - selectedInvoice.tax),
-                      tax: selectedInvoice.tax,
-                      total: selectedInvoice.amount,
-                      paymentMethod: selectedInvoice.paymentMethod,
-                      customerName: selectedInvoice.customerDetails?.name,
-                      customerPhone: selectedInvoice.customerDetails?.phone
-                    });
-                    toast.success('Generating Print PDF...');
+                    const id = selectedInvoice._id || selectedInvoice.id;
+                    navigate(`/invoice/${id}?print=true`);
                   }}
                   className="flex-1 px-4 py-3 bg-brand-accent text-white rounded-xl font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-accent/20 flex items-center justify-center gap-2"
                 >

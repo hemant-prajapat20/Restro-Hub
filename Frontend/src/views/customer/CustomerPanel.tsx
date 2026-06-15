@@ -21,6 +21,7 @@ interface Business {
   district: string;
   state: string;
   logoUrl?: string;
+  hotelImages?: string[];
 }
 
 export const CustomerPanel: React.FC = () => {
@@ -481,7 +482,17 @@ export const CustomerPanel: React.FC = () => {
                     whileHover={{ y: -4 }}
                   >
                     <div className="h-40 bg-slate-100 relative overflow-hidden flex-shrink-0 group/image">
-                       {business.logoUrl ? (
+                       {business.hotelImages && business.hotelImages.length > 0 ? (
+                          <img 
+                            src={business.hotelImages[0]} 
+                            alt={business.name} 
+                            className="w-full h-full object-cover transition-transform duration-700" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setViewingImage({url: business.hotelImages![0], alt: business.name});
+                            }}
+                          />
+                       ) : business.logoUrl ? (
                           <img 
                             src={business.logoUrl} 
                             alt={business.name} 

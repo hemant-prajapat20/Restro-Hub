@@ -25,6 +25,7 @@ import {
   AlertCircle,
   Zap
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { io } from 'socket.io-client';
 
@@ -348,6 +349,7 @@ export const Dashboard: React.FC = () => {
 };
 
 const RecentTransactionsTable = () => {
+  const navigate = useNavigate();
   const { data: orders, isLoading } = useQuery({
     queryKey: ['recentOrdersWidget'],
     queryFn: async () => {
@@ -365,7 +367,7 @@ const RecentTransactionsTable = () => {
         const invId = invoice._id || invoice.id || '';
         const shortId = invoice.transactionId ? invoice.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
         return (
-          <tr key={invId} onClick={() => window.open(`/invoice/${invId}`, '_blank')} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
+          <tr key={invId} onClick={() => navigate(`/invoice/${invId}`)} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
              <td className="px-6 py-4">
                 <p className="text-sm font-semibold text-brand-primary">#{shortId}</p>
                 <p className="text-[10px] font-semibold text-slate-400 mt-1">{new Date(invoice.createdAt || invoice.date).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
