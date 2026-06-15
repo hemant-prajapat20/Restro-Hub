@@ -75,6 +75,9 @@ export const StaffManagement: React.FC = () => {
   const [newContact, setNewContact] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newScore, setNewScore] = useState('5.0');
+  const [existingImage, setExistingImage] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   // Category management
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -134,6 +137,9 @@ export const StaffManagement: React.FC = () => {
       setNewContact('');
       setNewEmail('');
       setNewScore('5.0');
+      setExistingImage(null);
+      setUploadedImage(null);
+      setImagePreview(null);
       setShowAddModal(false);
       setEditingStaffId(null);
     },
@@ -151,7 +157,7 @@ export const StaffManagement: React.FC = () => {
     updateStaffMutation.mutate({ id: memberId, data: { status: nextStatus } });
   };
 
-  const handleSaveStaff = (e: React.FormEvent) => {
+  const handleSaveStaff = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newSalary || !newContact) return;
 
@@ -173,8 +179,22 @@ export const StaffManagement: React.FC = () => {
       contact: newContact,
       email: newEmail,
       score: Number(newScore) || 5.0,
-      image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}${avatarParams}`
+      image: existingImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedName}${avatarParams}`
     };
+
+    try {
+      if (uploadedImage) {
+        const formData = new FormData();
+        formData.append('image', uploadedImage);
+        const uploadRes = await api.post('/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        staffData.image = uploadRes.data.url;
+      }
+    } catch (err) {
+      toast.error('Failed to upload image. Please try again.');
+      return;
+    }
 
     if (editingStaffId) {
       updateStaffMutation.mutate({ id: editingStaffId, data: staffData });
@@ -182,7 +202,8 @@ export const StaffManagement: React.FC = () => {
       setShowAddModal(false);
       setEditingStaffId(null);
       // Reset form
-      setNewName(''); setNewSalary(''); setNewContact(''); setNewEmail(''); setNewGender('Male');
+      setNewName(''); setNewSalary(''); setNewContact(''); setNewEmail(''); setNewScore('5.0');
+      setExistingImage(null); setUploadedImage(null); setImagePreview(null);
     } else {
       addStaffMutation.mutate({ ...staffData, status: 'Off-Duty' });
     }
@@ -195,13 +216,24 @@ export const StaffManagement: React.FC = () => {
     setNewShift(staff.shift as any);
     setNewSalary(staff.salary.toString());
     setNewContact(staff.contact);
-    setNewEmail(staff.email);
-    setNewScore(staff.score.toString());
-    
+    setNewEmail(staff.email || '');
+    setNewScore(staff.score?.toString() || '5.0');
+    setExistingImage(staff.image || null);
+    setUploadedImage(null);
+    setImagePreview(null);
     // We cannot reliably guess gender from avatar seed without storing it, but we can default.
     setNewGender('Male'); 
     
     setShowAddModal(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setUploadedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+      setExistingImage(null); // Override existing image with new upload
+    }
   };
 
   const handleAddCategory = () => {
@@ -378,11 +410,7 @@ export const StaffManagement: React.FC = () => {
                      </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-stone-50 flex items-center justify-between">
-                     <div>
-                        <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest">Base Salary</p>
-                        <p className="text-sm font-semibold text-stone-800">₹{member.salary.toLocaleString()} / mo</p>
-                     </div>
+                  <div className="mt-6 pt-4 border-t border-stone-50 flex items-center justify-end">
                      <div className="flex gap-1">
                         <span className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2 py-1 bg-stone-50 rounded-lg">
                            Auto-Managed by Shift
@@ -478,32 +506,53 @@ export const StaffManagement: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl p-4 border border-amber-900/10 overflow-hidden"
             >
-              <h3 className="text-2xl font-semibold text-stone-900 mb-2 font-display">
+              <h3 className="text-xl font-semibold text-stone-900 mb-1 font-display">
                 {editingStaffId ? 'Edit Team Member' : 'Recruit Team Member'}
               </h3>
-              <p className="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-6">
+              <p className="text-[10px] text-stone-400 uppercase tracking-widest font-semibold mb-4">
                 {editingStaffId ? 'Update staff details and avatar' : 'Onboard certified luxury hospitality brigade personnel'}
               </p>
 
-              <form onSubmit={handleSaveStaff} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSaveStaff} className="space-y-3">
+                {/* Image Upload Area */}
+                <div className="flex flex-col items-center gap-2 p-3 bg-stone-50 border border-stone-200 border-dashed rounded-2xl">
+                  <div className="relative w-14 h-14 rounded-full bg-stone-100 border border-stone-200 overflow-hidden flex items-center justify-center">
+                    {(imagePreview || existingImage) ? (
+                      <img src={imagePreview || existingImage || ''} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <Users className="w-6 h-6 text-stone-300" />
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageChange}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
+                  <div className="text-center pointer-events-none">
+                    <p className="text-[9px] font-semibold text-stone-500 uppercase tracking-widest">Profile Photo</p>
+                    <p className="text-[8px] text-stone-400">Click avatar to upload (Optional)</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
                     <input 
                       type="text" 
                       required
                       placeholder="e.g. Master Sommelier Dev" 
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gender</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gender</label>
                     <select 
                       value={newGender} 
                       onChange={(e) => setNewGender(e.target.value as 'Male'|'Female')}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600"
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -511,13 +560,13 @@ export const StaffManagement: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
                     <select 
                       value={newRole} 
                       onChange={(e) => setNewRole(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600"
                     >
                       <option value="" disabled>Select a Category...</option>
                       {staffCategories.map(cat => (
@@ -526,11 +575,11 @@ export const StaffManagement: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Assigned Shift</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Assigned Shift</label>
                     <select 
                       value={newShift} 
                       onChange={(e) => setNewShift(e.target.value as any)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-600"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600"
                     >
                       <option value="General (10 AM - 7 PM)">General (10 AM - 7 PM)</option>
                       <option value="Morning (6 AM - 2 PM)">Morning (6 AM - 2 PM)</option>
@@ -540,9 +589,9 @@ export const StaffManagement: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Monthly Base Salary (₹)</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Monthly Base Salary (₹)</label>
                     <input 
                       type="number" 
                       min="0"
@@ -550,49 +599,54 @@ export const StaffManagement: React.FC = () => {
                       placeholder="e.g. 85000" 
                       value={newSalary}
                       onChange={(e) => setNewSalary(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Performance Score</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Performance Score</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 4.9" 
                       value={newScore}
                       onChange={(e) => setNewScore(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Secretariat Email</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Secretariat Email</label>
                     <input 
                       type="email" 
                       placeholder="e.g. dev@indiserve.pro" 
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Premium Call Contact</label>
+                    <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Premium Call Contact</label>
                     <input 
                       type="text" 
                       required
                       placeholder="e.g. +91 9999123456" 
                       value={newContact}
                       onChange={(e) => setNewContact(e.target.value)}
-                      className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-mono text-sm"
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-mono text-xs"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-4 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-xs uppercase tracking-widest">DISCARD</button>
-                  <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">
-                    {editingStaffId ? 'UPDATE STAFF' : 'INDIVIEW COMMISSION'}
+                <div className="flex gap-3 pt-2">
+                  <button type="button" onClick={() => {
+                    setShowAddModal(false);
+                    setEditingStaffId(null);
+                    setNewName(''); setNewSalary(''); setNewContact(''); setNewEmail(''); setNewScore('5.0');
+                    setExistingImage(null); setUploadedImage(null); setImagePreview(null);
+                  }} className="flex-1 py-3 font-semibold text-stone-400 hover:bg-stone-50 rounded-2xl text-[10px] uppercase tracking-widest">DISCARD</button>
+                  <button type="submit" disabled={updateStaffMutation.isPending || addStaffMutation.isPending} className="flex-[2] py-3 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-[10px] uppercase tracking-widest shadow-xl shadow-brand-primary/20 disabled:opacity-50">
+                    {addStaffMutation.isPending || updateStaffMutation.isPending ? 'SAVING...' : (editingStaffId ? 'UPDATE STAFF' : 'ONBOARD COMMISSION')}
                   </button>
                 </div>
               </form>
