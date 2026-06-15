@@ -138,7 +138,7 @@ export const Dashboard: React.FC = () => {
             </select>
           </div>
           <div className="h-[300px] w-full min-w-0">
-            <ResponsiveContainer width="99%" height={300}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={currentGraphData}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
@@ -209,7 +209,7 @@ export const Dashboard: React.FC = () => {
            <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
            <div className="flex flex-col lg:flex-row items-center gap-5 h-auto lg:h-[250px] min-w-0">
              <div className="w-full lg:w-1/2 h-[250px] lg:h-full min-w-0 flex items-center justify-center">
-               <ResponsiveContainer width="99%" height={250}>
+               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                  <PieChart>
                    <Pie
                      data={categoryData}

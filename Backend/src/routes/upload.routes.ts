@@ -6,11 +6,10 @@ import { Role } from '../models/User';
 
 const router = Router();
 
-// Only Business Admins (or higher) can upload images
+// Any authenticated user can upload images
 router.use(protect);
-router.use(authorize(Role.BUSINESS_ADMIN));
 
 // Handle single file upload mapped to the "image" field
-router.post('/image', upload.single('image'), uploadImage);
+router.post('/', upload.single('image'), uploadImage);
 
 export default router;

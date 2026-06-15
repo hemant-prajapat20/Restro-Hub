@@ -124,7 +124,7 @@ export const SuperAdminDashboard: React.FC = () => {
                     <p className="font-semibold uppercase tracking-widest text-sm">Loading Chart Data...</p>
                  </div>
                ) : (
-                 <ResponsiveContainer width="100%" height="100%">
+                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                    <AreaChart data={metrics.chartData}>
                      <defs>
                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">

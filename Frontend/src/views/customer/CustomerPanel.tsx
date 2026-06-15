@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import PastOrdersTab from './PastOrdersTab';
 import SavedAddressesTab from './SavedAddressesTab';
 import ActiveOrdersTab from './ActiveOrdersTab';
+import { ImageModal } from '../../components/ImageModal';
 
 interface Business {
   _id: string;
@@ -41,6 +42,7 @@ export const CustomerPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'home' | 'active_orders' | 'past_orders' | 'saved_addresses'>(tabFromUrl || 'home');
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [viewingImage, setViewingImage] = useState<{url: string, alt: string} | null>(null);
 
   useEffect(() => {
     if (tabFromUrl && ['home', 'active_orders', 'past_orders', 'saved_addresses'].includes(tabFromUrl)) {
@@ -278,7 +280,10 @@ export const CustomerPanel: React.FC = () => {
                     <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-4">
                         <div className="relative group">
-                          <div className="w-14 h-14 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center text-slate-400">
+                          <div 
+                            onClick={() => currentUser?.profilePhoto && setViewingImage({url: currentUser.profilePhoto, alt: 'Profile Photo'})}
+                            className="w-14 h-14 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center text-slate-400 cursor-pointer"
+                          >
                             {currentUser?.profilePhoto ? (
                               <img src={currentUser.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
@@ -288,7 +293,7 @@ export const CustomerPanel: React.FC = () => {
                           
                           {/* Hover Overlay */}
                           <div 
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                             className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer transition-opacity ${isUploadingPhoto ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                           >
                             {isUploadingPhoto ? (
@@ -475,11 +480,19 @@ export const CustomerPanel: React.FC = () => {
                     className="bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden cursor-pointer flex flex-col group transition-all duration-300 h-[340px]"
                     whileHover={{ y: -4 }}
                   >
-                    <div className="h-40 bg-slate-100 relative overflow-hidden flex-shrink-0">
+                    <div className="h-40 bg-slate-100 relative overflow-hidden flex-shrink-0 group/image">
                        {business.logoUrl ? (
-                          <img src={business.logoUrl} alt={business.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                          <img 
+                            src={business.logoUrl} 
+                            alt={business.name} 
+                            className="w-full h-full object-cover transition-transform duration-700" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setViewingImage({url: business.logoUrl as string, alt: business.name});
+                            }}
+                          />
                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-brand-accent/20 to-brand-accent/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                          <div className="w-full h-full bg-gradient-to-br from-brand-accent/20 to-brand-accent/5 flex items-center justify-center transition-transform duration-700">
                               <UtensilsCrossed size={48} className="text-brand-accent/60 opacity-50" />
                           </div>
                        )}
@@ -657,6 +670,14 @@ export const CustomerPanel: React.FC = () => {
             <span className="text-[10px] font-bold">Addresses</span>
         </button>
       </div>
+
+      {viewingImage && (
+        <ImageModal 
+          imageUrl={viewingImage.url} 
+          altText={viewingImage.alt} 
+          onClose={() => setViewingImage(null)} 
+        />
+      )}
     </div>
   );
 };

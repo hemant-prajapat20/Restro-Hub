@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createBusiness, getAllBusinesses, updateBusiness, getPublicBusinesses } from '../controllers/business.controller';
+import { createBusiness, getAllBusinesses, updateBusiness, getPublicBusinesses, updateMyBusinessLogo } from '../controllers/business.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 import { Role } from '../models/User';
 
@@ -7,12 +7,15 @@ const router = Router();
 
 router.get('/public', getPublicBusinesses);
 
-// All routes here are protected and require SUPER_ADMIN role
+// Protected routes
 router.use(protect);
-router.use(authorize(Role.SUPER_ADMIN));
 
-router.post('/', createBusiness);
-router.get('/', getAllBusinesses);
-router.put('/:id', updateBusiness);
+// Routes for Business Admin
+router.put('/me/logo', authorize(Role.BUSINESS_ADMIN, Role.SUPER_ADMIN), updateMyBusinessLogo);
+
+// Routes for Super Admin
+router.post('/', authorize(Role.SUPER_ADMIN), createBusiness);
+router.get('/', authorize(Role.SUPER_ADMIN), getAllBusinesses);
+router.put('/:id', authorize(Role.SUPER_ADMIN), updateBusiness);
 
 export default router;

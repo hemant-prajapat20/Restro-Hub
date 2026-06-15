@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
+import { setCredentials } from '../../store/slices/authSlice';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
+import { ImageModal } from '../../components/ImageModal';
 import { 
   Building2, 
   Mail, 
@@ -15,7 +19,10 @@ import {
   CalendarCheck,
   Phone,
   CreditCard,
-  Calendar
+  Calendar,
+  Camera,
+  Trash2,
+  Image as ImageIcon
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -61,6 +68,88 @@ export const Settings: React.FC = () => {
     reservations: true
   });
 
+  const dispatch = useDispatch();
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  
+  const [isUploadingProfile, setIsUploadingProfile] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  
+  const [viewingImage, setViewingImage] = useState<{url: string, alt: string} | null>(null);
+
+  const handleProfileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+    
+    setIsUploadingProfile(true);
+    const formData = new FormData(); formData.append('image', file);
+
+    try {
+      const uploadRes = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const imageUrl = uploadRes.data.url;
+      const updateRes = await api.put('/auth/profile/photo', { profilePhoto: imageUrl });
+      
+      dispatch(setCredentials({
+        user: updateRes.data.data,
+        token: localStorage.getItem('token') || ''
+      }));
+      toast.success('Profile photo updated');
+    } catch (error: any) {
+      toast.error('Failed to upload profile photo');
+    } finally {
+      setIsUploadingProfile(false);
+      if (profileInputRef.current) profileInputRef.current.value = '';
+    }
+  };
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+    
+    setIsUploadingLogo(true);
+    const formData = new FormData(); formData.append('image', file);
+
+    try {
+      const uploadRes = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const imageUrl = uploadRes.data.url;
+      const updateRes = await api.put('/businesses/me/logo', { logoUrl: imageUrl });
+      
+      // Update local redux state for businessData
+      const updatedUser = { ...user, businessData: { ...user?.businessData, logoUrl: imageUrl } } as any;
+      dispatch(setCredentials({
+        user: updatedUser,
+        token: localStorage.getItem('token') || ''
+      }));
+      toast.success('Business hotel picture updated');
+    } catch (error: any) {
+      toast.error('Failed to upload business picture');
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveProfile = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const updateRes = await api.put('/auth/profile/photo', { profilePhoto: null });
+      dispatch(setCredentials({ user: updateRes.data.data, token: localStorage.getItem('token') || '' }));
+      toast.success('Profile photo removed');
+    } catch (error) { toast.error('Failed to remove photo'); }
+  };
+
+  const handleRemoveLogo = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await api.put('/businesses/me/logo', { logoUrl: null });
+      const updatedUser = { ...user, businessData: { ...user?.businessData, logoUrl: null } } as any;
+      dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
+      toast.success('Business picture removed');
+    } catch (error) { toast.error('Failed to remove picture'); }
+  };
+
   const toggleFeature = (key: keyof typeof features) => {
     setFeatures(prev => ({ ...prev, [key]: !prev[key] }));
   };
@@ -80,9 +169,39 @@ export const Settings: React.FC = () => {
         <div className="lg:col-span-1">
           <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
             <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
-              <div className="w-24 h-24 bg-brand-accent/10 rounded-full flex items-center justify-center text-brand-accent text-2xl font-semibold mb-4 border-4 border-white shadow-lg">
-                {user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'G'}
+              
+              <div className="relative group mb-4">
+                <div 
+                  onClick={() => user?.profilePhoto && setViewingImage({url: user.profilePhoto, alt: 'Profile Photo'})}
+                  className="w-24 h-24 bg-brand-accent/10 rounded-full flex items-center justify-center text-brand-accent text-3xl font-bold border-4 border-white shadow-lg overflow-hidden cursor-pointer"
+                >
+                  {user?.profilePhoto ? (
+                    <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'G'
+                  )}
+                </div>
+                
+                {/* Profile Photo Upload Overlay */}
+                <div 
+                  onClick={() => profileInputRef.current?.click()}
+                  className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer transition-opacity ${isUploadingProfile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                >
+                  {isUploadingProfile ? (
+                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                     <Camera size={20} className="text-white" />
+                  )}
+                </div>
+                <input type="file" ref={profileInputRef} onChange={handleProfileUpload} className="hidden" accept="image/*" />
+                
+                {user?.profilePhoto && (
+                  <button onClick={handleRemoveProfile} className="absolute -bottom-1 -right-1 p-1.5 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors shadow-sm">
+                    <Trash2 size={12} />
+                  </button>
+                )}
               </div>
+
               <h2 className="text-xl font-semibold text-slate-900">{user ? `${user.firstName} ${user.lastName}` : 'Guest User'}</h2>
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold uppercase tracking-wider mt-2">
                 <Crown className="w-3 h-3" />
@@ -93,9 +212,47 @@ export const Settings: React.FC = () => {
             <div className="pt-6 space-y-5">
               <div className="flex items-start gap-3 text-sm">
                 <Building2 className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
-                <div>
+                <div className="flex-1">
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Business Name</p>
-                  <p className="font-semibold text-slate-900">{user?.businessData?.name || 'IndiServe Prime'}</p>
+                  <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'IndiServe Prime'}</p>
+                  
+                  {/* Business Hotel Picture */}
+                  <div className="relative group inline-block w-full max-w-[200px] aspect-video bg-slate-100 rounded-xl overflow-hidden border border-slate-200 cursor-pointer shadow-sm">
+                    {user?.businessData?.logoUrl ? (
+                      <img 
+                        src={user.businessData.logoUrl} 
+                        alt="Hotel Picture" 
+                        className="w-full h-full object-cover"
+                        onClick={() => setViewingImage({url: user.businessData.logoUrl, alt: 'Hotel Picture'})}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                        <ImageIcon size={24} className="mb-1 opacity-50" />
+                        <span className="text-[10px] font-medium">No hotel picture</span>
+                      </div>
+                    )}
+                    
+                    <div 
+                      onClick={() => logoInputRef.current?.click()}
+                      className={`absolute inset-0 bg-black/50 flex flex-col items-center justify-center transition-opacity ${isUploadingLogo ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                    >
+                      {isUploadingLogo ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Camera size={20} className="text-white mb-1" />
+                          <span className="text-white text-[10px] font-bold">Update Picture</span>
+                        </>
+                      )}
+                    </div>
+                    <input type="file" ref={logoInputRef} onChange={handleLogoUpload} className="hidden" accept="image/*" />
+                    
+                    {user?.businessData?.logoUrl && (
+                      <button onClick={handleRemoveLogo} className="absolute top-2 right-2 p-1.5 bg-red-100/90 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm">
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               
@@ -226,6 +383,14 @@ export const Settings: React.FC = () => {
         </div>
 
       </div>
+      
+      {viewingImage && (
+        <ImageModal 
+          imageUrl={viewingImage.url} 
+          altText={viewingImage.alt} 
+          onClose={() => setViewingImage(null)} 
+        />
+      )}
     </div>
   );
 };

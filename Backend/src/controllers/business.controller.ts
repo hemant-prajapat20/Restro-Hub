@@ -205,3 +205,35 @@ export const getPublicBusinesses = async (req: Request, res: Response): Promise<
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
+// @desc    Update business logo (for BUSINESS_ADMIN)
+// @route   PUT /api/businesses/me/logo
+// @access  Private/BUSINESS_ADMIN
+export const updateMyBusinessLogo = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = (req as any).user;
+    if (!user || !user.businessId) {
+      res.status(403).json({ status: 'error', message: 'Not authorized or no business associated' });
+      return;
+    }
+
+    const { logoUrl } = req.body;
+    const business = await Business.findById(user.businessId);
+
+    if (!business) {
+      res.status(404).json({ status: 'error', message: 'Business not found' });
+      return;
+    }
+
+    business.logoUrl = logoUrl;
+    await business.save();
+
+    res.json({
+      status: 'success',
+      message: 'Business logo updated successfully',
+      data: business
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
