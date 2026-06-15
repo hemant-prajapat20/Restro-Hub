@@ -657,13 +657,6 @@ export const BarLounge: React.FC = () => {
                             </div>
                             <div className="flex gap-2">
                               <button 
-                                onClick={() => addToCart(item)}
-                                className="p-3 bg-stone-50 border border-stone-200 hover:border-amber-500 rounded-xl text-stone-600 hover:text-amber-500 transition-all cursor-pointer"
-                                title="Add to Active POS Ticket"
-                              >
-                                <ShoppingCart size={16} />
-                              </button>
-                              <button 
                                 onClick={() => handleDispenseGlass(item.id)}
                                 disabled={item.stockBottles <= 0}
                                 className="px-5 py-3 bg-stone-900 border border-amber-500/20 text-brand-accent hover:bg-stone-850 disabled:opacity-40 text-xs font-semibold uppercase tracking-widest rounded-2xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer"

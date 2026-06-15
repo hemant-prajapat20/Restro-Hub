@@ -34,8 +34,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onClearFilters
 }) => {
   return (
-    <div className="p-2 space-y-2">
-      <div className="flex flex-col md:flex-row gap-2">
+    <div className="p-2">
+      <div className="flex flex-col md:flex-row gap-2 items-end">
         {/* Search Input */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -44,7 +44,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-sm bg-white/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent transition-all"
+            className="w-full pl-9 pr-3 py-1 text-sm bg-white/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent transition-all"
           />
         </div>
 
@@ -53,7 +53,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <select
             value={category || ''}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="px-3 py-1.5 text-sm bg-white/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent transition-all"
+            className="px-3 py-1 text-sm bg-white/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-accent transition-all"
           >
             <option value="">All Categories</option>
             {categories.map((c) => (
@@ -61,10 +61,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             ))}
           </select>
         )}
-      </div>
-
-      {/* Advanced Filters */}
-      <div className="flex flex-col md:flex-row gap-2 items-end">
         {onDateChange && (
           <div className="flex-1">
             <label className="block text-xs font-semibold text-gray-600 mb-0.5">Date</label>
