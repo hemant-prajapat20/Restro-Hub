@@ -619,7 +619,7 @@ export const StaffManagement: React.FC = () => {
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Secretariat Email</label>
                     <input 
                       type="email" 
-                      placeholder="e.g. dev@indiserve.pro" 
+                      placeholder="e.g. dev@restrohub.com" 
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"

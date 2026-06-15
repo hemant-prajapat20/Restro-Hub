@@ -52,6 +52,35 @@ export const getSuperAdminAnalytics = async (req: Request, res: Response): Promi
   }
 };
 
+// @desc    Get subscription transactions for SuperAdmin
+// @route   GET /api/analytics/superadmin/transactions
+// @access  Private/SuperAdmin
+export const getSubscriptionTransactions = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const businesses = await Business.find({ subscriptionAmountPaid: { $gt: 0 } })
+      .populate('ownerId', 'firstName lastName email phone businessAdminCode')
+      .sort({ createdAt: -1 });
+
+    const transactions = businesses.map((b: any) => ({
+      id: b._id,
+      businessName: b.name,
+      ownerName: b.ownerId ? `${b.ownerId.firstName} ${b.ownerId.lastName}` : 'N/A',
+      ownerEmail: b.ownerId?.email || 'N/A',
+      ownerPhone: b.ownerId?.phone || 'N/A',
+      businessAdminCode: b.ownerId?.businessAdminCode || 'N/A',
+      amount: b.subscriptionAmountPaid || 0,
+      platforms: b.platforms || [],
+      status: b.status,
+      subscriptionExpiry: b.subscriptionExpiry,
+      createdAt: b.createdAt,
+    }));
+
+    res.json({ status: 'success', data: transactions });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
 // @desc    Get dashboard analytics for BusinessAdmin
 // @route   GET /api/analytics/business
 // @access  Private/BusinessAdmin

@@ -109,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
             <Crown className="text-white w-6 h-6" />
           </div>
           <div className="flex flex-col">
-            <span className={cn("font-semibold text-lg tracking-wider text-brand-accent uppercase truncate", isSuperAdmin ? "font-display leading-none" : "font-sans")}>IndiServe</span>
+            <span className={cn("font-semibold text-lg tracking-wider uppercase truncate", isSuperAdmin ? "font-display leading-none" : "font-sans")}><span className="text-white">Restro</span><span className="text-brand-accent">Hub</span></span>
             {isSuperAdmin && <span className="text-[10px] font-semibold text-slate-400 tracking-[0.2em] uppercase mt-1 truncate">Super Admin</span>}
           </div>
         </div>
@@ -222,7 +222,11 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     // Set up Socket.IO connection for real-time notifications
     const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
     
-    socket.on('newMessage', (newNotif) => {
+    // SuperAdmin only listens to platform-level admin activity events
+    // BusinessAdmin listens to their own restaurant message events
+    const eventName = isSuperAdmin ? 'newAdminActivity' : 'newMessage';
+
+    socket.on(eventName, (newNotif) => {
       // Add the new notification to the top of the list
       setNotifications(prev => [newNotif, ...prev]);
       
@@ -255,7 +259,9 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     // Optimistically update UI immediately
     setNotifications(prev => prev.map(n => n._id === notifId ? { ...n, isRead: true } : n));
     try {
-      await api.put('/messages/read', { messageId: notifId });
+      const endpoint = isSuperAdmin ? '/activity/read' : '/messages/read';
+      const body = isSuperAdmin ? { logId: notifId } : { messageId: notifId };
+      await api.put(endpoint, body);
     } catch (err) {
       console.error(err);
     }
@@ -274,7 +280,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
         {isSuperAdmin ? (
           <div className="hidden sm:flex flex-col">
-            <h2 className="text-xl sm:text-2xl font-semibold font-display text-slate-900 truncate">IndiServe Admin</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold font-display truncate"><span className="text-black">Restro</span><span className="text-brand-accent">Hub</span> <span className="text-slate-900">Admin</span></h2>
             <p className="text-xs sm:text-sm text-slate-500 break-words">Platform-wide Management Console</p>
           </div>
         ) : (

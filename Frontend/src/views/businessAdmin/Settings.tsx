@@ -218,7 +218,7 @@ export const Settings: React.FC = () => {
                 <Building2 className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div className="flex-1">
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Business Name</p>
-                  <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'IndiServe Prime'}</p>
+                  <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'RestroHub Prime'}</p>
                   
                   {/* Business Hotel Pictures Gallery */}
                   <div className="mt-2 space-y-3">
@@ -265,7 +265,7 @@ export const Settings: React.FC = () => {
                 <Mail className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Owner Email</p>
-                  <p className="font-semibold text-slate-900">{user?.email || 'admin@indiserve.com'}</p>
+                  <p className="font-semibold text-slate-900">{user?.email || 'admin@restrohub.com'}</p>
                 </div>
               </div>
 

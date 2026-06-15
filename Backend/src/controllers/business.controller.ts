@@ -5,6 +5,12 @@ import User, { Role } from '../models/User';
 import ActivityLog from '../models/ActivityLog';
 import mongoose from 'mongoose';
 import { seedTemplateData } from '../utils/seedData';
+import app from '../app';
+
+const emitAdminActivity = (log: any) => {
+  const io = app.get('io');
+  if (io) io.emit('newAdminActivity', log);
+};
 
 // @desc    Create a new business and its admin user
 // @route   POST /api/businesses
@@ -94,9 +100,11 @@ export const createBusiness = async (req: Request, res: Response): Promise<void>
     const log = new ActivityLog({
       action: 'BUSINESS_REGISTERED',
       message: `New Business Admin registered: ${ownerFirstName} ${ownerLastName} for platform(s) ${platforms.join(', ')}`,
-      type: 'success'
+      type: 'success',
+      category: 'business'
     });
     await log.save({ session });
+    emitAdminActivity(log);
 
     // 7. Seed template data for the new business
     await seedTemplateData(newBusiness._id as mongoose.Types.ObjectId, session);
@@ -171,14 +179,48 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
 
     if (platforms) business.platforms = platforms;
     if (activeModules) business.activeModules = activeModules;
-    if (status) business.status = status;
+    if (status && status !== business.status) {
+      business.status = status;
+      const statusLog = await ActivityLog.create({
+        action: status === 'ACTIVE' ? 'BUSINESS_ACTIVATED' : 'BUSINESS_DEACTIVATED',
+        message: `Business '${business.name}' was marked as ${status}.`,
+        type: status === 'ACTIVE' ? 'success' : 'warning',
+        category: 'business'
+      });
+      emitAdminActivity(statusLog);
+    }
     if (name) business.name = name;
     if (contactEmail) business.contactEmail = contactEmail;
     if (address) business.address = address;
     if (state) business.state = state;
     if (district) business.district = district;
-    if (subscriptionExpiry) business.subscriptionExpiry = new Date(subscriptionExpiry);
-    if (subscriptionAmountPaid !== undefined) business.subscriptionAmountPaid = subscriptionAmountPaid;
+    
+    if (subscriptionExpiry) {
+      const newExpiry = new Date(subscriptionExpiry);
+      if (business.subscriptionExpiry && newExpiry.getTime() !== business.subscriptionExpiry.getTime()) {
+        const expiryLog = await ActivityLog.create({
+          action: 'PLAN_UPDATED',
+          message: `Subscription expiry for '${business.name}' updated to ${newExpiry.toLocaleDateString()}.`,
+          type: 'info',
+          category: 'subscription'
+        });
+        emitAdminActivity(expiryLog);
+      }
+      business.subscriptionExpiry = newExpiry;
+    }
+
+    if (subscriptionAmountPaid !== undefined) {
+      if (business.subscriptionAmountPaid !== subscriptionAmountPaid) {
+        const paymentLog = await ActivityLog.create({
+          action: 'SUBSCRIPTION_PAYMENT',
+          message: `Payment of ₹${subscriptionAmountPaid} received for '${business.name}'.`,
+          type: 'success',
+          category: 'payment'
+        });
+        emitAdminActivity(paymentLog);
+      }
+      business.subscriptionAmountPaid = subscriptionAmountPaid;
+    }
 
     const updatedBusiness = await business.save();
 

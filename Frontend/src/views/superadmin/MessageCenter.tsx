@@ -1,55 +1,101 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, CheckCircle, Info, AlertTriangle, XCircle, Search, ShoppingBag, CreditCard, Package, Calendar, Users, Settings } from 'lucide-react';
+import { 
+  Bell, Search, Building2, CreditCard, ShieldCheck, 
+  ShieldOff, RefreshCcw, CheckCheck, Trash2, Info,
+  CheckCircle2, AlertTriangle, XCircle, Clock
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import api from '../../utils/api';
+import toast from 'react-hot-toast';
 
-const TABS = [
-  { id: 'all', label: 'All', icon: Bell },
-  { id: 'order', label: 'Orders', icon: ShoppingBag },
-  { id: 'payment', label: 'Payments', icon: CreditCard },
-  { id: 'inventory', label: 'Inventory', icon: Package },
-  { id: 'reservation', label: 'Reservations', icon: Calendar },
-  { id: 'staff', label: 'Staff', icon: Users },
-  { id: 'system', label: 'System', icon: Settings },
-];
+const getActionMeta = (action: string, category: string) => {
+  switch (action) {
+    case 'BUSINESS_REGISTERED':
+      return { icon: Building2, color: 'text-emerald-500', bg: 'bg-emerald-50', label: 'New Business', border: 'border-emerald-200' };
+    case 'BUSINESS_ACTIVATED':
+      return { icon: ShieldCheck, color: 'text-blue-500', bg: 'bg-blue-50', label: 'Activated', border: 'border-blue-200' };
+    case 'BUSINESS_DEACTIVATED':
+      return { icon: ShieldOff, color: 'text-red-500', bg: 'bg-red-50', label: 'Deactivated', border: 'border-red-200' };
+    case 'SUBSCRIPTION_PAYMENT':
+      return { icon: CreditCard, color: 'text-violet-500', bg: 'bg-violet-50', label: 'Payment', border: 'border-violet-200' };
+    case 'PLAN_UPDATED':
+      return { icon: RefreshCcw, color: 'text-amber-500', bg: 'bg-amber-50', label: 'Plan Updated', border: 'border-amber-200' };
+    default:
+      return { icon: Info, color: 'text-slate-500', bg: 'bg-slate-50', label: 'System', border: 'border-slate-200' };
+  }
+};
+
+const getTypeIcon = (type: string) => {
+  switch (type) {
+    case 'success': return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+    case 'warning': return <AlertTriangle className="w-4 h-4 text-amber-500" />;
+    case 'error': return <XCircle className="w-4 h-4 text-red-500" />;
+    default: return <Info className="w-4 h-4 text-blue-500" />;
+  }
+};
 
 export const MessageCenter: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchLogs = async () => {
     try {
+      setIsLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/activity', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/activity`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.status === 'success') {
         setLogs(data.data);
+        setUnreadCount(data.data.filter((l: any) => !l.isRead).length);
       }
     } catch (error) {
       console.error('Error fetching logs', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchLogs();
-    
-    // Listen for real-time messages
+
     import('socket.io-client').then(({ io }) => {
       const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
-      socket.on('newMessage', (newNotif) => {
-        setLogs(prev => [newNotif, ...prev]);
+      socket.on('newAdminActivity', (newLog) => {
+        setLogs(prev => [newLog, ...prev]);
+        setUnreadCount(prev => prev + 1);
+        toast.success('New platform activity!');
       });
       return () => socket.disconnect();
     });
   }, []);
 
-  const handleDoubleClick = async (logId: string, isRead: boolean) => {
-    if (isRead) return; // Already read
-    
+  const markAllRead = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/activity/read', {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/activity/read`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      setLogs(prev => prev.map(log => ({ ...log, isRead: true })));
+      setUnreadCount(0);
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      toast.error('Failed to mark as read');
+    }
+  };
+
+  const markOneRead = async (logId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/activity/read`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -57,117 +103,141 @@ export const MessageCenter: React.FC = () => {
         },
         body: JSON.stringify({ logId })
       });
-      
-      if (res.ok) {
-        // Optimistically update the UI
-        setLogs(prev => prev.map(log => log._id === logId ? { ...log, isRead: true } : log));
-      }
+      setLogs(prev => prev.map(log => log._id === logId ? { ...log, isRead: true } : log));
+      setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Error marking message as read', error);
+      console.error('Error marking as read', error);
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'order': return <ShoppingBag className="w-5 h-5 text-emerald-500" />;
-      case 'payment': return <CreditCard className="w-5 h-5 text-blue-500" />;
-      case 'inventory': return <Package className="w-5 h-5 text-amber-500" />;
-      case 'reservation': return <Calendar className="w-5 h-5 text-purple-500" />;
-      case 'staff': return <Users className="w-5 h-5 text-indigo-500" />;
-      case 'system': return <Settings className="w-5 h-5 text-slate-500" />;
-      default: return <Info className="w-5 h-5 text-slate-500" />;
-    }
-  };
-
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) || log.action.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = activeTab === 'all' || log.category === activeTab || (!log.category && activeTab === 'system');
-    return matchesSearch && matchesTab;
-  });
+  const filteredLogs = logs.filter(log =>
+    log.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    log.action?.toLowerCase().replace(/_/g, ' ').includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-24 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
+    <div className="p-4 sm:p-8 max-w-5xl mx-auto space-y-6 pb-24 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-brand-accent/10 rounded-xl flex items-center justify-center shrink-0">
-            <Bell className="w-6 h-6 text-brand-accent" />
+          <div className="relative">
+            <div className="w-12 h-12 bg-brand-accent/10 rounded-xl flex items-center justify-center shrink-0">
+              <Bell className="w-6 h-6 text-brand-accent" />
+            </div>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold font-display text-slate-900 truncate">Message Center</h1>
-            <p className="text-xs sm:text-sm text-slate-500 break-words">Track all platform-wide activities, registrations, and updates</p>
+            <h1 className="text-xl sm:text-2xl font-bold font-display text-slate-900">Platform Notifications</h1>
+            <p className="text-xs sm:text-sm text-slate-500">Business registrations, plan changes, payments & status updates</p>
           </div>
         </div>
-        <div className="relative w-full sm:w-auto shrink-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search messages..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm w-full sm:w-64 focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all bg-slate-50 focus:bg-white"
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search notifications..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm w-full sm:w-56 focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all bg-slate-50 focus:bg-white"
+            />
+          </div>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllRead}
+              className="flex items-center gap-2 px-4 py-2 bg-brand-accent/10 hover:bg-brand-accent/20 text-brand-accent rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
+            >
+              <CheckCheck size={15} />
+              Mark All Read
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex overflow-x-auto gap-2 pb-2 custom-scrollbar">
-        {TABS.map(tab => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shrink-0 ${
-                isActive ? 'bg-brand-primary text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
-              }`}
-            >
-              <Icon size={16} className={isActive ? 'text-brand-accent' : 'text-slate-400'} />
-              {tab.label}
-            </button>
-          );
-        })}
+      {/* Stats Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Events', value: logs.length, color: 'text-slate-800', bg: 'bg-white' },
+          { label: 'Unread', value: unreadCount, color: 'text-brand-accent', bg: 'bg-brand-accent/5 border-brand-accent/20' },
+          { label: 'Businesses', value: logs.filter(l => l.category === 'business').length, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Payments', value: logs.filter(l => l.category === 'payment').length, color: 'text-violet-600', bg: 'bg-violet-50' },
+        ].map(stat => (
+          <div key={stat.label} className={`${stat.bg} border border-slate-100 rounded-xl p-4 text-center`}>
+            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+            <p className="text-xs text-slate-500 font-medium mt-1">{stat.label}</p>
+          </div>
+        ))}
       </div>
 
+      {/* Notifications List */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        {filteredLogs.length === 0 ? (
+        {isLoading ? (
+          <div className="p-12 text-center text-slate-500">
+            <div className="w-8 h-8 border-2 border-brand-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm">Loading notifications...</p>
+          </div>
+        ) : filteredLogs.length === 0 ? (
           <div className="p-12 text-center text-slate-500">
             <Bell className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-            <p>No messages found in this category.</p>
+            <p className="font-medium">No notifications yet</p>
+            <p className="text-sm text-slate-400 mt-1">Platform activities like new signups, plan changes and payments will appear here.</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
-            {filteredLogs.map((log) => (
-              <div 
-                key={log._id} 
-                onDoubleClick={() => handleDoubleClick(log._id, log.isRead)}
-                className={`p-6 flex items-start gap-4 transition-colors select-none cursor-pointer border-l-4 ${
-                  log.isRead ? 'bg-white border-transparent hover:bg-slate-50' : 'bg-brand-accent/5 border-brand-accent hover:bg-brand-accent/10'
-                }`}
-                title="Double-click to mark as seen"
-              >
-                <div className="mt-1 relative">
-                  {!log.isRead && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-accent rounded-full border-2 border-white"></span>
-                  )}
-                  {getCategoryIcon(log.category || 'system')}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2">
-                    <h3 className={`break-words ${log.isRead ? 'text-slate-800 font-semibold' : 'text-black font-bold'}`}>
-                      {log.action.replace(/_/g, ' ')}
-                    </h3>
-                    <span className="text-[10px] sm:text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-full shrink-0">
-                      {new Date(log.createdAt).toLocaleString()}
-                    </span>
-                  </div>
-                  <p className={`text-sm break-words ${log.isRead ? 'text-slate-500 font-normal' : 'text-black font-bold'}`}>
-                    {log.message}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <AnimatePresence>
+            <div className="divide-y divide-slate-50">
+              {filteredLogs.map((log) => {
+                const meta = getActionMeta(log.action, log.category);
+                const Icon = meta.icon;
+                return (
+                  <motion.div
+                    key={log._id}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={() => !log.isRead && markOneRead(log._id)}
+                    className={`p-5 flex items-start gap-4 cursor-pointer transition-all group border-l-4 ${
+                      log.isRead ? 'bg-white border-transparent hover:bg-slate-50/50' : 'bg-brand-accent/[0.03] border-brand-accent'
+                    }`}
+                    title={log.isRead ? '' : 'Click to mark as read'}
+                  >
+                    {/* Icon */}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.bg} border ${meta.border}`}>
+                      <Icon className={`w-5 h-5 ${meta.color}`} />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                            {meta.label}
+                          </span>
+                          {getTypeIcon(log.type)}
+                          {!log.isRead && (
+                            <span className="w-2 h-2 bg-brand-accent rounded-full flex-shrink-0" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                          <Clock size={11} />
+                          {new Date(log.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                        </div>
+                      </div>
+                      <h3 className={`text-sm font-semibold ${log.isRead ? 'text-slate-700' : 'text-slate-900'}`}>
+                        {log.action.replace(/_/g, ' ')}
+                      </h3>
+                      <p className={`text-sm mt-0.5 ${log.isRead ? 'text-slate-400' : 'text-slate-600'}`}>
+                        {log.message}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </AnimatePresence>
         )}
       </div>
     </div>

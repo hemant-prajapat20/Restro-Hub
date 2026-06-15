@@ -135,7 +135,7 @@ export const Register: React.FC = () => {
               <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center">
                 <UtensilsCrossed className="text-white w-6 h-6" />
               </div>
-              <h1 className="text-xl font-black font-display tracking-tight text-brand-primary">IndiServe</h1>
+              <h1 className="text-xl font-black font-display tracking-tight"><span className="text-black">Restro</span><span className="text-brand-accent">Hub</span></h1>
             </div>
 
             <motion.div

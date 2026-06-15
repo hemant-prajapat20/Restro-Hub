@@ -3,7 +3,7 @@ import { Settings as SettingsIcon, Save, Server, Shield, AlertCircle, CheckCircl
 
 export const Settings: React.FC = () => {
   const [formData, setFormData] = useState({
-    platformName: 'IndiServe Pro',
+    platformName: 'RestroHub',
     maintenanceMode: false,
     jwtExpirationTime: '30 Days'
   });
