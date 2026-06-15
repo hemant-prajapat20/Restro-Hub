@@ -58,7 +58,7 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     // Insert Message for the Message Center
-    await logMessage(businessId, 'New Transaction', `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`, 'success');
+    await logMessage(businessId, 'payment', 'New Transaction', `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`, 'success');
 
     res.status(201).json(populatedOrder);
   } catch (error) {
@@ -90,7 +90,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
 
     if (status === 'Completed' || status === 'Served') {
-        await logMessage(businessId, 'Order Completed', `Order ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} status changed to ${status}.`, 'success');
+        await logMessage(businessId, 'order', 'Order Completed', `Order ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} status changed to ${status}.`, 'success');
     }
 
     if (updatedOrder.customerId) {

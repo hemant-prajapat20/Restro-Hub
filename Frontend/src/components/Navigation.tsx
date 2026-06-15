@@ -22,7 +22,10 @@ import {
   Menu,
   X,
   FileText,
-  Store
+  Store,
+  Package,
+  Calendar,
+  Info
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -320,15 +323,33 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-sm text-slate-500">No new notifications</div>
                 ) : (
-                  notifications.map((notif, i) => (
+                  notifications.map((notif, i) => {
+                    let IconComp = Bell;
+                    let iconColor = "text-slate-400";
+                    switch(notif.category) {
+                      case 'order': IconComp = ShoppingBag; iconColor = "text-emerald-500"; break;
+                      case 'payment': IconComp = CreditCard; iconColor = "text-blue-500"; break;
+                      case 'inventory': IconComp = Package; iconColor = "text-amber-500"; break;
+                      case 'reservation': IconComp = Calendar; iconColor = "text-purple-500"; break;
+                      case 'staff': IconComp = Users; iconColor = "text-indigo-500"; break;
+                      case 'system': IconComp = Settings; iconColor = "text-slate-500"; break;
+                      default: IconComp = Info; iconColor = "text-blue-500"; break;
+                    }
+
+                    return (
                     <div
                       key={i}
                       onClick={() => !notif.isRead && markOneRead(notif._id)}
-                      className={cn("p-3 border-b border-slate-50 transition-colors", notif.isRead ? "hover:bg-slate-50" : "bg-amber-50/40 hover:bg-amber-50 cursor-pointer")}>
-                      <p className={cn("text-xs mb-1", notif.isRead ? "font-normal text-slate-600" : "font-bold text-black")}>{notif.message}</p>
-                      <span className={cn("text-[10px]", notif.isRead ? "text-slate-400" : "text-slate-500 font-medium")}>{new Date(notif.createdAt).toLocaleString()}</span>
+                      className={cn("p-3 border-b border-slate-50 transition-colors flex items-start gap-3", notif.isRead ? "hover:bg-slate-50" : "bg-amber-50/40 hover:bg-amber-50 cursor-pointer")}>
+                      <div className="mt-0.5 shrink-0">
+                        <IconComp size={16} className={iconColor} />
+                      </div>
+                      <div>
+                        <p className={cn("text-xs mb-1", notif.isRead ? "font-normal text-slate-600" : "font-bold text-black")}>{notif.message}</p>
+                        <span className={cn("text-[10px]", notif.isRead ? "text-slate-400" : "text-slate-500 font-medium")}>{new Date(notif.createdAt).toLocaleString()}</span>
+                      </div>
                     </div>
-                  ))
+                  )})
                 )}
               </div>
               <Link to={isSuperAdmin ? "/super-admin/messages" : "/admin/messages"} onClick={() => setShowDropdown(false)} className="block p-3 text-center text-xs text-brand-accent font-semibold hover:bg-slate-50 transition-colors border-t border-slate-100">

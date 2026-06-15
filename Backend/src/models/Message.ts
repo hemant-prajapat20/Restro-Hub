@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IMessage extends Document {
   businessId: mongoose.Types.ObjectId;
+  category: 'order' | 'payment' | 'inventory' | 'reservation' | 'staff' | 'system';
   action: string;
   message: string;
   type: 'success' | 'info' | 'warning' | 'error';
@@ -13,6 +14,7 @@ export interface IMessage extends Document {
 const messageSchema = new Schema<IMessage>(
   {
     businessId: { type: Schema.Types.ObjectId, ref: 'Business', required: true, index: true },
+    category: { type: String, enum: ['order', 'payment', 'inventory', 'reservation', 'staff', 'system'], default: 'system' },
     action: { type: String, required: true },
     message: { type: String, required: true },
     type: { type: String, enum: ['success', 'info', 'warning', 'error'], default: 'info' },

@@ -49,7 +49,7 @@ export const addStaff = async (req: Request, res: Response) => {
     });
 
     const savedStaff = await newStaff.save();
-    await logMessage(businessId, 'Staff Member Added', `Added new staff member: ${savedStaff.name}`, 'success');
+    await logMessage(businessId, 'staff', 'Staff Member Added', `Added new staff member: ${savedStaff.name}`, 'success');
     res.status(201).json(savedStaff);
   } catch (error: any) {
     if (error.name === 'ValidationError') {
@@ -75,7 +75,7 @@ export const updateStaff = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Staff member not found' });
     }
 
-    await logMessage(businessId, 'Staff Member Updated', `Updated staff member: ${updatedStaff.name}`, 'info');
+    await logMessage(businessId, 'staff', 'Staff Member Updated', `Updated staff member: ${updatedStaff.name}`, 'info');
     res.json(updatedStaff);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating staff' });
@@ -93,7 +93,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Staff member not found' });
     }
 
-    await logMessage(businessId, 'Staff Member Removed', `Removed staff member: ${deletedStaff.name}`, 'warning');
+    await logMessage(businessId, 'staff', 'Staff Member Removed', `Removed staff member: ${deletedStaff.name}`, 'warning');
     res.json({ message: 'Staff member deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting staff' });
