@@ -57,6 +57,9 @@ const FeatureToggle: React.FC<FeatureToggleProps> = ({ icon: Icon, title, descri
 export const Settings: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   
+  const [isStoreOpen, setIsStoreOpen] = useState(user?.businessData?.isStoreOpen ?? true);
+  const [isTogglingStore, setIsTogglingStore] = useState(false);
+  
   // Local state for UI toggles (these would sync with backend in reality)
   const [features, setFeatures] = useState({
     notifications: true,
@@ -156,6 +159,24 @@ export const Settings: React.FC = () => {
 
   const toggleFeature = (key: keyof typeof features) => {
     setFeatures(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleStoreToggle = async () => {
+    setIsTogglingStore(true);
+    try {
+      const newState = !isStoreOpen;
+      const res = await api.put('/businesses/me/store-status', { isStoreOpen: newState });
+      setIsStoreOpen(newState);
+      
+      const updatedUser = { ...user, businessData: { ...user?.businessData, isStoreOpen: newState } } as any;
+      dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
+      
+      toast.success(newState ? 'Restaurant is now Open' : 'Restaurant is now Closed');
+    } catch (error) {
+      toast.error('Failed to update store status');
+    } finally {
+      setIsTogglingStore(false);
+    }
   };
 
   return (
@@ -327,7 +348,14 @@ export const Settings: React.FC = () => {
               <p className="text-slate-500 font-medium mt-1">Enable or disable specific features for your business based on your current plan.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 content-start">
+              <FeatureToggle 
+                icon={Store}
+                title={isStoreOpen ? "Restaurant is Open" : "Restaurant is Closed"}
+                description={isStoreOpen ? "Customers can view menu and place orders" : "Store is closed. Orders are paused"}
+                enabled={isStoreOpen}
+                onToggle={handleStoreToggle}
+              />
               <FeatureToggle 
                 icon={Bell} 
                 title="Push Notifications" 

@@ -188,6 +188,12 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
         category: 'business'
       });
       emitAdminActivity(statusLog);
+
+      // Cascade the status to all users under this business (instantly blocks active tokens via auth middleware)
+      await User.updateMany(
+        { businessId: business._id },
+        { $set: { isActive: status === 'ACTIVE' } }
+      );
     }
     if (name) business.name = name;
     if (contactEmail) business.contactEmail = contactEmail;
@@ -238,10 +244,41 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
 // @access  Public
 export const getPublicBusinesses = async (req: Request, res: Response): Promise<void> => {
   try {
-    const businesses = await Business.find({ status: BusinessStatus.ACTIVE }).select('name address district state logoUrl activeModules');
+    const businesses = await Business.find({ status: BusinessStatus.ACTIVE }).select('name address district state logoUrl activeModules isStoreOpen');
     res.json({
       status: 'success',
       data: businesses
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// @desc    Toggle store open/closed status (for BUSINESS_ADMIN)
+// @route   PUT /api/businesses/me/store-status
+// @access  Private/BUSINESS_ADMIN
+export const updateMyStoreStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = (req as any).user;
+    if (!user || !user.businessId) {
+      res.status(403).json({ status: 'error', message: 'Not authorized or no business associated' });
+      return;
+    }
+
+    const { isStoreOpen } = req.body;
+    const business = await Business.findById(user.businessId);
+
+    if (!business) {
+      res.status(404).json({ status: 'error', message: 'Business not found' });
+      return;
+    }
+
+    business.isStoreOpen = isStoreOpen;
+    await business.save();
+
+    res.json({
+      status: 'success',
+      data: business
     });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });

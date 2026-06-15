@@ -30,6 +30,7 @@ export interface IBusiness extends Document {
   subscriptionExpiry: Date;
   status: BusinessStatus;
   isActive: boolean; // Legacy flag, kept for backward compatibility if needed
+  isStoreOpen: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,6 +63,7 @@ const businessSchema = new Schema<IBusiness>(
       default: BusinessStatus.ACTIVE
     },
     isActive: { type: Boolean, default: true },
+    isStoreOpen: { type: Boolean, default: true }
   },
   { timestamps: true }
 );

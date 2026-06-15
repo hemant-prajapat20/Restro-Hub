@@ -377,6 +377,8 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
           <div className={cn("w-10 h-10 rounded-full border-2 shadow-sm overflow-hidden flex items-center justify-center", isSuperAdmin ? "bg-slate-200 border-brand-accent" : "bg-slate-200 border-white")}>
             {isSuperAdmin ? (
               <Crown className="w-5 h-5 text-brand-accent" />
+            ) : user?.profilePhoto ? (
+              <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
             ) : user ? (
               <span className="font-bold text-brand-accent">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</span>
             ) : (

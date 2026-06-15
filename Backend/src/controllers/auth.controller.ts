@@ -135,6 +135,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     let businessData = null;
     if (user.businessId) {
       businessData = await Business.findById(user.businessId);
+      if (businessData && businessData.status !== 'ACTIVE') {
+        res.status(403).json({ status: 'error', message: 'Your business account has been suspended by the Super Admin.' });
+        return;
+      }
     }
 
     res.json({

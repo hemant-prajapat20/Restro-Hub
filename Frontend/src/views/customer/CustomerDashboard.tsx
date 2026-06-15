@@ -324,8 +324,12 @@ export const CustomerDashboard: React.FC = () => {
                   }}
                   className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-4 rounded-full transition-all"
                 >
-                  <div className="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center">
-                    <User size={18} />
+                  <div className="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                    {currentUser?.profilePhoto ? (
+                      <img src={currentUser.profilePhoto} alt={currentUser.firstName} className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={18} />
+                    )}
                   </div>
                   <span className="font-bold text-sm text-slate-700 hidden sm:block">
                     {currentUser?.firstName || 'Profile'}
@@ -384,6 +388,17 @@ export const CustomerDashboard: React.FC = () => {
       </header>
 
       <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+        {/* Store Closed Banner */}
+        {business.isStoreOpen === false && (
+          <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
+            <Info className="w-5 h-5 text-red-500 shrink-0" />
+            <div>
+              <p className="font-bold text-sm">Restaurant is currently closed</p>
+              <p className="text-xs text-red-600 mt-0.5 font-medium">Online ordering is temporarily paused. Please check back later.</p>
+            </div>
+          </div>
+        )}
+
         {/* Restaurant Info Banner */}
         <div className="bg-white p-6 mt-6 rounded-3xl shadow-sm border border-slate-100">
           {business.hotelImages && business.hotelImages.length > 0 && (
@@ -483,7 +498,11 @@ export const CustomerDashboard: React.FC = () => {
                     </div>
                     
                     <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
-                      {cartItem ? (
+                      {business.isStoreOpen === false ? (
+                        <div className="w-24 h-10 bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-xs uppercase">
+                          Closed
+                        </div>
+                      ) : cartItem ? (
                         <div className="flex items-center justify-between w-24 h-10 px-2 bg-green-50">
                           <button onClick={() => removeFromCart(item._id)} className="p-1 text-green-700 hover:bg-green-100 rounded-lg transition-colors"><Minus size={14}/></button>
                           <span className="font-bold text-green-800 text-sm">{cartItem.quantity}</span>
@@ -654,7 +673,7 @@ export const CustomerDashboard: React.FC = () => {
                 <div className="max-w-4xl mx-auto w-full">
                   <button 
                   onClick={handleCheckout}
-                  disabled={placeOrderMutation.isPending}
+                  disabled={placeOrderMutation.isPending || business.isStoreOpen === false}
                   className="w-full bg-green-600 text-white rounded-2xl py-4 font-bold uppercase tracking-wider flex justify-between items-center px-6 shadow-lg shadow-green-600/30 hover:bg-green-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <div className="text-left">
@@ -662,7 +681,7 @@ export const CustomerDashboard: React.FC = () => {
                     <p className="text-[10px] text-green-200">TOTAL</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {placeOrderMutation.isPending ? 'PROCESSING...' : 'PLACE ORDER'} <ArrowRight size={18}/>
+                    {business.isStoreOpen === false ? 'STORE CLOSED' : placeOrderMutation.isPending ? 'PROCESSING...' : 'PLACE ORDER'} <ArrowRight size={18}/>
                   </div>
                 </button>
                 </div>

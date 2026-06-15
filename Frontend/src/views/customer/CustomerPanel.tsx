@@ -365,8 +365,12 @@ export const CustomerPanel: React.FC = () => {
         <aside className="hidden lg:block w-64 flex-shrink-0 space-y-6">
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 bg-gradient-to-tr from-brand-accent to-brand-accent/80 rounded-full flex items-center justify-center shadow-md shrink-0">
-                        <User className="text-white" size={28} />
+                    <div className="w-14 h-14 bg-gradient-to-tr from-brand-accent to-brand-accent/80 rounded-full flex items-center justify-center shadow-md shrink-0 overflow-hidden">
+                        {currentUser?.profilePhoto ? (
+                          <img src={currentUser.profilePhoto} alt={currentUser.firstName} className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="text-white" size={28} />
+                        )}
                     </div>
                     <div className="overflow-hidden">
                         <h2 className="font-extrabold text-brand-primary text-lg leading-tight truncate">{currentUser?.firstName} {currentUser?.lastName}</h2>
