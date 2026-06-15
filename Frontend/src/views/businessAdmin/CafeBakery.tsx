@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Coffee, Plus, Search, Flame, Timer, Utensils, TrendingUp, Sliders, Loader2, SlidersHorizontal, X, PlusCircle, TrendingDown, Sparkles, Award, ShoppingCart, Receipt, Printer, CreditCard, CheckCircle, ChevronRight, FileText, Edit2, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
@@ -97,6 +97,15 @@ export const CafeBakery: React.FC = () => {
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any | null>(null);
 
+  // Category management
+  const [cafeCategories, setCafeCategories] = useState<string[]>(() => {
+    const saved = localStorage.getItem('cafeCategories');
+    return saved ? JSON.parse(saved) : ['Specialty Beans', 'Artisan Patisserie', 'Cold Brew', 'Signature Beverage'];
+  });
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
+  const [editCategoryName, setEditCategoryName] = useState('');
+  const [newCategoryNameInput, setNewCategoryNameInput] = useState('');
 
   // Brewing Equipment state
   const [activeBrew, setActiveBrew] = useState<{name: string, secondsLeft: number, isBrewing: boolean}>({
@@ -132,6 +141,35 @@ export const CafeBakery: React.FC = () => {
       return response.data;
     }
   });
+
+  useEffect(() => {
+    localStorage.setItem('cafeCategories', JSON.stringify(cafeCategories));
+  }, [cafeCategories]);
+
+  const handleSaveCategory = (index: number) => {
+    if (!editCategoryName.trim()) return;
+    const updated = [...cafeCategories];
+    const oldName = updated[index];
+    updated[index] = editCategoryName.trim();
+    setCafeCategories(updated);
+    setEditingCategoryIndex(null);
+    if (selectedCategory === oldName) setSelectedCategory(updated[index]);
+  };
+
+  const handleDeleteCategory = (index: number) => {
+    if (confirm('Delete this category?')) {
+      const updated = cafeCategories.filter((_, i) => i !== index);
+      setCafeCategories(updated);
+      if (selectedCategory === cafeCategories[index]) setSelectedCategory('All');
+    }
+  };
+
+  const handleAddCategory = () => {
+    if (newCategoryNameInput.trim() && !cafeCategories.includes(newCategoryNameInput.trim())) {
+      setCafeCategories([...cafeCategories, newCategoryNameInput.trim()]);
+      setNewCategoryNameInput('');
+    }
+  };
 
   const filteredItems = items.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
@@ -479,28 +517,37 @@ export const CafeBakery: React.FC = () => {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                {['All', 'Specialty Beans', 'Artisan Patisserie', 'Cold Brew', 'Signature Beverage'].map((cat) => (
+              <div className="flex flex-wrap xl:flex-nowrap items-center gap-2 overflow-hidden">
+                <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 pt-2 flex-1 scroll-smooth">
+                  {['All', ...cafeCategories].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`whitespace-nowrap px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all shrink-0 ${
+                        selectedCategory === cat 
+                          ? 'bg-brand-primary text-brand-accent shadow-lg shadow-brand-primary/10' 
+                          : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 shrink-0 border-l border-stone-200 pl-2 ml-1">
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
-                      selectedCategory === cat 
-                        ? 'bg-brand-primary text-brand-accent shadow-lg shadow-brand-primary/10' 
-                        : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
-                    }`}
+                    onClick={() => setShowCategoryModal(true)}
+                    className="p-2.5 bg-stone-50 hover:bg-stone-100 text-stone-500 hover:text-brand-accent rounded-xl transition-colors shrink-0 shadow-sm border border-stone-200/60"
+                    title="Manage Categories"
                   >
-                    {cat}
+                    <SlidersHorizontal size={18} />
                   </button>
-                ))}
-                <div className="h-6 w-[1px] bg-stone-200 mx-2 hidden xl:block" />
-                <button 
-                  onClick={() => setShowAddModal(true)}
-                  className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
-                >
-                  <Plus size={16} strokeWidth={3} />
-                  Bake / Roast Item
-                </button>
+                  <button 
+                    onClick={() => setShowAddModal(true)}
+                    className="whitespace-nowrap px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
+                  >
+                    <Plus size={16} /> Bake / Roast Item
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1177,10 +1224,7 @@ export const CafeBakery: React.FC = () => {
                       className="w-full p-4 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-sm text-stone-800 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/20"
                     />
                     <datalist id="cafe-categories">
-                      <option value="Specialty Beans" />
-                      <option value="Artisan Patisserie" />
-                      <option value="Cold Brew" />
-                      <option value="Signature Beverage" />
+                      {cafeCategories.map(cat => <option key={cat} value={cat} />)}
                     </datalist>
                   </div>
                   <div className="space-y-1">
@@ -1545,6 +1589,92 @@ export const CafeBakery: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Category Management Modal */}
+      {showCategoryModal && (
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowCategoryModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white border border-stone-200 w-full max-w-md rounded-[32px] shadow-2xl p-8 max-h-[90vh] flex flex-col"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold font-serif text-stone-900">Manage Categories</h3>
+                  <p className="text-xs text-stone-500 uppercase tracking-widest font-semibold mt-1">Add, edit or remove cafe labels</p>
+                </div>
+                <button onClick={() => setShowCategoryModal(false)} className="p-2 hover:bg-stone-100 rounded-xl transition-colors">
+                  <X size={20} className="text-stone-400" />
+                </button>
+              </div>
+
+              {/* Add New */}
+              <div className="flex gap-2 mb-6">
+                <input 
+                  type="text" 
+                  value={newCategoryNameInput}
+                  onChange={e => setNewCategoryNameInput(e.target.value)}
+                  placeholder="New category name..."
+                  className="flex-1 bg-stone-50 border border-stone-200 rounded-2xl px-4 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20"
+                />
+                <button 
+                  onClick={handleAddCategory}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold rounded-2xl hover:from-amber-500 hover:to-amber-400 transition-colors shadow-lg shadow-amber-900/20"
+                >
+                  Add
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                {cafeCategories.map((cat, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-stone-50 rounded-2xl border border-stone-200 group hover:border-amber-500/30 transition-all">
+                    {editingCategoryIndex === idx ? (
+                      <input 
+                        type="text"
+                        autoFocus
+                        value={editCategoryName}
+                        onChange={e => setEditCategoryName(e.target.value)}
+                        className="flex-1 bg-white border border-amber-500/50 rounded-xl px-3 py-1 text-sm font-semibold text-stone-800 focus:outline-none"
+                      />
+                    ) : (
+                      <span className="font-semibold text-sm text-stone-800">{cat}</span>
+                    )}
+                    
+                    <div className="flex items-center gap-1">
+                      {editingCategoryIndex === idx ? (
+                        <button onClick={() => handleSaveCategory(idx)} className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-colors">
+                          <CheckCircle size={16} />
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => { setEditingCategoryIndex(idx); setEditCategoryName(cat); }}
+                          className="p-2 text-stone-500 hover:text-amber-500 hover:bg-amber-50 rounded-xl transition-colors"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => handleDeleteCategory(idx)}
+                        className="p-2 text-stone-500 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      )}
     </div>
   );
 };
