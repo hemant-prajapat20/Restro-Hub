@@ -10,6 +10,7 @@ export interface User {
   outletId?: string;
   phone?: string;
   businessData?: any;
+  profilePhoto?: string;
 }
 
 export interface AuthState {

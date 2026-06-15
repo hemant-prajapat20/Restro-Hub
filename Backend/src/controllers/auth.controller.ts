@@ -313,3 +313,26 @@ export const secretLogin = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
+export const updateProfilePhoto = async (req: any, res: Response): Promise<void> => {
+  try {
+    const { profilePhoto } = req.body;
+    
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      res.status(404).json({ status: 'error', message: 'User not found' });
+      return;
+    }
+
+    user.profilePhoto = profilePhoto;
+    await user.save();
+
+    res.json({
+      status: 'success',
+      message: 'Profile photo updated successfully',
+      data: user
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};

@@ -22,6 +22,7 @@ interface Transaction {
   type: string;
   total: number;
   date: string;
+  profilePhoto?: string | null;
 }
 
 export const Customers: React.FC = () => {
@@ -143,8 +144,12 @@ export const Customers: React.FC = () => {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-brand-accent/10 flex items-center justify-center text-brand-accent font-bold">
-                          {tx.name.charAt(0).toUpperCase()}
+                        <div className="w-10 h-10 rounded-full bg-brand-accent/10 flex items-center justify-center text-brand-accent font-bold overflow-hidden border border-brand-accent/20">
+                          {tx.profilePhoto ? (
+                            <img src={tx.profilePhoto} alt={tx.name} className="w-full h-full object-cover" />
+                          ) : (
+                            tx.name.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-slate-900">{tx.name}</p>

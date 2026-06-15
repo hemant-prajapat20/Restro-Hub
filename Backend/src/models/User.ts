@@ -22,6 +22,7 @@ export interface IUser extends Document {
   staffCategory?: string;
   otp?: string;
   otpExpires?: Date;
+  profilePhoto?: string;
   businessAdminCode?: string;
   isActive: boolean;
   savedAddresses?: {
@@ -55,6 +56,7 @@ const userSchema = new Schema<IUser>(
     staffCategory: { type: String },
     otp: { type: String },
     otpExpires: { type: Date },
+    profilePhoto: { type: String },
     businessAdminCode: { type: String, unique: true, sparse: true },
     isActive: { type: Boolean, default: true },
     savedAddresses: [{

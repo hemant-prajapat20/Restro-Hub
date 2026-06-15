@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { io } from 'socket.io-client';
 import { useQuery } from '@tanstack/react-query';
-import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag, Bell, Calendar, Info } from 'lucide-react';
+import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag, Bell, Calendar, Info, Camera, Trash2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { logout } from '../../store/slices/authSlice';
+import { logout, setCredentials } from '../../store/slices/authSlice';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import PastOrdersTab from './PastOrdersTab';
@@ -39,6 +39,8 @@ export const CustomerPanel: React.FC = () => {
   const tabFromUrl = queryParams.get('tab') as any;
 
   const [activeTab, setActiveTab] = useState<'home' | 'active_orders' | 'past_orders' | 'saved_addresses'>(tabFromUrl || 'home');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (tabFromUrl && ['home', 'active_orders', 'past_orders', 'saved_addresses'].includes(tabFromUrl)) {
@@ -107,6 +109,63 @@ export const CustomerPanel: React.FC = () => {
   const handleLogout = () => {
       dispatch(logout());
       navigate('/customer-login');
+  };
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      // 1. Upload to Cloudinary via backend
+      const uploadRes = await api.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const imageUrl = uploadRes.data.url;
+
+      // 2. Update user profile
+      const updateRes = await api.put('/auth/profile/photo', { profilePhoto: imageUrl });
+      
+      // 3. Update Redux state
+      dispatch(setCredentials({
+        user: updateRes.data.data,
+        token: localStorage.getItem('token') || ''
+      }));
+
+      toast.success('Profile photo updated');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to upload photo');
+    } finally {
+      setIsUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      const updateRes = await api.put('/auth/profile/photo', { profilePhoto: null });
+      dispatch(setCredentials({
+        user: updateRes.data.data,
+        token: localStorage.getItem('token') || ''
+      }));
+      toast.success('Profile photo removed');
+    } catch (error) {
+      toast.error('Failed to remove photo');
+    }
   };
 
   const filteredBusinesses = businesses.filter(b => 
@@ -197,8 +256,12 @@ export const CustomerPanel: React.FC = () => {
                   }}
                   className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-4 rounded-full transition-all"
                 >
-                  <div className="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center">
-                    <User size={18} />
+                  <div className="w-9 h-9 bg-brand-primary text-white rounded-full flex items-center justify-center overflow-hidden border border-brand-primary/20">
+                    {currentUser?.profilePhoto ? (
+                      <img src={currentUser.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={18} />
+                    )}
                   </div>
                   <span className="font-bold text-sm text-slate-700 hidden sm:block">
                     {currentUser?.firstName || 'Profile'}
@@ -213,9 +276,48 @@ export const CustomerPanel: React.FC = () => {
                       onClick={() => setShowProfileDropdown(false)}
                     ></div>
                     <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                        <p className="font-bold text-brand-primary truncate">{currentUser?.firstName} {currentUser?.lastName}</p>
-                        <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{currentUser?.email || 'customer@example.com'}</p>
+                      <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-4">
+                        <div className="relative group">
+                          <div className="w-14 h-14 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center text-slate-400">
+                            {currentUser?.profilePhoto ? (
+                              <img src={currentUser.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                              <User size={24} />
+                            )}
+                          </div>
+                          
+                          {/* Hover Overlay */}
+                          <div 
+                            onClick={() => fileInputRef.current?.click()}
+                            className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer transition-opacity ${isUploadingPhoto ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                          >
+                            {isUploadingPhoto ? (
+                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                               <Camera size={16} className="text-white" />
+                            )}
+                          </div>
+                          <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            onChange={handlePhotoUpload} 
+                            className="hidden" 
+                            accept="image/*"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-brand-primary truncate">{currentUser?.firstName} {currentUser?.lastName}</p>
+                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{currentUser?.email || 'customer@example.com'}</p>
+                          
+                          {currentUser?.profilePhoto && (
+                            <button 
+                              onClick={handleRemovePhoto}
+                              className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1 hover:text-red-600 transition-colors"
+                            >
+                              <Trash2 size={10} /> Remove photo
+                            </button>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="p-2">

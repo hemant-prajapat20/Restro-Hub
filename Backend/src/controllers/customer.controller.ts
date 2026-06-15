@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Customer from '../models/Customer';
 import { logMessage } from '../utils/messageLogger';
 import Order from '../models/Order';
+import User from '../models/User';
 
 export const getCustomers = async (req: Request, res: Response) => {
   try {
@@ -13,10 +14,17 @@ export const getCustomers = async (req: Request, res: Response) => {
       status: { $in: ['Completed', 'Served'] } 
     }).sort({ createdAt: -1 });
 
+    // Fetch user profile photos
+    const uniquePhones = [...new Set(orders.map(o => o.customerDetails?.phone).filter(Boolean))];
+    const users = await User.find({ phone: { $in: uniquePhones } }).select('phone profilePhoto');
+    const photoMap = new Map();
+    users.forEach(u => photoMap.set(u.phone, u.profilePhoto));
+
     const transactions = orders.map(order => ({
       _id: order._id,
       name: order.customerDetails?.name || 'Walk-in Customer',
       phone: order.customerDetails?.phone || 'N/A',
+      profilePhoto: photoMap.get(order.customerDetails?.phone) || null,
       type: order.type,
       total: order.total,
       date: order.createdAt
