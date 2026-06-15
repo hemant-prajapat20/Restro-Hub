@@ -466,13 +466,6 @@ export const CafeBakery: React.FC = () => {
           >
              Barista POS Counter
           </button>
-          <button 
-            type="button"
-            onClick={() => setActiveTab('users')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${activeTab === 'users' ? 'bg-brand-accent text-stone-950 shadow-md shadow-brand-accent/20' : 'text-stone-400 hover:text-white'}`}
-          >
-             Cafeteria Users
-          </button>
         </div>
 
         {/* Status Indicators */}
@@ -1544,49 +1537,6 @@ export const CafeBakery: React.FC = () => {
               </div>
             </motion.div>
           </div>
-        )}
-
-        {activeTab === 'users' && (
-          <motion.div 
-            key="users"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            className="p-8 bg-white rounded-2xl border border-stone-200 shadow-soft"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-xl font-bold text-stone-800">Cafeteria Users</h3>
-                <p className="text-stone-500 text-sm mt-1">Manage employee and student meal registrations.</p>
-              </div>
-              <button 
-                className="bg-brand-primary text-brand-accent px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-primary/90 flex items-center gap-2"
-                onClick={() => toast('Add User Modal goes here', { icon: 'ℹ️' })}
-              >
-                <Plus size={16} /> Add User
-              </button>
-            </div>
-            {isLoadingUsers ? (
-              <p>Loading users...</p>
-            ) : cafeUsers.length === 0 ? (
-              <p className="text-stone-500">No users found. Register an employee or student to start tracking meals.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cafeUsers.map((user: any) => (
-                  <div key={user._id} className="border border-stone-200 p-4 rounded-xl shadow-sm">
-                    <h4 className="font-bold text-stone-800">{user.name}</h4>
-                    <p className="text-xs text-stone-500">{user.employeeId} - {user.department}</p>
-                    <div className="mt-4 flex justify-between items-center">
-                      <span className="text-xs px-2 py-1 bg-stone-100 rounded-md font-medium">{user.mealPlan}</span>
-                      <span className={`text-xs px-2 py-1 rounded-md font-medium ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {user.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
         )}
       </AnimatePresence>
       {/* Category Management Modal */}

@@ -185,7 +185,7 @@ export const Inventory: React.FC = () => {
 
       {/* Tabs */}
       <div className="flex items-center gap-4 border-b border-stone-200">
-        {['Stock', 'Logs'].map(tab => (
+        {['Stock'].map(tab => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab as any)}
@@ -481,12 +481,7 @@ export const Inventory: React.FC = () => {
       </>
       )}
 
-      {activeTab === 'Logs' && (
-        <div className="p-8 bg-white rounded-2xl border border-stone-200 shadow-soft">
-          <h3 className="text-xl font-bold text-stone-800">Inventory Logs</h3>
-          <p className="text-stone-500 mt-2">View history of stock adjustments and wastage.</p>
-        </div>
-      )}
+
     </div>
   );
 };
