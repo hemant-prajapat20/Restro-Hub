@@ -8,6 +8,7 @@ export interface IPricingMatrix {
 }
 
 export interface IPricingConfig extends Document {
+  zeroPlatforms: IPricingMatrix;
   onePlatform: IPricingMatrix;
   twoPlatforms: IPricingMatrix;
   threePlatforms: IPricingMatrix;
@@ -16,6 +17,12 @@ export interface IPricingConfig extends Document {
 
 const pricingConfigSchema = new Schema<IPricingConfig>(
   {
+    zeroPlatforms: {
+      months1: { type: Number, default: 500 },
+      months3: { type: Number, default: 1400 },
+      months6: { type: Number, default: 2700 },
+      months12: { type: Number, default: 5000 },
+    },
     onePlatform: {
       months1: { type: Number, default: 1000 },
       months3: { type: Number, default: 2800 },

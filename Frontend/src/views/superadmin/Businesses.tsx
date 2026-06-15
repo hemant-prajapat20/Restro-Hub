@@ -91,15 +91,13 @@ export const Businesses: React.FC = () => {
 
   // Smart Pricing Engine Auto-calculator
   useEffect(() => {
-    if (!matrix || selectedPlatforms.length === 0) {
-      if (selectedPlatforms.length === 0) {
-        setFormData(prev => ({ ...prev, subscriptionAmountPaid: '0' }));
-      }
+    if (!matrix) {
       return;
     }
     
     const count = selectedPlatforms.length;
-    let tierKey = 'onePlatform';
+    let tierKey = 'zeroPlatforms';
+    if (count === 1) tierKey = 'onePlatform';
     if (count === 2) tierKey = 'twoPlatforms';
     if (count === 3) tierKey = 'threePlatforms';
 
@@ -150,10 +148,7 @@ export const Businesses: React.FC = () => {
       setError("Mobile number must be exactly 10 digits.");
       return;
     }
-    if (selectedPlatforms.length === 0) {
-      setError("Please select at least one platform (Restaurant, Cafeteria, or Bar).");
-      return;
-    }
+    // Removed 0-platform validation to allow Core Plan
 
     setIsSubmitting(true);
     
@@ -555,8 +550,15 @@ export const Businesses: React.FC = () => {
                   </h3>
                   
                   <div className="mb-6 space-y-3">
-                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Select Platforms</label>
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Select Plan Add-ons</label>
                     <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        className="px-4 py-2 rounded-xl font-semibold border-2 transition-colors bg-brand-accent/10 border-brand-accent text-brand-accent cursor-default flex items-center gap-2"
+                      >
+                        Core Base Plan
+                        <span className="text-[10px] bg-brand-accent text-white px-2 py-0.5 rounded-full">REQUIRED</span>
+                      </button>
                       {AVAILABLE_PLATFORMS.map(plat => (
                         <button
                           key={plat}
@@ -568,7 +570,7 @@ export const Businesses: React.FC = () => {
                               : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
                           }`}
                         >
-                          {plat}
+                          + {plat}
                         </button>
                       ))}
                     </div>

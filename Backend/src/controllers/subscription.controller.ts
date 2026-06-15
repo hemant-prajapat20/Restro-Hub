@@ -27,13 +27,14 @@ export const getPricingConfig = async (req: Request, res: Response): Promise<voi
 // @access  Private/SuperAdmin
 export const updatePricingConfig = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { onePlatform, twoPlatforms, threePlatforms } = req.body;
+    const { zeroPlatforms, onePlatform, twoPlatforms, threePlatforms } = req.body;
 
     let config = await PricingConfig.findOne();
     if (!config) {
       config = new PricingConfig();
     }
 
+    if (zeroPlatforms) config.zeroPlatforms = zeroPlatforms;
     if (onePlatform) config.onePlatform = onePlatform;
     if (twoPlatforms) config.twoPlatforms = twoPlatforms;
     if (threePlatforms) config.threePlatforms = threePlatforms;

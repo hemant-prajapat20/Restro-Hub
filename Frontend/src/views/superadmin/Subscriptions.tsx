@@ -8,6 +8,19 @@ export const Subscriptions: React.FC = () => {
 
   const guidelines = [
     {
+      title: 'Core Base Tier',
+      icon: <Building2 className="w-6 h-6" />,
+      color: 'bg-slate-500',
+      description: 'The foundation plan offering core modules like POS, CRM, and Inventory without platform-specific dashboards.',
+      platforms: '0 Platforms (Core Features Only)',
+      pricingRules: [
+        '1 Month: Base Rate (e.g. ₹500)',
+        '3 Months: 5% Discount applied to base rate',
+        '6 Months: 10% Discount applied to base rate',
+        '12 Months: 15% Discount applied to base rate'
+      ]
+    },
+    {
       title: 'Single Platform Tier',
       icon: <UtensilsCrossed className="w-6 h-6" />,
       color: 'bg-blue-500',
