@@ -207,3 +207,19 @@ export const verifyOtp = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error verifying OTP' });
   }
 };
+
+export const deleteOrder = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { id } = req.params;
+
+    const deletedOrder = await Order.findOneAndDelete({ _id: id, businessId });
+    if (!deletedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({ message: 'Order deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error deleting order' });
+  }
+};

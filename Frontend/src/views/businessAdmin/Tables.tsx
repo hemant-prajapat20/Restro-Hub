@@ -346,29 +346,28 @@ export const Tables: React.FC = () => {
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
     
     const processOrder = async () => {
-      // 1. Mark existing table orders as Completed
+      // 1. Delete all existing DB orders for this table (they will be replaced by the merged one)
       const tableDbOrders = dbOrders.filter((o: any) => o.tableId?._id === tableId || o.tableId === tableId);
       await Promise.all(tableDbOrders.map((order: any) => 
-        api.put(`/orders/${order._id}`, { status: 'Completed', paymentMethod })
+        api.delete(`/orders/${order._id}`)
       ));
 
-      // 2. Post local un-sent items as a new Completed order
-      const localItems = tableOrders[tableId] || [];
-      if (localItems.length > 0) {
-        const localSubtotal = localItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      // 2. Post a single unified transaction
+      const combinedItems = getCombinedTableItems(tableId);
+      if (combinedItems.length > 0) {
         await api.post('/orders', {
           type: 'Dine-In',
           tableId,
-          items: localItems.map(i => ({
+          items: combinedItems.map((i: any) => ({
             menuItem: i.itemId,
             name: i.name,
             quantity: i.quantity,
             price: i.price,
             status: 'Served'
           })),
-          subtotal: localSubtotal,
-          tax: Math.round(localSubtotal * 0.05), // Assuming 5% tax for food
-          total: Math.round(localSubtotal * 1.05),
+          subtotal: subtotal,
+          tax: computeTableTax(tableId),
+          total: total,
           paymentMethod,
           status: 'Completed',
           customerDetails: { name: customerName || 'Table Guest', phone: customerPhone || 'N/A' }
@@ -379,12 +378,14 @@ export const Tables: React.FC = () => {
         invoiceNumber: invoiceNum,
         timestamp: dateStr,
         tableNumber: selectedTable?.number,
-        items: getCombinedTableItems(tableId),
+        items: combinedItems,
         subtotal: subtotal,
         tax: computeTableTax(tableId),
         discount: Math.round(subtotal * (appliedDiscount / 100)),
         total: total,
-        payment: paymentMethod
+        payment: paymentMethod,
+        customerName: customerName || 'Table Guest',
+        customerPhone: customerPhone || 'N/A'
       });
 
       clearTableMutation.mutate(tableId);
@@ -733,11 +734,15 @@ export const Tables: React.FC = () => {
 
                        {/* Receipt summary if settled */}
                        {settledReceipt && settledReceipt.tableNumber === selectedTable.number && (
-                         <div className="p-6 bg-slate-50 rounded-[32px] border border-dashed border-slate-300 space-y-4">
+                         <div className="p-6 bg-slate-50 rounded-[32px] border border-dashed border-slate-300">
                            <div className="text-center pb-2 border-b border-dashed border-slate-200">
                              <Receipt size={24} className="mx-auto text-brand-success mb-1" />
                              <p className="text-xs font-semibold uppercase tracking-wider text-slate-900">Settled Receipt Summary</p>
                              <p className="text-[9px] font-mono text-slate-400 mt-0.5">Invoice: {settledReceipt.invoiceNumber}</p>
+                             <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between text-[10px] text-slate-500 font-mono">
+                               <span>Guest: {settledReceipt.customerName}</span>
+                               <span>Ph: {settledReceipt.customerPhone}</span>
+                             </div>
                            </div>
 
                            <div className="text-xs font-mono space-y-1.5 text-slate-600">
@@ -774,7 +779,9 @@ export const Tables: React.FC = () => {
                                    tax: settledReceipt.tax,
                                    discount: settledReceipt.discount,
                                    total: settledReceipt.total,
-                                   paymentMethod: settledReceipt.payment
+                                   paymentMethod: settledReceipt.payment,
+                                   customerName: settledReceipt.customerName,
+                                   customerPhone: settledReceipt.customerPhone
                                  });
                                }}
                                className="py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md shadow-brand-accent/10 hover:scale-102 active:scale-98 transition-all"
