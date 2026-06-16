@@ -426,12 +426,12 @@ export const Tables: React.FC = () => {
   });
 
   return (
-    <div className="p-8 space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
-      <div className="flex items-center justify-between bg-white p-4 rounded-3xl border border-slate-200 shadow-soft">
-        <div className="flex items-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-200 shadow-soft">
+        <div className="flex flex-wrap items-center justify-center gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner w-full sm:w-auto">
           <button 
             onClick={() => setActiveFloor(1)}
-            className={`px-6 py-3 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-[10px] sm:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
               activeFloor === 1 ? 'bg-white text-brand-accent shadow-md border border-slate-100' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -439,7 +439,7 @@ export const Tables: React.FC = () => {
           </button>
           <button 
             onClick={() => setActiveFloor(2)}
-            className={`px-6 py-3 rounded-xl font-semibold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-[10px] sm:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
               activeFloor === 2 ? 'bg-white text-brand-accent shadow-md border border-slate-100' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -447,7 +447,7 @@ export const Tables: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
 
            <button 
              onClick={() => {

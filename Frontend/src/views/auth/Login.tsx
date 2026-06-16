@@ -110,7 +110,7 @@ export const Login: React.FC = () => {
       <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-brand-success/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-center relative z-10 h-full max-h-[800px]">
+      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 h-full max-h-[800px]">
         {/* Hero Section */}
         <div className="hidden lg:block space-y-6">
           <div className="w-12 h-12 bg-brand-accent rounded-[16px] flex items-center justify-center shadow-xl shadow-brand-accent/40 rotate-3">
@@ -157,7 +157,7 @@ export const Login: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-[380px] mx-auto lg:mx-0 justify-self-center lg:justify-self-end bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
+          className="w-full max-w-[420px] mx-auto lg:mx-0 justify-self-center lg:justify-self-center bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
         >
           <div className="p-6">
             <div className="lg:hidden flex items-center gap-3 mb-10">

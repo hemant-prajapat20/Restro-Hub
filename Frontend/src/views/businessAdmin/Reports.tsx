@@ -56,7 +56,7 @@ export const Reports: React.FC = () => {
   const { netRevenue, totalGst, operatingCost, netProfit, recentInvoices, paymentMethodData, topFoodItems, inventoryAlerts, inventoryValue, yearlySalesData, moduleComparisonData, staffPerformance } = reports;
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
   return (
-    <div className="px-8 pt-8 pb-0 space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
+    <div className="p-4 md:px-8 md:pt-8 pb-0 space-y-6 md:space-y-8 max-w-[1600px] mx-auto h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar font-[Inter] font-semibold">
        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
              <h3 className="text-2xl font-semibold font-display text-slate-900">Financial Audit & GST</h3>

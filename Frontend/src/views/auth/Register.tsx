@@ -82,7 +82,7 @@ export const Register: React.FC = () => {
       <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-brand-success/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-center relative z-10 h-full max-h-[800px]">
+      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 h-full max-h-[800px]">
         {/* Hero Section */}
         <div className="hidden lg:block space-y-6">
           <div className="w-12 h-12 bg-brand-accent rounded-[16px] flex items-center justify-center shadow-xl shadow-brand-accent/40 rotate-3 mb-6">
@@ -90,10 +90,10 @@ export const Register: React.FC = () => {
           </div>
           <div className="space-y-2">
             <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
-              Your Favorite Food. <br /><span className="text-brand-accent">Delivered Faster.</span>
+              Scale Your Restaurant. <br /><span className="text-brand-accent">Simplify Operations.</span>
             </h1>
             <p className="text-sm text-slate-500 font-medium max-w-sm">
-              Join thousands of food lovers. Experience seamless ordering, exclusive loyalty rewards, and live tracking.
+              Create your business account to access an integrated Bar, Cafe, and Restro POS with unified billing and real-time dashboards.
             </p>
           </div>
           <div className="flex items-center gap-6 pt-4">
@@ -101,16 +101,16 @@ export const Register: React.FC = () => {
               {[1, 2, 3, 4].map(i => (
                 <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 20}`} className="w-12 h-12 rounded-full border-4 border-white" alt="User" />
               ))}
-              <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">+10k</div>
+              <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">+2k</div>
             </div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Happy Customers</p>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Trusted by Restaurants</p>
           </div>
 
           <div className="pt-8 grid grid-cols-1 gap-5 max-w-sm">
             {[
-              { title: "Live Order Tracking", desc: "Watch your food arrive in real-time on our interactive map." },
-              { title: "Exclusive Rewards", desc: "Earn loyalty points on every order and unlock special discounts." },
-              { title: "Instant Support", desc: "24/7 customer support ready to help you with any issues." }
+              { title: "Unified Multi-Platform POS", desc: "Manage Bar, Cafe, and Restro orders seamlessly with combined table billing." },
+              { title: "Live Kitchen Displays", desc: "Send orders directly to the kitchen with real-time KDS syncing." },
+              { title: "Advanced Analytics", desc: "Track daily sales, transactions, and GST reports in one unified dashboard." }
             ].map((feature, idx) => (
               <div key={idx} className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0 mt-0.5">
@@ -129,7 +129,7 @@ export const Register: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-[380px] mx-auto lg:mx-0 justify-self-center lg:justify-self-end bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
+          className="w-full max-w-[420px] mx-auto lg:mx-0 justify-self-center lg:justify-self-center bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
         >
           <div className="p-5 sm:p-6">
             <div className="lg:hidden flex items-center gap-3 mb-10">

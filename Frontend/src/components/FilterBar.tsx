@@ -34,10 +34,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onClearFilters
 }) => {
   return (
-    <div className="p-2">
-      <div className="flex flex-col md:flex-row gap-2 items-end">
+    <div className="p-2 w-full">
+      <div className="flex flex-row gap-2 items-end w-full">
         {/* Search Input */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-[120px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
