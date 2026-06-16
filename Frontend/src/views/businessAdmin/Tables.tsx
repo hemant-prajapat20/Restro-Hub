@@ -1257,22 +1257,15 @@ export const Tables: React.FC = () => {
                        </div>
                      </div>
                      <div className="flex gap-4">
-                        {settingsData?.smartMapping ? (
-                           <div className="flex-1 bg-brand-primary/5 rounded-2xl border border-brand-primary/20 p-4 flex flex-col justify-center items-center">
-                              <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest text-center">Smart Mapping Active</span>
-                              <span className="text-[10px] text-brand-primary/70 font-semibold text-center mt-1">Table Auto-Allocated</span>
-                           </div>
-                        ) : (
-                           <div className="flex-1">
-                              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Number</label>
-                              <select value={newResTableId} onChange={e => setNewResTableId(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg">
-                                 <option value="">Select Available Table</option>
-                                 {tables.filter(t => t.floor === newResFloor && t.status === 'Available').map(t => (
-                                   <option key={t._id} value={t._id}>Table {t.number} ({t.capacity} Seats)</option>
-                                 ))}
-                              </select>
-                           </div>
-                        )}
+                         <div className="flex-1">
+                            <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Table Number</label>
+                            <select value={newResTableId} onChange={e => setNewResTableId(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg">
+                               <option value="">Select Available Table</option>
+                               {tables.filter(t => t.floor === newResFloor && t.status === 'Available').map(t => (
+                                 <option key={t._id} value={t._id}>Table {t.number} ({t.capacity} Seats)</option>
+                               ))}
+                            </select>
+                         </div>
                        <div className="flex-1">
                           <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest px-2">Time</label>
                           <input type="time" value={newResTime} onChange={e => setNewResTime(e.target.value)} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-semibold text-lg" />
