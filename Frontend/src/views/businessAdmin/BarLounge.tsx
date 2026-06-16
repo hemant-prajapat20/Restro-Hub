@@ -225,6 +225,25 @@ export const BarLounge: React.FC = () => {
     }
   });
 
+  const { data: tables = [] } = useQuery({
+    queryKey: ['tables'],
+    queryFn: async () => {
+      const res = await api.get('/tables');
+      return res.data;
+    }
+  });
+
+  const { data: pdrs = [] } = useQuery({
+    queryKey: ['pdrs'],
+    queryFn: async () => {
+      const res = await api.get('/restro/pdrs');
+      return res.data;
+    }
+  });
+
+  const [showSendToTable, setShowSendToTable] = useState(false);
+  const [selectedSendTableId, setSelectedSendTableId] = useState('');
+
   // Category management
   const [barCategories, setBarCategories] = useState<string[]>(() => {
     const saved = localStorage.getItem('barCategories');
@@ -400,6 +419,41 @@ export const BarLounge: React.FC = () => {
       addToCart(item);
       setActiveTab('billing');
     }
+  };
+
+  const sendToTableMutation = useMutation({
+    mutationFn: async (tableId: string) => {
+      const res = await api.post('/orders', {
+        type: 'Bar',
+        tableId,
+        items: cart.map((c: any) => ({
+          menuItem: c.item.id || c.item._id,
+          name: c.item.name + (c.pourSize !== 'Single' ? ` (${c.pourSize})` : ''),
+          category: c.item.category || 'Bar',
+          quantity: c.quantity,
+          price: getItemPrice(c),
+          status: 'Served'
+        })),
+        subtotal: cartSubtotal,
+        tax: cgst + sgst,
+        total: cartTotal,
+        status: 'In Kitchen',
+        customerDetails: { name: 'Table Guest', phone: 'N/A' }
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Sent to Table successfully!');
+      setCart([]);
+      setShowSendToTable(false);
+      setSelectedSendTableId('');
+    },
+    onError: () => toast.error('Failed to send to table')
+  });
+
+  const handleSendToTable = () => {
+    if (cart.length === 0 || !selectedSendTableId) return;
+    sendToTableMutation.mutate(selectedSendTableId);
   };
 
   const handleCheckout = () => {
@@ -905,10 +959,18 @@ export const BarLounge: React.FC = () => {
                         onChange={(e) => setTargetTable(e.target.value)}
                         className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none truncate"
                       >
-                        <option value="Main Salon Table #12">Main Salon Table #12</option>
-                        <option value="Exclusive Cabana #A">Exclusive Cabana #A</option>
-                        <option value="Cognac Library Suite #1">Cognac Library Suite #1</option>
                         <option value="Mixologist Desk (In-Person)">Mixologist Desk (In-Person)</option>
+                        <option value="Walk-in Customer">Walk-in Customer</option>
+                        <optgroup label="Floor Tables">
+                          {tables.map(t => (
+                            <option key={t._id} value={`Table ${t.number} - Floor ${t.floor}`}>Table {t.number} - Floor {t.floor}</option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Restro Suites">
+                          {pdrs.map(p => (
+                            <option key={p.id || p._id} value={p.name}>{p.name}</option>
+                          ))}
+                        </optgroup>
                       </select>
                     </div>
 
@@ -981,14 +1043,24 @@ export const BarLounge: React.FC = () => {
                 </div>
 
                 {/* Settle Checkout Button */}
-                <button
-                  type="button"
-                  onClick={() => setShowCheckout(true)}
-                  disabled={cart.length === 0}
-                  className="w-full py-4 bg-stone-950 text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-stone-950/10 hover:bg-stone-900 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
-                >
-                  Generate Tax Invoice & Checkout
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSendToTable(true)}
+                    disabled={cart.length === 0}
+                    className="flex-1 py-4 bg-brand-accent text-white font-semibold rounded-2xl text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-brand-accent/20 hover:bg-brand-accent/90 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
+                  >
+                    SEND TO TABLE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCheckout(true)}
+                    disabled={cart.length === 0}
+                    className="flex-1 py-4 bg-stone-950 text-brand-accent font-semibold rounded-2xl text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-stone-950/10 hover:bg-stone-900 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
+                  >
+                    QUICK CHECKOUT
+                  </button>
+                </div>
               </div>
 
               {/* Physical Thermal Receipt View */}
@@ -1249,6 +1321,57 @@ export const BarLounge: React.FC = () => {
                   <button type="submit" className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-stone-900 font-bold rounded-xl text-xs uppercase tracking-widest shadow-xl shadow-amber-500/20">ACQUIRE BOTTLE</button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Send to Table Modal */}
+      <AnimatePresence>
+        {showSendToTable && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm"
+              onClick={() => setShowSendToTable(false)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden p-6"
+            >
+              <h3 className="text-xl font-bold text-stone-900 mb-4">Send to Table</h3>
+              <p className="text-sm text-stone-500 mb-6">Select a table to route these bar items to. They will be added to the table's master bill.</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Select Table</label>
+                  <select 
+                    value={selectedSendTableId} 
+                    onChange={e => setSelectedSendTableId(e.target.value)} 
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-stone-800 outline-none focus:border-brand-accent transition-colors"
+                  >
+                    <option value="">-- Choose a Table --</option>
+                    {tables.map(t => (
+                      <option key={t._id} value={t._id}>Table {t.number} ({t.status}) - Floor {t.floor}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <button onClick={() => setShowSendToTable(false)} className="flex-1 py-3 font-semibold text-stone-400 hover:bg-stone-50 rounded-xl text-xs uppercase tracking-widest cursor-pointer">CANCEL</button>
+                  <button 
+                    onClick={handleSendToTable} 
+                    disabled={!selectedSendTableId || sendToTableMutation.isPending}
+                    className="flex-1 py-3 bg-brand-accent hover:bg-brand-accent/90 text-white font-bold rounded-xl text-xs uppercase tracking-widest disabled:opacity-50 cursor-pointer"
+                  >
+                    {sendToTableMutation.isPending ? 'SENDING...' : 'SEND TO TAB'}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}

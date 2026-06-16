@@ -198,6 +198,17 @@ export const RestroSignature: React.FC = () => {
     }
   });
 
+  const { data: tables = [] } = useQuery({
+    queryKey: ['tables'],
+    queryFn: async () => {
+      const res = await api.get('/tables');
+      return res.data;
+    }
+  });
+
+  const [showSendToTable, setShowSendToTable] = useState(false);
+  const [selectedSendTableId, setSelectedSendTableId] = useState('');
+
   useEffect(() => {
     if (pdrs.length > 0 && !pdrs.find(p => p.id === targetRoomId)) {
       setTargetRoomId(pdrs[0].id);
@@ -429,6 +440,41 @@ export const RestroSignature: React.FC = () => {
     },
     onError: () => toast.error('Failed to checkout PDR')
   });
+
+  const sendToTableMutation = useMutation({
+    mutationFn: async (tableId: string) => {
+      const res = await api.post('/orders', {
+        type: 'Signature',
+        tableId,
+        items: cart.map((c: any) => ({
+          menuItem: c.dish.id || c.dish._id,
+          name: c.dish.name,
+          category: c.dish.category || 'Restro',
+          quantity: c.quantity,
+          price: c.dish.price,
+          status: 'In Kitchen'
+        })),
+        subtotal: cartSubtotal,
+        tax: cgst + sgst,
+        total: cartTotal,
+        status: 'In Kitchen',
+        customerDetails: { name: 'Table Guest', phone: 'N/A' }
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Sent to Floor Table successfully!');
+      setCart([]);
+      setShowSendToTable(false);
+      setSelectedSendTableId('');
+    },
+    onError: () => toast.error('Failed to send to table')
+  });
+
+  const handleSendToTable = () => {
+    if (cart.length === 0 || !selectedSendTableId) return;
+    sendToTableMutation.mutate(selectedSendTableId);
+  };
 
   const handleRestroCheckout = () => {
     if (cart.length === 0) return;
@@ -1037,14 +1083,24 @@ export const RestroSignature: React.FC = () => {
                 </div>
 
                 {/* Authorize billing button */}
-                <button
-                  type="button"
-                  onClick={() => setShowCheckout(true)}
-                  disabled={cart.length === 0}
-                  className="w-full py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40"
-                >
-                  Generate Royal Invoice & Settle Suite
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSendToTable(true)}
+                    disabled={cart.length === 0}
+                    className="flex-1 py-4 bg-brand-accent text-white font-semibold rounded-2xl text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-brand-accent/20 hover:bg-brand-accent/90 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
+                  >
+                    SEND TO FLOOR TABLE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCheckout(true)}
+                    disabled={cart.length === 0}
+                    className="flex-1 py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/10 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40 cursor-pointer"
+                  >
+                    SETTLE PDR SUITE
+                  </button>
+                </div>
               </div>
 
               
@@ -1536,6 +1592,57 @@ export const RestroSignature: React.FC = () => {
                   <button type="submit" className="flex-[2] py-4 bg-brand-primary text-brand-accent font-semibold rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-primary/20">CONFIRM RECOMMENDATION</button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Send to Table Modal */}
+      <AnimatePresence>
+        {showSendToTable && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm"
+              onClick={() => setShowSendToTable(false)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden p-6"
+            >
+              <h3 className="text-xl font-bold text-stone-900 mb-4">Send to Floor Table</h3>
+              <p className="text-sm text-stone-500 mb-6">Select a standard floor table to route these signature items to.</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-2">Select Table</label>
+                  <select 
+                    value={selectedSendTableId} 
+                    onChange={e => setSelectedSendTableId(e.target.value)} 
+                    className="w-full p-4 bg-stone-50 border border-stone-200 rounded-xl font-semibold text-stone-800 outline-none focus:border-brand-accent transition-colors"
+                  >
+                    <option value="">-- Choose a Table --</option>
+                    {tables.map(t => (
+                      <option key={t._id} value={t._id}>Table {t.number} ({t.status}) - Floor {t.floor}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <button onClick={() => setShowSendToTable(false)} className="flex-1 py-3 font-semibold text-stone-400 hover:bg-stone-50 rounded-xl text-xs uppercase tracking-widest cursor-pointer">CANCEL</button>
+                  <button 
+                    onClick={handleSendToTable} 
+                    disabled={!selectedSendTableId || sendToTableMutation.isPending}
+                    className="flex-1 py-3 bg-brand-accent hover:bg-brand-accent/90 text-white font-bold rounded-xl text-xs uppercase tracking-widest disabled:opacity-50 cursor-pointer"
+                  >
+                    {sendToTableMutation.isPending ? 'SENDING...' : 'SEND TO TAB'}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}
