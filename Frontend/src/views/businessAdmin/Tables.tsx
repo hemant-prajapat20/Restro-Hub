@@ -345,15 +345,41 @@ export const Tables: React.FC = () => {
     const invoiceNum = 'IND-TBL-' + Math.floor(100000 + Math.random() * 900000);
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
     
-    const processOrder = () => {
-      // Generate PDF Invoice like Car Wash App
-      
+    const processOrder = async () => {
+      // 1. Mark existing table orders as Completed
+      const tableDbOrders = dbOrders.filter((o: any) => o.tableId?._id === tableId || o.tableId === tableId);
+      await Promise.all(tableDbOrders.map((order: any) => 
+        api.put(`/orders/${order._id}`, { status: 'Completed', paymentMethod })
+      ));
+
+      // 2. Post local un-sent items as a new Completed order
+      const localItems = tableOrders[tableId] || [];
+      if (localItems.length > 0) {
+        const localSubtotal = localItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+        await api.post('/orders', {
+          type: 'Dine-In',
+          tableId,
+          items: localItems.map(i => ({
+            menuItem: i.itemId,
+            name: i.name,
+            quantity: i.quantity,
+            price: i.price,
+            status: 'Served'
+          })),
+          subtotal: localSubtotal,
+          tax: Math.round(localSubtotal * 0.05), // Assuming 5% tax for food
+          total: Math.round(localSubtotal * 1.05),
+          paymentMethod,
+          status: 'Completed',
+          customerDetails: { name: customerName || 'Table Guest', phone: customerPhone || 'N/A' }
+        });
+      }
 
       setSettledReceipt({
         invoiceNumber: invoiceNum,
         timestamp: dateStr,
         tableNumber: selectedTable?.number,
-        items: tableOrders[tableId] || [],
+        items: getCombinedTableItems(tableId),
         subtotal: subtotal,
         tax: computeTableTax(tableId),
         discount: Math.round(subtotal * (appliedDiscount / 100)),
@@ -371,6 +397,7 @@ export const Tables: React.FC = () => {
 
       setAppliedDiscount(0);
       setDiscountCode('');
+      queryClient.invalidateQueries({ queryKey: ['activeOrders'] });
     };
 
     if (paymentMethod === 'UPI' || paymentMethod === 'Online') {
@@ -679,7 +706,16 @@ export const Tables: React.FC = () => {
                            <p className="text-xs font-semibold uppercase tracking-wider">Sanitization In Progress</p>
                            <p className="text-xs font-medium text-slate-500">Waiters are preparing and wiping table #{selectedTable.number}. Click 'Complete Reset' below to clear.</p>
                            <button 
-                             onClick={() => setTableStatus(selectedTable.id, 'Available')}
+                             onClick={() => {
+                               setTableStatus(selectedTable.id, 'Available');
+                               setTableOrders(prev => {
+                                 const next = { ...prev };
+                                 delete next[selectedTable.id];
+                                 return next;
+                               });
+                               setSettledReceipt(null);
+                               setSelectedTableId(null);
+                             }}
                              className="px-5 py-2.5 bg-brand-warning text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-md shadow-brand-warning/10"
                            >
                              Complete Reset & Open Table
