@@ -43,6 +43,7 @@ export const SystemOwnerLogin: React.FC = () => {
           lastName: data.data.lastName,
           email: data.data.email,
           role: data.data.role,
+          profilePhoto: data.data.profilePhoto,
         },
         token: data.data.token
       }));

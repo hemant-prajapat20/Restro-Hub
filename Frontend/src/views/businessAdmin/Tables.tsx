@@ -65,6 +65,9 @@ export const Tables: React.FC = () => {
   const [newResTime, setNewResTime] = useState('19:00');
   const [newResFloor, setNewResFloor] = useState<number>(1);
   const [newResTableId, setNewResTableId] = useState('');
+  
+  const [isMergeMode, setIsMergeMode] = useState(false);
+  const [selectedTablesToMerge, setSelectedTablesToMerge] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -143,6 +146,16 @@ export const Tables: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       toast.success('Table Added');
+    }
+  });
+
+  const mergeTableMutation = useMutation({
+    mutationFn: async (data: { primaryTableId: string; secondaryTableIds: string[] }) => await api.post('/tables/merge', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      toast.success('Tables Merged Successfully');
+      setIsMergeMode(false);
+      setSelectedTablesToMerge([]);
     }
   });
 
@@ -409,6 +422,25 @@ export const Tables: React.FC = () => {
         <div className="flex items-center gap-3">
 
            <button 
+             onClick={() => {
+               if (!isMergeMode) {
+                 setIsMergeMode(true);
+                 setSelectedTablesToMerge([]);
+                 toast('Select tables to merge', { icon: '🔗' });
+               } else {
+                 setIsMergeMode(false);
+                 setSelectedTablesToMerge([]);
+               }
+             }}
+             className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
+               isMergeMode ? 'bg-slate-200 text-slate-700 shadow-inner' : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-slate-300'
+             }`}
+           >
+              <Layers size={16} strokeWidth={3} />
+              {isMergeMode ? 'CANCEL MERGE' : 'MERGE TABLES'}
+           </button>
+
+           <button 
              onClick={() => setShowAddTableModal(true)}
              className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-2xl text-xs font-semibold uppercase tracking-widest shadow-lg shadow-brand-primary/10 hover:scale-105 transition-all"
            >
@@ -418,17 +450,77 @@ export const Tables: React.FC = () => {
         </div>
       </div>
 
+      {isMergeMode && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-brand-accent/10 border-2 border-brand-accent rounded-2xl p-4 flex items-center justify-between shadow-lg"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-brand-accent text-white rounded-xl flex items-center justify-center">
+              <Layers size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900">Merge Mode Active</h3>
+              <p className="text-sm text-slate-600 font-medium">Select {selectedTablesToMerge.length === 0 ? 'the primary table' : 'secondary tables'} to link together. Only 'Available' tables can be merged.</p>
+            </div>
+          </div>
+          <button
+            disabled={selectedTablesToMerge.length < 2 || mergeTableMutation.isPending}
+            onClick={() => {
+              mergeTableMutation.mutate({
+                primaryTableId: selectedTablesToMerge[0],
+                secondaryTableIds: selectedTablesToMerge.slice(1)
+              });
+            }}
+            className="px-6 py-3 bg-brand-accent text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-accent/90 transition-all"
+          >
+            {mergeTableMutation.isPending ? 'MERGING...' : `MERGE ${selectedTablesToMerge.length} TABLES`}
+          </button>
+        </motion.div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {floorTables.map((table) => (
           <motion.div
             layout
             key={table._id}
             onClick={() => {
+              if (isMergeMode) {
+                if (table.status !== 'Available') {
+                  toast.error('Only Available tables can be merged');
+                  return;
+                }
+                if (table.linkedTables?.length > 0) {
+                  toast.error('This table is already primary for a merge group. Split it first.');
+                  return;
+                }
+                if (selectedTablesToMerge.includes(table._id)) {
+                  setSelectedTablesToMerge(prev => prev.filter(id => id !== table._id));
+                } else {
+                  setSelectedTablesToMerge(prev => [...prev, table._id]);
+                }
+                return;
+              }
+
+              if (table.status === 'Merged') {
+                toast('This table is merged. Please manage it from its primary table.', { icon: 'ℹ️' });
+                // Optional: find primary table and open it
+                const primary = tables.find((t: any) => t.linkedTables?.includes(table._id));
+                if (primary) {
+                  setSelectedTableId(primary._id);
+                  setModalTab('checkout');
+                  setSettledReceipt(null);
+                }
+                return;
+              }
+
               setSelectedTableId(table._id);
               setModalTab('checkout');
               setSettledReceipt(null);
             }}
             className={`bg-white rounded-3xl p-6 border transition-all duration-300 relative overflow-hidden group cursor-pointer ${
+              selectedTablesToMerge.includes(table._id) ? 'border-brand-accent ring-4 ring-brand-accent/20 bg-brand-accent/5 scale-[1.02] z-10' :
               selectedTableId === table._id ? 'border-brand-accent ring-2 ring-brand-accent/10 scale-[1.02] z-10' : 'border-slate-200 shadow-soft hover:border-brand-accent/50'
             }`}
           >
@@ -440,7 +532,19 @@ export const Tables: React.FC = () => {
                   {table.capacity} Seater
                 </p>
               </div>
-              <StatusBadge status={table.status} />
+              <div className="flex flex-col items-end gap-2">
+                <StatusBadge status={table.status} />
+                {table.status === 'Merged' && (
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Layers size={10} /> LINKED
+                  </span>
+                )}
+                {table.linkedTables && table.linkedTables.length > 0 && (
+                  <span className="px-2 py-0.5 bg-brand-accent/10 text-brand-accent rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Layers size={10} /> +{table.linkedTables.length} MERGED
+                  </span>
+                )}
+              </div>
             </div>
 
             {table.status === 'Occupied' || table.status === 'Billing' ? (
@@ -524,7 +628,7 @@ export const Tables: React.FC = () => {
                           <h3 className="text-xl font-semibold text-slate-900">Table Billing & POS</h3>
                           <div className="flex items-center gap-2 mt-1">
                              <StatusBadge status={selectedTable.status} />
-                             {selectedTable.status === 'Merged' && (
+                             {selectedTable.linkedTables && selectedTable.linkedTables.length > 0 && (
                                <button
                                  onClick={() => {
                                    if (window.confirm('Are you sure you want to split these tables?')) {
@@ -534,7 +638,7 @@ export const Tables: React.FC = () => {
                                  disabled={splitTableMutation.isPending}
                                  className="ml-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[10px] px-2 py-0.5 rounded-md font-semibold transition-colors uppercase tracking-widest"
                                >
-                                 {splitTableMutation.isPending ? 'Splitting...' : 'Split Tables'}
+                                 {splitTableMutation.isPending ? 'SPLITTING...' : 'SPLIT TABLES'}
                                </button>
                              )}
                              <span className="text-xs font-bold text-slate-400 uppercase ml-2">• {selectedTable.floor === 1 ? 'Ground Floor' : 'Terrace Rooftop'}</span>

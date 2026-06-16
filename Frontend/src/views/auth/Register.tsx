@@ -49,7 +49,8 @@ export const Register: React.FC = () => {
           firstName: data.data.firstName,
           lastName: data.data.lastName,
           email: data.data.email,
-          role: data.data.role
+          role: data.data.role,
+          profilePhoto: data.data.profilePhoto
         },
         token: data.data.token
       }));
