@@ -188,7 +188,7 @@ const ActiveOrdersTab: React.FC<Props> = ({ onNavigateHome }) => {
                <div className="flex justify-between items-start">
                    <div>
                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Order ID</p>
-                       <p className="text-sm font-black text-brand-primary">#{order.transactionId ? order.transactionId : order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                       <p className="text-sm font-black text-brand-primary">#{(order as any).transactionId ? (order as any).transactionId : order._id.substring(order._id.length - 8).toUpperCase()}</p>
                    </div>
                    <div className="text-right">
                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Payment</p>

@@ -3,12 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { io } from 'socket.io-client';
 import { useQuery } from '@tanstack/react-query';
-import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag, Bell, Calendar, Info, Camera, Trash2 } from 'lucide-react';
+import { Package, Clock, LogOut, MapPin, Search, Star, UtensilsCrossed, User, ChevronDown, Mail, Phone, Menu, X, ArrowRight, ShoppingBag, Bell, Calendar, Info, Camera, Trash2, QrCode } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { logout, setCredentials } from '../../store/slices/authSlice';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
+import { playNotificationSound } from '../../utils/sound';
 import PastOrdersTab from './PastOrdersTab';
 import SavedAddressesTab from './SavedAddressesTab';
 import ActiveOrdersTab from './ActiveOrdersTab';
@@ -99,6 +100,7 @@ export const CustomerPanel: React.FC = () => {
     const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
     socket.on('newCustomerNotification', (notif: any) => {
       if (notif.customerId === currentUser?._id) {
+        playNotificationSound();
         refetchNotifications();
         toast(notif.message, { icon: '🔔' });
       }
@@ -145,7 +147,7 @@ export const CustomerPanel: React.FC = () => {
       
       // 3. Update Redux state
       dispatch(setCredentials({
-        user: { ...user, profilePhoto: updateRes.data.data.profilePhoto } as any,
+        user: { ...currentUser, profilePhoto: updateRes.data.data.profilePhoto } as any,
         token: localStorage.getItem('token') || ''
       }));
 
@@ -162,7 +164,7 @@ export const CustomerPanel: React.FC = () => {
     try {
       const updateRes = await api.put('/auth/profile/photo', { profilePhoto: null });
       dispatch(setCredentials({
-        user: { ...user, profilePhoto: null } as any,
+        user: { ...currentUser, profilePhoto: null } as any,
         token: localStorage.getItem('token') || ''
       }));
       toast.success('Profile photo removed');

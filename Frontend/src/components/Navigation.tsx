@@ -25,8 +25,18 @@ import {
   Store,
   Package,
   Calendar,
-  Info
+  Info,
+  User,
+  ArrowRight,
+  Activity,
+  CalendarDays,
+  ExternalLink,
+  Moon,
+  Sun,
+  Monitor,
+  Laptop
 } from 'lucide-react';
+import { playNotificationSound } from '../utils/sound';
 import { motion } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -236,6 +246,9 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
     const eventName = isSuperAdmin ? 'newAdminActivity' : 'newMessage';
 
     socket.on(eventName, (newNotif) => {
+      // Play sound
+      playNotificationSound();
+
       // Add the new notification to the top of the list
       setNotifications(prev => [newNotif, ...prev]);
       
