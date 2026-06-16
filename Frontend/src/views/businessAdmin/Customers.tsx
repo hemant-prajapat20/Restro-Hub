@@ -25,8 +25,12 @@ interface Transaction {
   profilePhoto?: string | null;
 }
 
+import { FilterBar } from '../../components/FilterBar';
+
 export const Customers: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedModule, setSelectedModule] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
 
   const { data: transactions = [], isLoading } = useQuery<Transaction[]>({
     queryKey: ['customers-transactions'],
@@ -36,11 +40,26 @@ export const Customers: React.FC = () => {
     }
   });
 
-  const filteredTransactions = transactions.filter(t => 
-    t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    t.phone.includes(searchQuery) ||
-    t._id.includes(searchQuery)
-  );
+  const filteredTransactions = transactions.filter(t => {
+    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          t.phone.includes(searchQuery) ||
+                          t._id.includes(searchQuery);
+    let matchesModule = true;
+    if (selectedModule === 'Online/Delivery') {
+      matchesModule = t.type === 'Online' || t.type === 'Delivery' || t.type === 'Online/Delivery';
+    } else if (selectedModule !== '') {
+      matchesModule = t.type === selectedModule;
+    }
+    
+    let matchesDate = true;
+    if (selectedDate) {
+      const tDate = new Date(t.date);
+      const localDate = `${tDate.getFullYear()}-${String(tDate.getMonth() + 1).padStart(2, '0')}-${String(tDate.getDate()).padStart(2, '0')}`;
+      matchesDate = localDate === selectedDate;
+    }
+
+    return matchesSearch && matchesModule && matchesDate;
+  });
 
   const customerSpends: Record<string, number> = {};
   transactions.forEach(t => {
@@ -95,21 +114,16 @@ export const Customers: React.FC = () => {
 
       {/* CRM List */}
       <div className="bg-white rounded-[32px] shadow-soft border border-stone-200/80 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <div className="relative w-[350px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input 
-              type="text" 
-              placeholder="Search by name, phone, or ID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent transition-all"
-            />
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-xl font-medium text-slate-600 hover:bg-slate-50">
-            <Filter size={18} />
-            Filters
-          </button>
+        <div className="p-4 border-b border-slate-100">
+          <FilterBar
+            searchTerm={searchQuery}
+            onSearchChange={setSearchQuery}
+            category={selectedModule}
+            onCategoryChange={setSelectedModule}
+            categories={['Cafe', 'Bar', 'Restro', 'Online/Delivery', 'Signature']}
+            date={selectedDate}
+            onDateChange={setSelectedDate}
+          />
         </div>
         
         <div className="overflow-x-auto w-full custom-scrollbar">
