@@ -276,52 +276,55 @@ export const Delivery: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     key={order.id} 
-                    className="bg-slate-50 p-4 md:p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-4 hover:bg-slate-100/50 transition-colors"
+                    className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-100/50 transition-colors"
                   >
-                     <div className="flex items-center gap-4 w-full sm:w-auto">
-                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-semibold ${
+                     <div className="flex items-center gap-4 flex-1 min-w-0 w-full">
+                     <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center font-semibold ${
                        order.source === 'Zomato' ? 'bg-red-50 text-red-600' : 
                        order.source === 'Swiggy' ? 'bg-orange-50 text-orange-600' : 'bg-brand-accent/10 text-brand-accent'
                      }`}>
                         {order.source[0]}
                      </div>
-                     <div className="flex-1">
-                        <div className="flex items-center gap-3">
+                     <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 flex-wrap">
                            <h6 className="font-semibold text-slate-900">{order.id}</h6>
                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{order.time} • {order.date}</span>
-                           <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                           <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0 ${
                              order.paymentMethod === 'Online' ? 'bg-brand-accent/10 text-brand-accent' : 'bg-emerald-50 text-emerald-600'
                            }`}>{order.paymentMethod}</span>
                         </div>
-                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                           <p className="text-sm font-medium text-slate-500">{order.items}</p>
+                        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                           <p className="text-sm font-medium text-slate-500 truncate max-w-full">{order.items}</p>
                            {order.source === 'Online' && (
-                             <p className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                             <p className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
                                {order.customerName} ({order.customerPhone})
                              </p>
                            )}
                         </div>
                      </div>
                      </div>
-                     <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
-                        <p className="text-lg font-semibold text-slate-900">{order.total}</p>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
-                          order.status === 'Ready' || order.status === 'Completed' || order.status === 'Out for Delivery' ? 'bg-brand-success/10 text-brand-success' : 'bg-brand-accent/10 text-brand-accent'
-                        }`}>
-                           {order.status}
-                        </span>
+                     
+                     <div className="flex items-center gap-4 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
+                       <div className="flex sm:flex-col items-center sm:items-end justify-center gap-2 sm:gap-1">
+                          <p className="text-lg font-semibold text-slate-900">{order.total}</p>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
+                            order.status === 'Ready' || order.status === 'Completed' || order.status === 'Out for Delivery' ? 'bg-brand-success/10 text-brand-success' : 'bg-brand-accent/10 text-brand-accent'
+                          }`}>
+                             {order.status}
+                          </span>
+                       </div>
+                       <button 
+                          onClick={() => {
+                            setSelectedManageOrder(order);
+                            setDriverName(order.driverDetails?.name || '');
+                            setDriverPhone(order.driverDetails?.phone || '');
+                            setOtpInput('');
+                          }}
+                          className="p-2 bg-slate-50 hover:bg-slate-200 rounded-xl text-slate-400 hover:text-brand-accent transition-all cursor-pointer"
+                       >
+                          <ChevronRight size={20} />
+                       </button>
                      </div>
-                     <button 
-                        onClick={() => {
-                          setSelectedManageOrder(order);
-                          setDriverName(order.driverDetails?.name || '');
-                          setDriverPhone(order.driverDetails?.phone || '');
-                          setOtpInput('');
-                        }}
-                        className="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-brand-accent transition-all cursor-pointer"
-                     >
-                        <ChevronRight size={20} />
-                     </button>
                   </motion.div>
                 ))}
              </div>
