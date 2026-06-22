@@ -98,7 +98,7 @@ export const Transactions: React.FC = () => {
                      <tr><td colSpan={6} className="p-8 text-center text-slate-500 font-medium">No orders found</td></tr>
                    ) : filteredOrders.map((order: any) => {
                      const invId = order._id || order.id || '';
-                     const shortId = order.transactionId ? order.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
+                     const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
                      return (
                      <tr key={invId} className="hover:bg-slate-50/50 transition-all group">
                         <td className="px-6 py-4">

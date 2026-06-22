@@ -27,6 +27,7 @@ export const Businesses: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState<'details' | 'subscription' | null>(null);
   const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
   const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -218,8 +219,9 @@ export const Businesses: React.FC = () => {
     }
   };
 
-  const handleEditClick = (business: any) => {
+  const handleEditClick = (business: any, mode: 'details' | 'subscription') => {
     setEditingBusinessId(business._id);
+    setEditMode(mode);
     setFormData({
       ...formData,
       businessName: business.name,
@@ -252,6 +254,7 @@ export const Businesses: React.FC = () => {
         body: JSON.stringify({
           name: formData.businessName,
           contactEmail: formData.ownerEmail,
+          contactPhone: formData.ownerPhone,
           address: formData.address,
           state: formData.state,
           district: formData.district,
@@ -352,7 +355,7 @@ export const Businesses: React.FC = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto w-full custom-scrollbar pb-2">
+        <div className="overflow-x-auto w-full custom-scrollbar pb-32 min-h-[300px]">
           <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
@@ -424,13 +427,43 @@ export const Businesses: React.FC = () => {
                       </button>
                     </td>
                     <td className="p-4 text-right">
-                      <button 
-                        onClick={() => handleEditClick(business)}
-                        title="Edit Details"
-                        className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors inline-block"
-                      >
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
+                      <div className="relative">
+                        <button 
+                          onClick={() => setActionMenuOpen(actionMenuOpen === business._id ? null : business._id)}
+                          className="p-2 text-slate-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-xl transition-colors inline-block"
+                        >
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                        <AnimatePresence>
+                          {actionMenuOpen === business._id && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                              className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-50 py-1"
+                            >
+                              <button
+                                onClick={() => handleEditClick(business, 'details')}
+                                className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-accent transition-colors flex items-center gap-2 font-medium"
+                              >
+                                Edit Details
+                              </button>
+                              <button
+                                onClick={() => handleEditClick(business, 'subscription')}
+                                className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-accent transition-colors flex items-center gap-2 font-medium"
+                              >
+                                Edit Plan & Subscription
+                              </button>
+                              <button
+                                onClick={() => handleToggleBusinessStatus(business._id, business.status)}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors flex items-center gap-2 font-medium ${business.status === 'ACTIVE' ? "text-red-600 hover:text-red-700" : "text-green-600 hover:text-green-700"}`}
+                              >
+                                {business.status === 'ACTIVE' ? 'Suspend Business' : 'Activate Business'}
+                              </button>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </td>
                   </motion.tr>
                 ))
@@ -705,6 +738,8 @@ export const Businesses: React.FC = () => {
                 )}
 
                 {/* Basic Info */}
+                {editMode === 'details' && (
+                  <>
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                     <Building2 className="w-5 h-5 text-brand-accent" />
@@ -718,6 +753,10 @@ export const Businesses: React.FC = () => {
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contact Email</label>
                       <input type="email" name="ownerEmail" value={formData.ownerEmail} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Contact Phone</label>
+                      <input type="text" name="ownerPhone" value={formData.ownerPhone} onChange={handleInputChange} required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" />
                     </div>
                   </div>
                 </div>
@@ -745,7 +784,11 @@ export const Businesses: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                </>
+                )}
 
+                {editMode === 'subscription' && (
+                  <>
                 {/* Status Toggle */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
@@ -780,6 +823,30 @@ export const Businesses: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Platforms Info */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-brand-accent" />
+                    Add-ons / Platforms
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {AVAILABLE_PLATFORMS.map(plat => (
+                      <button
+                        key={plat}
+                        type="button"
+                        onClick={() => togglePlatform(plat)}
+                        className={`px-4 py-2 rounded-xl font-semibold border-2 transition-colors ${
+                          selectedPlatforms.includes(plat)
+                            ? 'bg-brand-accent/10 border-brand-accent text-brand-accent'
+                            : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300'
+                        }`}
+                      >
+                        {plat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Subscription Info */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
@@ -800,6 +867,8 @@ export const Businesses: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                </>
+                )}
 
                 <div className="pt-4 flex flex-col sm:flex-row justify-end gap-4">
                   <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-6 py-4 font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors order-2 sm:order-1">

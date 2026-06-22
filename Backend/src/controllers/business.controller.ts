@@ -163,6 +163,7 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
       status,
       name,
       contactEmail,
+      contactPhone,
       address,
       state,
       district,
@@ -197,6 +198,7 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
     }
     if (name) business.name = name;
     if (contactEmail) business.contactEmail = contactEmail;
+    if (contactPhone) business.contactPhone = contactPhone;
     if (address) business.address = address;
     if (state) business.state = state;
     if (district) business.district = district;
@@ -230,6 +232,11 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
 
     const updatedBusiness = await business.save();
 
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('businessUpdated', { businessId: updatedBusiness._id });
+    }
+
     res.json({
       status: 'success',
       data: updatedBusiness
@@ -244,7 +251,7 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
 // @access  Public
 export const getPublicBusinesses = async (req: Request, res: Response): Promise<void> => {
   try {
-    const businesses = await Business.find({ status: BusinessStatus.ACTIVE }).select('name address district state logoUrl activeModules isStoreOpen');
+    const businesses = await Business.find({ status: BusinessStatus.ACTIVE }).select('name address district state logoUrl activeModules isStoreOpen hotelImages contactPhone contactEmail');
     res.json({
       status: 'success',
       data: businesses

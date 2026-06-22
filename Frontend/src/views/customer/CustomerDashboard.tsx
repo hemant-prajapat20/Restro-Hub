@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { playNotificationSound } from '../../utils/sound';
 import { io } from 'socket.io-client';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Package, Clock, MapPin, Search, Star, ShoppingBag, Plus, Minus, User, ChevronDown, Mail, Phone, LogOut, ArrowLeft, ArrowRight, Bell, Calendar, Info } from 'lucide-react';
 import { logout } from '../../store/slices/authSlice';
@@ -85,6 +85,8 @@ export const CustomerDashboard: React.FC = () => {
     setShowProfileDropdown(false);
   };
 
+  const queryClient = useQueryClient();
+
   React.useEffect(() => {
     const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
     socket.on('newCustomerNotification', (notif: any) => {
@@ -95,10 +97,16 @@ export const CustomerDashboard: React.FC = () => {
       }
     });
 
+    socket.on('businessUpdated', (data: any) => {
+      if (data.businessId === businessId) {
+        queryClient.invalidateQueries({ queryKey: ['publicMenu', businessId] });
+      }
+    });
+
     return () => {
       socket.disconnect();
     };
-  }, [currentUser]);
+  }, [currentUser, businessId, queryClient, refetchNotifications]);
 
   const token = useSelector((state: RootState) => state.auth.token);
 

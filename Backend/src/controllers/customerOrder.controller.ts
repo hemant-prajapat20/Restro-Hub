@@ -17,7 +17,17 @@ export const getPublicMenu = async (req: Request, res: Response) => {
 
     const items = await MenuItem.find({ businessId, isAvailable: true }).sort({ category: 1, name: 1 });
     res.json({
-      business: { name: business.name, address: business.address, district: business.district, state: business.state, isStoreOpen: business.isStoreOpen },
+      business: { 
+        _id: business._id,
+        name: business.name, 
+        address: business.address, 
+        district: business.district, 
+        state: business.state, 
+        isStoreOpen: business.isStoreOpen,
+        hotelImages: business.hotelImages,
+        contactPhone: business.contactPhone,
+        contactEmail: business.contactEmail
+      },
       items
     });
   } catch (error) {

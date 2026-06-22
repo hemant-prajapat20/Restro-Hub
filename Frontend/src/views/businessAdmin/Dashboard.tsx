@@ -206,18 +206,18 @@ export const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Category Breakdown */}
-        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col">
-           <h4 className="text-lg font-semibold font-display mb-6">Sales Mix by Category</h4>
-           <div className="flex flex-col items-center gap-5">
-             <div className="w-full h-[250px] flex items-center justify-center">
+        <div className="bg-white p-5 rounded-[32px] shadow-soft border border-stone-200/80 h-full flex flex-col min-h-0">
+           <h4 className="text-lg font-semibold font-display mb-6 shrink-0">Sales Mix by Category</h4>
+           <div className="flex flex-col gap-4 flex-1 overflow-y-auto custom-scrollbar pr-1 min-h-0">
+             <div className="w-full h-[180px] flex items-center justify-center shrink-0">
                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                  <PieChart>
                    <Pie
                      data={categoryData}
                      cx="50%"
                      cy="50%"
-                     innerRadius={60}
-                     outerRadius={80}
+                     innerRadius={50}
+                     outerRadius={70}
                      paddingAngle={5}
                      dataKey="value"
                    >
@@ -229,12 +229,12 @@ export const Dashboard: React.FC = () => {
                  </PieChart>
                </ResponsiveContainer>
              </div>
-             <div className="w-full space-y-4">
+             <div className="w-full space-y-3 mt-auto">
                {categoryData.slice(0, 5).map((cat) => (
                  <div key={cat.name} className="flex items-center justify-between">
                    <div className="flex items-center gap-2">
-                     <div className="w-3 h-3 rounded-full" style={{backgroundColor: cat.color}} />
-                     <span className="text-sm font-medium text-slate-600">{cat.name}</span>
+                     <div className="w-3 h-3 rounded-full shrink-0" style={{backgroundColor: cat.color}} />
+                     <span className="text-sm font-medium text-slate-600 truncate max-w-[120px]" title={cat.name}>{cat.name}</span>
                    </div>
                    <span className="text-sm font-semibold">{cat.value}%</span>
                  </div>
@@ -365,7 +365,7 @@ const RecentTransactionsTable = () => {
     <>
       {orders.map((invoice: any) => {
         const invId = invoice._id || invoice.id || '';
-        const shortId = invoice.transactionId ? invoice.transactionId : (invId ? invId.slice(-8).toUpperCase() : 'N/A');
+        const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
         return (
           <tr key={invId} onClick={() => navigate(`/invoice/${invId}`)} className="hover:bg-slate-50/50 transition-all group cursor-pointer">
              <td className="px-6 py-4">

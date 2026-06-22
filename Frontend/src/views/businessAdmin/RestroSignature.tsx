@@ -805,38 +805,6 @@ export const RestroSignature: React.FC = () => {
 
             {/* Right Hand Sidebar: Master Chef Active Tasting session */}
             <div className="space-y-6">
-              <div className="bg-stone-950 p-5 rounded-2xl border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
-                <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Chef Tasting Session Log</h5>
-                
-                <div className="space-y-3">
-                   <div className="bg-stone-900/60 p-5 rounded-2xl border border-stone-800">
-                      <span className="text-[9px] font-semibold text-brand-accent uppercase tracking-widest block mb-2">Live Session #05</span>
-                      <h6 className="text-sm font-semibold text-white uppercase tracking-tight">Royals Tasting Plate</h6>
-                      <p className="text-xs text-stone-400 font-medium leading-relaxed mt-1">
-                         6 premium courses curated dynamically by Chef Head Sommelier Ranveer for the Agarwal delegation.
-                      </p>
-                      <div className="flex items-center justify-between mt-4 text-[10px] font-mono">
-                         <span className="text-stone-500 font-semibold uppercase">Status</span>
-                         <span className="text-amber-500 font-semibold uppercase tracking-wider animate-pulse">Session active</span>
-                      </div>
-                   </div>
-                   
-                   <div className="bg-stone-900/60 p-5 rounded-2xl border border-stone-800">
-                      <span className="text-[9px] font-semibold text-stone-500 uppercase tracking-widest block mb-2">Upcoming - 8:30 PM</span>
-                      <h6 className="text-sm font-semibold text-stone-400 uppercase tracking-tight">Ambassador Gala Plate</h6>
-                      <p className="text-xs text-stone-500 font-medium leading-relaxed mt-1">
-                         8 courses featuring authentic copper oven baked starters.
-                      </p>
-                   </div>
-                </div>
-
-                <div className="pt-6 border-t border-stone-900 text-center">
-                   <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest leading-none mb-1">Weekly Booking Revenue</p>
-                   <p className="text-3xl font-display font-semibold text-brand-accent">₹248,500</p>
-                   <p className="text-[8px] text-stone-500 mt-2 uppercase font-mono tracking-wider">Generated from 14 PDR groups</p>
-                </div>
-              </div>
-
               <div className="bg-white p-5 rounded-2xl border border-stone-200/60 shadow-soft space-y-6">
                 <h5 className="text-xs font-semibold text-stone-400 uppercase tracking-[0.25em]">Signature Kitchen Protocols</h5>
                 <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100">

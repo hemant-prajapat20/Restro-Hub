@@ -168,7 +168,19 @@ export const getProfile = async (req: any, res: Response): Promise<void> => {
       res.status(404).json({ status: 'error', message: 'User not found' });
       return;
     }
-    res.json({ status: 'success', data: user });
+
+    let businessData = null;
+    if (user.businessId) {
+      businessData = await Business.findById(user.businessId);
+    }
+
+    res.json({ 
+      status: 'success', 
+      data: {
+        ...user.toObject(),
+        businessData
+      }
+    });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });
   }
@@ -243,6 +255,15 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
     user.otp = undefined;
     user.otpExpires = undefined;
     await user.save();
+    
+    let businessData = null;
+    if (user.businessId) {
+      businessData = await Business.findById(user.businessId);
+      if (businessData && businessData.status !== 'ACTIVE') {
+        res.status(403).json({ status: 'error', message: 'Your business account has been suspended by the Super Admin.' });
+        return;
+      }
+    }
 
     res.json({
       status: 'success',
@@ -255,6 +276,7 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         profilePhoto: user.profilePhoto,
         businessId: user.businessId,
+        businessData,
         token: await generateToken(user._id.toString()),
       }
     });

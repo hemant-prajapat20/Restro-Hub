@@ -562,7 +562,7 @@ export const BarLounge: React.FC = () => {
             </div>
           </div>
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-850 rounded-2xl flex items-center gap-3">
-            <Droplet className="text-blue-400" size={24} />
+            <Droplet className="text-brand-accent" size={24} />
             <div>
               <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest">Cellar Humidity</p>
               <p className="text-lg font-semibold text-white font-mono">68.5 %</p>
@@ -733,45 +733,7 @@ export const BarLounge: React.FC = () => {
 
               {/* Live Dispense logs & Sommelier Stats */}
               <div className="space-y-6">
-                <div className="bg-stone-950 p-5 rounded-2xl border border-amber-950/50 text-white space-y-6 shadow-xl relative overflow-hidden">
-                  <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Sommelier Pour Logs</h5>
-                  {dispenseLog.length === 0 ? (
-                    <div className="py-8 text-center text-stone-500 italic text-xs border border-dashed border-stone-900 rounded-2xl p-4 bg-stone-950/60">
-                      No manual pours recorded during active service roster. Select "Dispense Glass" above to register entries.
-                    </div>
-                  ) : (
-                    <div className="space-y-4 max-h-[350px] overflow-y-auto custom-scrollbar pr-1">
-                      {dispenseLog.map((log, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-stone-900/60 p-4 rounded-2xl border border-stone-850">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-amber-950/60 text-brand-accent flex items-center justify-center border border-amber-900/30">
-                              <Wine size={16} />
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold text-stone-200">{log.name}</p>
-                              <p className="text-[9px] font-semibold text-stone-500 uppercase tracking-widest">Dispensed to {log.tables}</p>
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-mono font-semibold text-brand-accent">{log.timestamp}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  <div className="pt-6 border-t border-stone-900">
-                    <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4 font-display">Vault Performance</h5>
-                    <div className="space-y-4 font-mono">
-                      <div className="flex justify-between items-center text-xs text-stone-400">
-                        <span className="font-sans">Estimated Pour Valuation</span>
-                        <span className="text-white font-semibold">₹62,800 Est.</span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs text-stone-400">
-                        <span className="font-sans">Registered Premium Corkage</span>
-                        <span className="text-white font-semibold">06 Pours Active</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
 
                 {/* Luxury Cocktail Ratio Assistant */}
                 <div className="bg-white p-5 rounded-2xl border border-stone-200/60 shadow-soft space-y-6">

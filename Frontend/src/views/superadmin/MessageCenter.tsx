@@ -38,7 +38,9 @@ export const MessageCenter: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Derive unread count from the logs to guarantee synchronization
+  const unreadCount = logs.filter((l: any) => !l.isRead).length;
 
   const fetchLogs = async () => {
     try {
@@ -50,7 +52,6 @@ export const MessageCenter: React.FC = () => {
       const data = await res.json();
       if (data.status === 'success') {
         setLogs(data.data);
-        setUnreadCount(data.data.filter((l: any) => !l.isRead).length);
       }
     } catch (error) {
       console.error('Error fetching logs', error);
@@ -66,7 +67,6 @@ export const MessageCenter: React.FC = () => {
       const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
       socket.on('newAdminActivity', (newLog) => {
         setLogs(prev => [newLog, ...prev]);
-        setUnreadCount(prev => prev + 1);
         toast.success('New platform activity!');
       });
       return () => socket.disconnect();
@@ -85,7 +85,7 @@ export const MessageCenter: React.FC = () => {
         body: JSON.stringify({})
       });
       setLogs(prev => prev.map(log => ({ ...log, isRead: true })));
-      setUnreadCount(0);
+      window.dispatchEvent(new CustomEvent('notificationsReadAll'));
       toast.success('All notifications marked as read');
     } catch (error) {
       toast.error('Failed to mark as read');
@@ -104,9 +104,9 @@ export const MessageCenter: React.FC = () => {
         body: JSON.stringify({ logId })
       });
       setLogs(prev => prev.map(log => log._id === logId ? { ...log, isRead: true } : log));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      window.dispatchEvent(new CustomEvent('notificationsReadOne', { detail: { id: logId } }));
     } catch (error) {
-      console.error('Error marking as read', error);
+      console.error('Failed to mark notification as read', error);
     }
   };
 

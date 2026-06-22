@@ -43,7 +43,7 @@ import { twMerge } from 'tailwind-merge';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../store/slices/authSlice';
+import { logout, setCredentials } from '../store/slices/authSlice';
 import { RootState } from '../store';
 import api from '../utils/api';
 import { io } from 'socket.io-client';
@@ -196,7 +196,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
 };
 
 export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token);
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const fullName = user ? (isSuperAdmin ? 'System Root' : `${user.firstName} ${user.lastName}`) : 'Guest User';
   const roleDisplay = user ? user.role.replace('_', ' ') : 'System Admin';
@@ -260,8 +263,37 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
       }
     });
 
+    socket.on('businessUpdated', async (data) => {
+      if (user && user.businessId === data.businessId && token) {
+        try {
+          const res = await api.get('/auth/profile', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.data.status === 'success') {
+            dispatch(setCredentials({ user: res.data.data, token }));
+            // We can optionally show a toast
+            toast.success('Business settings updated by SuperAdmin');
+          }
+        } catch (err) {
+          console.error('Failed to refresh profile after business update', err);
+        }
+      }
+    });
+
+    const handleReadOne = (e: any) => {
+      setNotifications(prev => prev.map(n => n._id === e.detail.id ? { ...n, isRead: true } : n));
+    };
+    const handleReadAll = () => {
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    };
+
+    window.addEventListener('notificationsReadOne', handleReadOne);
+    window.addEventListener('notificationsReadAll', handleReadAll);
+
     return () => {
       socket.disconnect();
+      window.removeEventListener('notificationsReadOne', handleReadOne);
+      window.removeEventListener('notificationsReadAll', handleReadAll);
     };
   }, [isSuperAdmin]);
 
@@ -389,7 +421,10 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
         <div className="h-10 w-[1px] bg-slate-200 mx-1 md:mx-2" />
 
-        <div className="flex items-center gap-3">
+        <div 
+          onClick={() => navigate(isSuperAdmin ? '/super-admin/settings' : '/admin/settings')}
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <div className="hidden md:block text-right">
             <p className="text-sm font-semibold text-slate-900 break-words">{fullName}</p>
             <p className={cn("text-xs capitalize break-words", isSuperAdmin ? "text-brand-accent font-semibold uppercase tracking-widest" : "text-slate-500")}>

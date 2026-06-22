@@ -281,7 +281,7 @@ export const Delivery: React.FC = () => {
                      <div className="flex items-center gap-4 w-full sm:w-auto">
                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-semibold ${
                        order.source === 'Zomato' ? 'bg-red-50 text-red-600' : 
-                       order.source === 'Swiggy' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'
+                       order.source === 'Swiggy' ? 'bg-orange-50 text-orange-600' : 'bg-brand-accent/10 text-brand-accent'
                      }`}>
                         {order.source[0]}
                      </div>
@@ -290,7 +290,7 @@ export const Delivery: React.FC = () => {
                            <h6 className="font-semibold text-slate-900">{order.id}</h6>
                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{order.time} • {order.date}</span>
                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                             order.paymentMethod === 'Online' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
+                             order.paymentMethod === 'Online' ? 'bg-brand-accent/10 text-brand-accent' : 'bg-emerald-50 text-emerald-600'
                            }`}>{order.paymentMethod}</span>
                         </div>
                         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
@@ -306,7 +306,7 @@ export const Delivery: React.FC = () => {
                      <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
                         <p className="text-lg font-semibold text-slate-900">{order.total}</p>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${
-                          order.status === 'Ready' || order.status === 'Completed' || order.status === 'Out for Delivery' ? 'bg-brand-success/10 text-brand-success' : 'bg-blue-50 text-blue-500'
+                          order.status === 'Ready' || order.status === 'Completed' || order.status === 'Out for Delivery' ? 'bg-brand-success/10 text-brand-success' : 'bg-brand-accent/10 text-brand-accent'
                         }`}>
                            {order.status}
                         </span>
@@ -405,6 +405,10 @@ export const Delivery: React.FC = () => {
                    onClick={() => {
                      if (!driverName || !driverPhone) {
                        toast.error('Please enter Driver Details first!');
+                       return;
+                     }
+                     if (driverPhone.length !== 10) {
+                       toast.error('Driver phone number must be exactly 10 digits.');
                        return;
                      }
                      updateOrderStatusMutation.mutate({ id: selectedManageOrder._id, status: 'Out for Delivery', driverDetails: { name: driverName, phone: driverPhone } });

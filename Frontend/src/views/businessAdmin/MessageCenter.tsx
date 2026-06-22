@@ -30,9 +30,11 @@ export const MessageCenter: React.FC = () => {
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
       await api.put('/messages/read', { messageId });
+      return messageId; // pass messageId to onSuccess
     },
-    onSuccess: () => {
+    onSuccess: (messageId) => {
       queryClient.invalidateQueries({ queryKey: ['businessMessages'] });
+      window.dispatchEvent(new CustomEvent('notificationsReadOne', { detail: { id: messageId } }));
     }
   });
 

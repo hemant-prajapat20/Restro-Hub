@@ -703,57 +703,7 @@ export const CafeBakery: React.FC = () => {
 
               {/* Live Brewing Timers & Lab Equipment status */}
               <div className="space-y-6">
-                <div className="bg-stone-950 p-5 rounded-2xl border border-amber-950 text-white space-y-6 shadow-xl relative overflow-hidden">
-                  <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Gourmet Extraction Lab</h5>
-                  
-                  {activeBrew.isBrewing ? (
-                    <div className="space-y-4">
-                       <div className="flex items-center justify-between">
-                          <div>
-                             <p className="text-[10px] font-semibold text-brand-accent uppercase tracking-widest">Active Extract</p>
-                             <p className="text-sm font-semibold text-stone-200 mt-1">{activeBrew.name}</p>
-                          </div>
-                          <Loader2 className="text-brand-accent animate-spin" size={24} />
-                       </div>
-                       <div className="space-y-2">
-                          <div className="flex justify-between items-center text-[10.5px] font-mono">
-                             <span className="text-stone-500 font-semibold uppercase">Time remaining</span>
-                             <span className="text-brand-accent font-semibold">{activeBrew.secondsLeft}s</span>
-                          </div>
-                          <div className="h-2 bg-stone-900 rounded-full overflow-hidden">
-                             <div 
-                               className="h-full bg-brand-accent transition-all duration-1000" 
-                               style={{ width: `${(activeBrew.secondsLeft / 28) * 100}%` }}
-                             />
-                          </div>
-                       </div>
-                    </div>
-                  ) : (
-                    <div className="py-6 text-center border-2 border-dashed border-stone-800 rounded-2xl text-xs text-stone-500 italic">
-                       Espresso group heads calibrated & idle. Ready to extract micro-lot coffees.
-                    </div>
-                  )}
-
-                  <div className="pt-6 border-t border-stone-900">
-                    <h5 className="text-[10px] font-semibold text-brand-accent uppercase tracking-[0.25em] mb-4">Patisserie Batching</h5>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center bg-stone-900/50 p-4 rounded-2xl border border-stone-800">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2.5 h-2.5 rounded-full bg-brand-accent" />
-                          <span className="text-xs text-stone-300 font-semibold">Golden Croissants Batch B</span>
-                        </div>
-                        <span className="text-[10px] bg-amber-500/15 text-brand-accent border border-amber-500/10 px-2.5 py-1 rounded-xl uppercase font-semibold tracking-widest font-mono">Baked Now</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-stone-900/50 p-4 rounded-2xl border border-stone-800">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2.5 h-2.5 rounded-full bg-stone-600" />
-                          <span className="text-xs text-stone-400 font-semibold">Sourdough Loaf Batch E</span>
-                        </div>
-                        <span className="text-[10px] bg-stone-800 text-stone-500 border border-stone-700 px-2.5 py-1 rounded-xl uppercase font-semibold tracking-widest font-mono">4:30 PM</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
 
                 {/* Luxury Quality Seal */}
                 <div className="bg-white p-5 rounded-2xl border border-stone-200/60 shadow-soft space-y-6">

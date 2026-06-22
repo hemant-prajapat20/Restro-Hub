@@ -1,3 +1,4 @@
+// Settings component for Restrohub Business Admin
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
@@ -5,17 +6,17 @@ import { setCredentials } from '../../store/slices/authSlice';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { ImageModal } from '../../components/ImageModal';
-import { 
-  Building2, 
-  Mail, 
-  User, 
-  MapPin, 
-  Bell, 
-  ShoppingBag, 
-  Crown, 
-  Coffee, 
-  Utensils, 
-  Store, 
+import {
+  Building2,
+  Mail,
+  User,
+  MapPin,
+  Bell,
+  ShoppingBag,
+  Crown,
+  Coffee,
+  Utensils,
+  Store,
   CalendarCheck,
   Phone,
   CreditCard,
@@ -43,7 +44,7 @@ const FeatureToggle: React.FC<FeatureToggleProps> = ({ icon: Icon, title, descri
     <div className="flex-1">
       <div className="flex items-center justify-between mb-1">
         <h4 className="font-semibold text-slate-900">{title}</h4>
-        <button 
+        <button
           onClick={onToggle}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${enabled ? 'bg-brand-accent' : 'bg-slate-200'}`}
         >
@@ -57,10 +58,10 @@ const FeatureToggle: React.FC<FeatureToggleProps> = ({ icon: Icon, title, descri
 
 export const Settings: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  
+
   const [isStoreOpen, setIsStoreOpen] = useState(user?.businessData?.isStoreOpen ?? true);
   const [isTogglingStore, setIsTogglingStore] = useState(false);
-  
+
   // Local state for UI toggles (these would sync with backend in reality)
   const [features, setFeatures] = useState(() => {
     const backendToggles = user?.businessData?.featureToggles || {};
@@ -79,25 +80,26 @@ export const Settings: React.FC = () => {
   const dispatch = useDispatch();
   const profileInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [isUploadingProfile, setIsUploadingProfile] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
-  
+
   const [viewingImage, setViewingImage] = useState<{url: string, alt: string} | null>(null);
 
   const handleProfileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
-    
+
     setIsUploadingProfile(true);
-    const formData = new FormData(); formData.append('image', file);
+    const formData = new FormData();
+    formData.append('image', file);
 
     try {
       const uploadRes = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       const imageUrl = uploadRes.data.url;
       const updateRes = await api.put('/auth/profile/photo', { profilePhoto: imageUrl });
-      
+
       dispatch(setCredentials({
         user: { ...user, profilePhoto: updateRes.data.data.profilePhoto } as any,
         token: localStorage.getItem('token') || ''
@@ -111,27 +113,38 @@ export const Settings: React.FC = () => {
     }
   };
 
+  // Fetch full profile and update Redux store
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('/auth/profile');
+      if (response.data?.data) {
+        dispatch(setCredentials({
+          user: response.data.data,
+          token: localStorage.getItem('token') || ''
+        }));
+      }
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+    }
+  };
+
   const handleHotelImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
-    
+
     setIsUploadingLogo(true);
-    const formData = new FormData(); formData.append('image', file);
+    const formData = new FormData();
+    formData.append('image', file);
 
     try {
       const uploadRes = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       const imageUrl = uploadRes.data.url;
       const currentImages = user?.businessData?.hotelImages || [];
       const newImages = [...currentImages, imageUrl];
-      
+
       await api.put('/businesses/me/hotel-images', { hotelImages: newImages });
-      
-      const updatedUser = { ...user, businessData: { ...user?.businessData, hotelImages: newImages } } as any;
-      dispatch(setCredentials({
-        user: updatedUser,
-        token: localStorage.getItem('token') || ''
-      }));
+      await fetchProfile();
       toast.success('Hotel picture added');
     } catch (error: any) {
       toast.error('Failed to upload picture');
@@ -144,36 +157,27 @@ export const Settings: React.FC = () => {
   const handleRemoveProfile = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const updateRes = await api.put('/auth/profile/photo', { profilePhoto: null });
+      await api.put('/auth/profile/photo', { profilePhoto: null });
       dispatch(setCredentials({ user: { ...user, profilePhoto: null } as any, token: localStorage.getItem('token') || '' }));
       toast.success('Profile photo removed');
-    } catch (error) { toast.error('Failed to remove photo'); }
-  };
-
-  const handleRemoveHotelImage = async (urlToRemove: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      const currentImages = user?.businessData?.hotelImages || [];
-      const newImages = currentImages.filter((url: string) => url !== urlToRemove);
-      await api.put('/businesses/me/hotel-images', { hotelImages: newImages });
-      const updatedUser = { ...user, businessData: { ...user?.businessData, hotelImages: newImages } } as any;
-      dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
-      toast.success('Picture removed');
-    } catch (error) { toast.error('Failed to remove picture'); }
+      await fetchProfile();
+    } catch (error) {
+      toast.error('Failed to remove photo');
+    }
   };
 
   const toggleFeature = async (key: keyof typeof features) => {
     const newValue = !features[key];
     setFeatures(prev => ({ ...prev, [key]: newValue }));
-    
+
     try {
       await api.put('/businesses/me/features', { featureToggles: { [key]: newValue } });
-      const updatedUser = { 
-        ...user, 
-        businessData: { 
-          ...user?.businessData, 
-          featureToggles: { ...user?.businessData?.featureToggles, [key]: newValue } 
-        } 
+      const updatedUser = {
+        ...user,
+        businessData: {
+          ...user?.businessData,
+          featureToggles: { ...user?.businessData?.featureToggles, [key]: newValue }
+        }
       } as any;
       dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
       toast.success('Feature setting saved');
@@ -187,12 +191,12 @@ export const Settings: React.FC = () => {
     setIsTogglingStore(true);
     try {
       const newState = !isStoreOpen;
-      const res = await api.put('/businesses/me/store-status', { isStoreOpen: newState });
+      await api.put('/businesses/me/store-status', { isStoreOpen: newState });
       setIsStoreOpen(newState);
-      
+
       const updatedUser = { ...user, businessData: { ...user?.businessData, isStoreOpen: newState } } as any;
       dispatch(setCredentials({ user: updatedUser, token: localStorage.getItem('token') || '' }));
-      
+
       toast.success(newState ? 'Restaurant is now Open' : 'Restaurant is now Closed');
     } catch (error) {
       toast.error('Failed to update store status');
@@ -211,12 +215,10 @@ export const Settings: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        
         {/* Profile Card */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
             <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
-              
               <div className="relative group mb-4">
                 <div 
                   onClick={() => user?.profilePhoto && setViewingImage({url: user.profilePhoto, alt: 'Profile Photo'})}
@@ -228,20 +230,18 @@ export const Settings: React.FC = () => {
                     user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'G'
                   )}
                 </div>
-                
                 {/* Profile Photo Upload Overlay */}
                 <div 
                   onClick={() => profileInputRef.current?.click()}
                   className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer transition-opacity ${isUploadingProfile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                 >
                   {isUploadingProfile ? (
-                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
-                     <Camera size={20} className="text-white" />
+                    <Camera size={20} className="text-white" />
                   )}
                 </div>
                 <input type="file" ref={profileInputRef} onChange={handleProfileUpload} className="hidden" accept="image/*" />
-                
                 {user?.profilePhoto && (
                   <button onClick={handleRemoveProfile} className="absolute -bottom-1 -right-1 p-1.5 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors shadow-sm">
                     <Trash2 size={12} />
@@ -262,7 +262,7 @@ export const Settings: React.FC = () => {
                 <div className="flex-1">
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Business Name</p>
                   <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'RestroHub Prime'}</p>
-                  
+
                   {/* Business Hotel Pictures Gallery */}
                   <div className="mt-2 space-y-3">
                     <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Hotel Pictures Gallery</p>
@@ -275,12 +275,9 @@ export const Settings: React.FC = () => {
                             className="w-full h-full object-cover"
                             onClick={() => setViewingImage({url, alt: `Hotel Picture ${index + 1}`})}
                           />
-                          <button 
-                            onClick={(e) => handleRemoveHotelImage(url, e)} 
-                            className="absolute top-1 right-1 p-1 bg-red-100/90 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm opacity-0 group-hover:opacity-100"
-                          >
-                            <Trash2 size={12} />
-                          </button>
+                          <div className="absolute top-1 right-1 p-1 bg-gray-100/90 text-gray-600 rounded-lg opacity-0 group-hover:opacity-100" title="Image is permanent">
+                            <Camera size={12} className="text-gray-600" />
+                          </div>
                         </div>
                       ))}
 
@@ -303,7 +300,7 @@ export const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-3 text-sm">
                 <Mail className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div>
@@ -357,8 +354,6 @@ export const Settings: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-
           </div>
         </div>
 
@@ -403,7 +398,7 @@ export const Settings: React.FC = () => {
                 <FeatureToggle 
                   icon={Utensils} 
                   title="Restaurant (Restro)" 
-                  description="Full dining experience with KDS and POS billing."
+                  description="Full dining experience with KDS and POS billing." 
                   enabled={features.restaurant}
                   onToggle={() => toggleFeature('restaurant')}
                 />
@@ -412,7 +407,7 @@ export const Settings: React.FC = () => {
                 <FeatureToggle 
                   icon={Coffee} 
                   title="Cafe & Patisserie" 
-                  description="Quick service mode for cafes, bakeries, and coffee shops."
+                  description="Quick service mode for cafes, bakeries, and coffee shops." 
                   enabled={features.cafe}
                   onToggle={() => toggleFeature('cafe')}
                 />
@@ -426,7 +421,6 @@ export const Settings: React.FC = () => {
                   onToggle={() => toggleFeature('bar')}
                 />
               )}
-              {/* Optional: if there's a separate generic Cafeteria platform */}
               {user?.businessData?.platforms?.includes('GenericCafeteria') && (
                 <FeatureToggle 
                   icon={Store} 
@@ -444,7 +438,7 @@ export const Settings: React.FC = () => {
                 onToggle={() => toggleFeature('reservations')}
               />
             </div>
-            
+
             <div className="mt-auto pt-6 border-t border-slate-100 flex justify-end">
                <button className="py-3 px-6 bg-brand-accent hover:bg-yellow-500 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-brand-accent/20">
                  Save Configuration
@@ -454,7 +448,7 @@ export const Settings: React.FC = () => {
         </div>
 
       </div>
-      
+
       {viewingImage && (
         <ImageModal 
           imageUrl={viewingImage.url} 
