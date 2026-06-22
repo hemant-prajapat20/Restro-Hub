@@ -438,7 +438,7 @@ export const BarLounge: React.FC = () => {
         tax: cgst + sgst,
         total: cartTotal,
         status: 'In Kitchen',
-        customerDetails: { name: 'Table Guest', phone: 'N/A' }
+        customerDetails: { name: 'N/A', phone: 'N/A' }
       });
       return res.data;
     },
@@ -458,6 +458,10 @@ export const BarLounge: React.FC = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+    if (!customerName.trim() && !customerPhone.trim()) {
+      toast.error('Customer Name or Mobile Number is required for billing.');
+      return;
+    }
 
     checkoutBarMutation.mutate(cart);
 
@@ -477,7 +481,7 @@ export const BarLounge: React.FC = () => {
       total: cartTotal,
       paymentMethod: paymentMethod || 'Cash',
       status: 'Completed',
-      customerDetails: { name: customerName || 'Walk-in', phone: customerPhone || 'N/A' }
+      customerDetails: { name: customerName || 'N/A', phone: customerPhone || 'N/A' }
     }).then(res => {
       if (res.data && res.data._id) {
         window.open(`/invoice/${res.data._id}`, '_blank');
@@ -936,18 +940,7 @@ export const BarLounge: React.FC = () => {
                       </select>
                     </div>
 
-                    <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1 block truncate">Clearing Ledger</label>
-                      <select 
-                        value={paymentMethod || ''}
-                        onChange={(e: any) => setPaymentMethod(e.target.value as any)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:outline-none truncate"
-                      >
-                        <option value="Cash">Cash Settlement</option>
-                        <option value="UPI">Instant UPI (Tejas/BHIM)</option>
-                        <option value="Online">Online / Card (Razorpay)</option>
-                      </select>
-                    </div>
+
                   </div>
 
                   {/* Loyalty Discount Voucher */}

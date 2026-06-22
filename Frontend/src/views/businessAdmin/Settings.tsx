@@ -86,6 +86,25 @@ export const Settings: React.FC = () => {
 
   const [viewingImage, setViewingImage] = useState<{url: string, alt: string} | null>(null);
 
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [editPhoneValue, setEditPhoneValue] = useState(user?.phone || user?.businessData?.contactPhone || '');
+  const [isUpdatingPhone, setIsUpdatingPhone] = useState(false);
+
+  const handleUpdatePhone = async () => {
+    if (!editPhoneValue.trim()) return;
+    setIsUpdatingPhone(true);
+    try {
+      await api.put('/businesses/me/phone', { contactPhone: editPhoneValue });
+      await fetchProfile();
+      toast.success('Contact phone updated successfully');
+      setIsEditingPhone(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update phone');
+    } finally {
+      setIsUpdatingPhone(false);
+    }
+  };
+
   const handleProfileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -311,9 +330,45 @@ export const Settings: React.FC = () => {
 
               <div className="flex items-start gap-3 text-sm">
                 <Phone className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Contact Phone</p>
-                  <p className="font-semibold text-slate-900">{user?.phone || user?.businessData?.contactPhone || 'N/A'}</p>
+                  {isEditingPhone ? (
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <input 
+                        type="text" 
+                        value={editPhoneValue} 
+                        onChange={(e) => setEditPhoneValue(e.target.value)} 
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm w-36 sm:w-48 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent"
+                        placeholder="Enter contact phone"
+                      />
+                      <button 
+                        onClick={handleUpdatePhone}
+                        disabled={isUpdatingPhone}
+                        className="px-3 py-1.5 bg-brand-accent text-white rounded-lg text-sm font-medium hover:bg-brand-accent/90 disabled:opacity-50 shrink-0"
+                      >
+                        {isUpdatingPhone ? 'Saving...' : 'Save'}
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setIsEditingPhone(false);
+                          setEditPhoneValue(user?.phone || user?.businessData?.contactPhone || '');
+                        }}
+                        className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 shrink-0"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-slate-900 truncate pr-2">{user?.phone || user?.businessData?.contactPhone || 'N/A'}</p>
+                      <button 
+                        onClick={() => setIsEditingPhone(true)}
+                        className="text-brand-accent text-xs font-semibold hover:underline shrink-0"
+                      >
+                        Edit Phone
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -359,13 +414,13 @@ export const Settings: React.FC = () => {
 
         {/* Feature Toggles */}
         <div className="lg:col-span-2">
-          <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
+          <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-6 shadow-soft">
             <div className="mb-6">
               <h3 className="text-xl font-semibold text-slate-900">Active Modules & Features</h3>
               <p className="text-slate-500 font-medium mt-1">Enable or disable specific features for your business based on your current plan.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 content-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FeatureToggle 
                 icon={Store}
                 title={isStoreOpen ? "Restaurant is Open" : "Restaurant is Closed"}
@@ -439,7 +494,7 @@ export const Settings: React.FC = () => {
               />
             </div>
 
-            <div className="mt-auto pt-6 border-t border-slate-100 flex justify-end">
+            <div className="mt-6 pt-6 border-t border-slate-100 flex justify-end">
                <button className="py-3 px-6 bg-brand-accent hover:bg-yellow-500 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-brand-accent/20">
                  Save Configuration
                </button>

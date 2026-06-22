@@ -339,6 +339,11 @@ export const Tables: React.FC = () => {
   };
 
   const handleSettleAndClear = (tableId: string) => {
+    if (!customerName.trim() && !customerPhone.trim()) {
+      toast.error('Customer Name or Mobile Number is required for billing.');
+      return;
+    }
+
     const total = computeTableTotal(tableId);
     const subtotal = computeTableSubtotal(tableId);
 
@@ -370,7 +375,7 @@ export const Tables: React.FC = () => {
           total: total,
           paymentMethod,
           status: 'Completed',
-          customerDetails: { name: customerName || 'Table Guest', phone: customerPhone || 'N/A' }
+          customerDetails: { name: customerName || 'N/A', phone: customerPhone || 'N/A' }
         });
       }
 
@@ -384,7 +389,7 @@ export const Tables: React.FC = () => {
         discount: Math.round(subtotal * (appliedDiscount / 100)),
         total: total,
         payment: paymentMethod,
-        customerName: customerName || 'Table Guest',
+        customerName: customerName || 'N/A',
         customerPhone: customerPhone || 'N/A'
       });
 

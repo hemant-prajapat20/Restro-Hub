@@ -430,7 +430,7 @@ export const CafeBakery: React.FC = () => {
         tax: cgst + sgst,
         total: cartTotal,
         status: 'In Kitchen',
-        customerDetails: { name: 'Table Guest', phone: 'N/A' }
+        customerDetails: { name: 'N/A', phone: 'N/A' }
       });
       return res.data;
     },
@@ -450,6 +450,10 @@ export const CafeBakery: React.FC = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+    if (!customerName.trim() && !customerPhone.trim()) {
+      toast.error('Customer Name or Mobile Number is required for billing.');
+      return;
+    }
 
     checkoutCafeMutation.mutate(cart);
 
@@ -469,7 +473,7 @@ export const CafeBakery: React.FC = () => {
       total: cartTotal,
       paymentMethod: paymentMethod || 'Cash',
       status: 'Completed',
-      customerDetails: { name: customerName || 'Walk-in', phone: customerPhone || 'N/A' }
+      customerDetails: { name: customerName || 'N/A', phone: customerPhone || 'N/A' }
     }).then(res => {
       if (res.data && res.data._id) {
         window.open(`/invoice/${res.data._id}`, '_blank');
@@ -897,18 +901,7 @@ export const CafeBakery: React.FC = () => {
                       </select>
                     </div>
 
-                    <div className="flex-1 space-y-1">
-                      <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-1">Tender Payment</label>
-                      <select 
-                        value={paymentMethod || ''}
-                        onChange={(e: any) => setPaymentMethod(e.target.value)}
-                        className="w-full py-2.5 px-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800"
-                      >
-                        <option value="UPI">Instant UPI (Paytm / BHIM)</option>
-                        <option value="Card">Visa / Amex Metallic</option>
-                        <option value="Maison Guild Tab">Maison Membership Ledger</option>
-                      </select>
-                    </div>
+
                   </div>
 
                   {/* Loyalty Discount Voucher */}

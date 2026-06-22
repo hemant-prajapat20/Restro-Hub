@@ -198,7 +198,11 @@ export const updateBusiness = async (req: Request, res: Response): Promise<void>
     }
     if (name) business.name = name;
     if (contactEmail) business.contactEmail = contactEmail;
-    if (contactPhone) business.contactPhone = contactPhone;
+    if (contactPhone) {
+      business.contactPhone = contactPhone;
+      // Keep the Business Admin's user profile phone in sync
+      await User.updateMany({ businessId: business._id, role: 'BUSINESS_ADMIN' }, { phone: contactPhone });
+    }
     if (address) business.address = address;
     if (state) business.state = state;
     if (district) business.district = district;
@@ -389,6 +393,46 @@ export const updateMyHotelImages = async (req: Request, res: Response): Promise<
     res.json({
       status: 'success',
       message: 'Business hotel images updated successfully',
+      data: business
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// @desc    Update business contact phone (for BUSINESS_ADMIN)
+// @route   PUT /api/businesses/me/phone
+// @access  Private/BUSINESS_ADMIN
+export const updateMyContactPhone = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = (req as any).user;
+    if (!user || !user.businessId) {
+      res.status(403).json({ status: 'error', message: 'Not authorized or no business associated' });
+      return;
+    }
+
+    const { contactPhone } = req.body;
+    if (!contactPhone) {
+      res.status(400).json({ status: 'error', message: 'contactPhone is required' });
+      return;
+    }
+
+    const business = await Business.findById(user.businessId);
+
+    if (!business) {
+      res.status(404).json({ status: 'error', message: 'Business not found' });
+      return;
+    }
+
+    business.contactPhone = contactPhone;
+    await business.save();
+    
+    // Also update the User's phone to keep it in sync
+    await User.findByIdAndUpdate(user._id, { phone: contactPhone });
+
+    res.json({
+      status: 'success',
+      message: 'Contact phone updated successfully',
       data: business
     });
   } catch (error: any) {

@@ -458,7 +458,7 @@ export const RestroSignature: React.FC = () => {
         tax: cgst + sgst,
         total: cartTotal,
         status: 'In Kitchen',
-        customerDetails: { name: 'Table Guest', phone: 'N/A' }
+        customerDetails: { name: 'N/A', phone: 'N/A' }
       });
       return res.data;
     },
@@ -479,8 +479,8 @@ export const RestroSignature: React.FC = () => {
   const handleRestroCheckout = () => {
     if (cart.length === 0) return;
 
-    if (!customerName.trim() || !customerPhone.trim()) {
-      toast.error('Guest Name and Contact are required for billing.');
+    if (!customerName.trim() && !customerPhone.trim()) {
+      toast.error('Customer Name or Mobile Number is required for billing.');
       return;
     }
 
@@ -503,7 +503,7 @@ export const RestroSignature: React.FC = () => {
       total: cartTotal,
       paymentMethod: paymentMethod || 'Cash',
       status: 'Completed',
-      customerDetails: { name: customerName || 'Walk-in VIP', phone: customerPhone || 'N/A' }
+      customerDetails: { name: customerName || 'N/A', phone: customerPhone || 'N/A' }
     }).then(res => {
       if (res.data && res.data._id) {
         window.open(`/invoice/${res.data._id}`, '_blank');
@@ -517,7 +517,7 @@ export const RestroSignature: React.FC = () => {
     const newReceipt = {
       chef: 'Ranveer Brar (Executive Chef)'
     ,
-      customerName: customerName || 'Walk-in VIP',
+      customerName: customerName || 'N/A',
       customerPhone: customerPhone || 'N/A',
       hotelName,
       hotelLocation
