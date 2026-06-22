@@ -388,6 +388,9 @@ export const updateMyHotelImages = async (req: Request, res: Response): Promise<
     }
 
     business.hotelImages = hotelImages;
+    if (business.mainHotelImage && !hotelImages.includes(business.mainHotelImage)) {
+      business.mainHotelImage = undefined;
+    }
     await business.save();
 
     res.json({
@@ -433,6 +436,44 @@ export const updateMyContactPhone = async (req: Request, res: Response): Promise
     res.json({
       status: 'success',
       message: 'Contact phone updated successfully',
+      data: business
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// @desc    Update business main hotel image
+// @route   PUT /api/businesses/me/main-hotel-image
+// @access  Private/BUSINESS_ADMIN
+export const updateMyMainHotelImage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = (req as any).user;
+    if (!user || !user.businessId) {
+      res.status(403).json({ status: 'error', message: 'Not authorized or no business associated' });
+      return;
+    }
+
+    const { mainHotelImage } = req.body;
+
+    const business = await Business.findById(user.businessId);
+    if (!business) {
+      res.status(404).json({ status: 'error', message: 'Business not found' });
+      return;
+    }
+
+    // If setting a main image, ensure it exists in the array
+    if (mainHotelImage && (!business.hotelImages || !business.hotelImages.includes(mainHotelImage))) {
+      res.status(400).json({ status: 'error', message: 'Image must be in the uploaded hotel images list' });
+      return;
+    }
+
+    business.mainHotelImage = mainHotelImage;
+    await business.save();
+
+    res.json({
+      status: 'success',
+      message: 'Business main hotel image updated successfully',
       data: business
     });
   } catch (error: any) {

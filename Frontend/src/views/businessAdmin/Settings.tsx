@@ -24,7 +24,8 @@ import {
   Camera,
   Trash2,
   Image as ImageIcon,
-  Wine
+  Wine,
+  Star
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -173,6 +174,30 @@ export const Settings: React.FC = () => {
     }
   };
 
+  const handleDeleteHotelImage = async (e: React.MouseEvent, imageUrl: string) => {
+    e.stopPropagation();
+    try {
+      const currentImages = user?.businessData?.hotelImages || [];
+      const newImages = currentImages.filter((url: string) => url !== imageUrl);
+      await api.put('/businesses/me/hotel-images', { hotelImages: newImages });
+      await fetchProfile();
+      toast.success('Hotel picture deleted');
+    } catch (error: any) {
+      toast.error('Failed to delete picture');
+    }
+  };
+
+  const handleSetMainHotelImage = async (e: React.MouseEvent, imageUrl: string) => {
+    e.stopPropagation();
+    try {
+      await api.put('/businesses/me/main-hotel-image', { mainHotelImage: imageUrl });
+      await fetchProfile();
+      toast.success('Main profile photo updated');
+    } catch (error: any) {
+      toast.error('Failed to set main photo');
+    }
+  };
+
   const handleRemoveProfile = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
@@ -286,19 +311,42 @@ export const Settings: React.FC = () => {
                   <div className="mt-2 space-y-3">
                     <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Hotel Pictures Gallery</p>
                     <div className="flex flex-wrap gap-3">
-                      {user?.businessData?.hotelImages?.map((url: string, index: number) => (
-                        <div key={index} className="relative group w-24 h-24 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 cursor-pointer shadow-sm">
-                          <img 
-                            src={url} 
-                            alt={`Hotel Picture ${index + 1}`} 
-                            className="w-full h-full object-cover"
-                            onClick={() => setViewingImage({url, alt: `Hotel Picture ${index + 1}`})}
-                          />
-                          <div className="absolute top-1 right-1 p-1 bg-gray-100/90 text-gray-600 rounded-lg opacity-0 group-hover:opacity-100" title="Image is permanent">
-                            <Camera size={12} className="text-gray-600" />
+                      {user?.businessData?.hotelImages?.map((url: string, index: number) => {
+                        const isMain = user?.businessData?.mainHotelImage === url;
+                        return (
+                          <div key={index} className="relative group w-24 h-24 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                            <img 
+                              src={url} 
+                              alt={`Hotel Picture ${index + 1}`} 
+                              className="w-full h-full object-cover cursor-pointer"
+                              onClick={() => setViewingImage({url, alt: `Hotel Picture ${index + 1}`})}
+                            />
+                            {/* Hover Actions */}
+                            <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                onClick={(e) => handleSetMainHotelImage(e, url)}
+                                className="p-1 bg-white/90 text-yellow-500 hover:text-yellow-600 rounded-lg shadow-sm" 
+                                title="Set as Main Photo"
+                              >
+                                <Star size={12} className={isMain ? "fill-current" : ""} />
+                              </button>
+                              <button 
+                                onClick={(e) => handleDeleteHotelImage(e, url)}
+                                className="p-1 bg-white/90 text-red-500 hover:text-red-600 rounded-lg shadow-sm" 
+                                title="Delete Photo"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                            {/* Main Photo Badge */}
+                            {isMain && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-brand-accent text-white text-[8px] font-bold uppercase tracking-widest text-center py-0.5">
+                                Main
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {/* Add New Picture Button */}
                       <div 

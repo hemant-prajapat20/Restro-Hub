@@ -23,6 +23,7 @@ export interface IBusiness extends Document {
   district: string;
   logoUrl?: string;
   hotelImages?: string[];
+  mainHotelImage?: string;
   platforms: string[];
   subscriptionAmountPaid?: number;
   activeModules: BusinessModule[];
@@ -56,6 +57,7 @@ const businessSchema = new Schema<IBusiness>(
     district: { type: String, required: true },
     logoUrl: { type: String },
     hotelImages: [{ type: String }],
+    mainHotelImage: { type: String },
     platforms: [{ type: String }],
     subscriptionAmountPaid: { type: Number },
     activeModules: [
