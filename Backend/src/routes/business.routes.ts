@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createBusiness, getAllBusinesses, updateBusiness, getPublicBusinesses, updateMyBusinessLogo, updateMyHotelImages, updateMyMainHotelImage, updateMyStoreStatus, updateMyFeatureToggles, updateMyContactPhone } from '../controllers/business.controller';
+import { createBusiness, getAllBusinesses, updateBusiness, getPublicBusinesses, updateMyBusinessLogo, updateMyHotelImages, updateMyMainHotelImage, updateMyStoreStatus, updateMyFeatureToggles, updateMyContactPhone, globalSearch } from '../controllers/business.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 import { Role } from '../models/User';
 
@@ -11,6 +11,7 @@ router.get('/public', getPublicBusinesses);
 router.use(protect);
 
 // Routes for Business Admin
+router.get('/me/search', authorize(Role.BUSINESS_ADMIN, Role.SUPER_ADMIN), globalSearch);
 router.put('/me/store-status', authorize(Role.BUSINESS_ADMIN, Role.SUPER_ADMIN), updateMyStoreStatus);
 router.put('/me/features', authorize(Role.BUSINESS_ADMIN, Role.SUPER_ADMIN), updateMyFeatureToggles);
 router.put('/me/logo', authorize(Role.BUSINESS_ADMIN, Role.SUPER_ADMIN), updateMyBusinessLogo);

@@ -6,6 +6,9 @@ import ActivityLog from '../models/ActivityLog';
 import mongoose from 'mongoose';
 import { seedTemplateData } from '../utils/seedData';
 import app from '../app';
+import Order from '../models/Order';
+import MenuItem from '../models/MenuItem';
+import Customer from '../models/Customer';
 
 const emitAdminActivity = (log: any) => {
   const io = app.get('io');
@@ -475,6 +478,67 @@ export const updateMyMainHotelImage = async (req: Request, res: Response): Promi
       status: 'success',
       message: 'Business main hotel image updated successfully',
       data: business
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// @desc    Global search for orders, menu items, customers
+// @route   GET /api/businesses/me/search
+// @access  Private/BUSINESS_ADMIN
+export const globalSearch = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = (req as any).user;
+    if (!user || !user.businessId) {
+      res.status(403).json({ status: 'error', message: 'Not authorized or no business associated' });
+      return;
+    }
+
+    const { q } = req.query;
+    if (!q || typeof q !== 'string' || q.trim() === '') {
+      res.json({
+        status: 'success',
+        data: { orders: [], menuItems: [], customers: [] }
+      });
+      return;
+    }
+
+    const searchRegex = new RegExp(q.trim(), 'i');
+
+    const [orders, menuItems, customers] = await Promise.all([
+      Order.find({
+        businessId: user.businessId,
+        $or: [
+          { orderNumber: searchRegex },
+          { 'customer.name': searchRegex },
+          { 'customer.phone': searchRegex }
+        ]
+      }).limit(5).lean(),
+      MenuItem.find({
+        businessId: user.businessId,
+        $or: [
+          { name: searchRegex },
+          { category: searchRegex }
+        ]
+      }).limit(5).lean(),
+      Customer.find({
+        businessId: user.businessId,
+        $or: [
+          { name: searchRegex },
+          { phone: searchRegex },
+          { email: searchRegex }
+        ]
+      }).limit(5).lean()
+    ]);
+
+    res.json({
+      status: 'success',
+      data: {
+        orders,
+        menuItems,
+        customers
+      }
     });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });

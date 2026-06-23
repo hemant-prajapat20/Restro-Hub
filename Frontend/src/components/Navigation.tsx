@@ -37,7 +37,7 @@ import {
   Laptop
 } from 'lucide-react';
 import { playNotificationSound } from '../utils/sound';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -46,6 +46,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout, setCredentials } from '../store/slices/authSlice';
 import { RootState } from '../store';
 import api from '../utils/api';
+import { useQuery } from '@tanstack/react-query';
 import { io } from 'socket.io-client';
 
 function cn(...inputs: ClassValue[]) {
@@ -208,12 +209,36 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { data: searchResults, isFetching: isSearching } = useQuery({
+    queryKey: ['global-search', debouncedQuery],
+    queryFn: async () => {
+      if (!debouncedQuery || debouncedQuery.length < 2) return null;
+      const res = await api.get(`/businesses/me/search?q=${debouncedQuery}`);
+      return res.data.data;
+    },
+    enabled: debouncedQuery.length >= 2 && !isSuperAdmin
+  });
+
   useEffect(() => {
     function handleGlobalEvent(event: Event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        const target = event.target as Element;
-        if (target.closest('button[aria-label="Notifications"]')) return;
-        setShowDropdown(false);
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
+        if (!(target as Element).closest?.('button[aria-label="Notifications"]')) {
+          setShowDropdown(false);
+        }
+      }
+      if (searchRef.current && !searchRef.current.contains(target)) {
+        setShowSearchDropdown(false);
       }
     }
 
@@ -338,14 +363,122 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             <p className="text-xs sm:text-sm text-slate-500 break-words">Platform-wide Management Console</p>
           </div>
         ) : (
-          <div className="flex-1 max-w-xl hidden md:block">
+          <div className="flex-1 max-w-xl hidden md:block" ref={searchRef}>
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-brand-accent transition-colors" />
               <input 
                 type="text" 
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
+                onFocus={() => setShowSearchDropdown(true)}
                 placeholder="Search orders, menu items, or customers..." 
                 className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:bg-white transition-all font-medium text-sm text-slate-800 shadow-sm"
               />
+
+              {/* Global Search Dropdown */}
+              <AnimatePresence>
+                {showSearchDropdown && searchQuery.length >= 2 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 max-h-[70vh] flex flex-col"
+                  >
+                    {isSearching ? (
+                      <div className="p-8 text-center text-slate-500">
+                        <div className="w-8 h-8 border-4 border-brand-accent border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                        <p className="text-sm font-medium">Searching...</p>
+                      </div>
+                    ) : searchResults && (searchResults.orders?.length > 0 || searchResults.menuItems?.length > 0 || searchResults.customers?.length > 0) ? (
+                      <div className="overflow-y-auto p-2 scrollbar-thin">
+                        
+                        {searchResults.orders?.length > 0 && (
+                          <div className="mb-3">
+                            <h3 className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-widest sticky top-0 bg-white/95 backdrop-blur z-10 flex items-center gap-2">
+                              <ShoppingBag size={12} /> Orders
+                            </h3>
+                            <div className="space-y-0.5 mt-1">
+                              {searchResults.orders.map((o: any) => (
+                                <button 
+                                  key={o._id}
+                                  onClick={() => { setShowSearchDropdown(false); navigate('/admin/transactions'); }}
+                                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-xl transition-colors text-left group"
+                                >
+                                  <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                    <ShoppingBag size={14} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-slate-900 truncate">Order #{o.orderNumber || o._id.slice(-6).toUpperCase()}</p>
+                                    <p className="text-[10px] text-slate-500 truncate">{o.customer?.name || 'Guest'} • ₹{o.totalAmount || o.subtotal}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {searchResults.menuItems?.length > 0 && (
+                          <div className="mb-3">
+                            <h3 className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-widest sticky top-0 bg-white/95 backdrop-blur z-10 flex items-center gap-2">
+                              <UtensilsCrossed size={12} /> Menu Items
+                            </h3>
+                            <div className="space-y-0.5 mt-1">
+                              {searchResults.menuItems.map((m: any) => (
+                                <button 
+                                  key={m._id}
+                                  onClick={() => { setShowSearchDropdown(false); navigate('/admin/menu'); }}
+                                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-xl transition-colors text-left group"
+                                >
+                                  <div className="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                    <UtensilsCrossed size={14} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-slate-900 truncate">{m.name}</p>
+                                    <p className="text-[10px] text-slate-500 truncate">{m.category} • ₹{m.price}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {searchResults.customers?.length > 0 && (
+                          <div className="mb-1">
+                            <h3 className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-widest sticky top-0 bg-white/95 backdrop-blur z-10 flex items-center gap-2">
+                              <Contact size={12} /> Customers
+                            </h3>
+                            <div className="space-y-0.5 mt-1">
+                              {searchResults.customers.map((c: any) => (
+                                <button 
+                                  key={c._id}
+                                  onClick={() => { setShowSearchDropdown(false); navigate('/admin/customers'); }}
+                                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-xl transition-colors text-left group"
+                                >
+                                  <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                    <Contact size={14} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-slate-900 truncate">{c.name}</p>
+                                    <p className="text-[10px] text-slate-500 truncate">{c.phone || c.email}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-slate-500 flex flex-col items-center">
+                        <Search className="w-8 h-8 text-slate-300 mb-2" />
+                        <p className="text-sm font-medium">No results found for "{searchQuery}"</p>
+                        <p className="text-xs mt-1 text-slate-400">Try searching for something else</p>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
             </div>
           </div>
         )}
