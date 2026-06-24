@@ -29,6 +29,13 @@ export const addInventoryItem = async (req: Request, res: Response) => {
     });
 
     const savedItem = await newItem.save();
+    
+    // Log and emit
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('newMessage', { category: 'inventory', message: `Added inventory item: ${savedItem.name}` });
+    }
+    
     res.status(201).json(savedItem);
   } catch (error) {
     res.status(500).json({ message: 'Server error adding inventory item' });
@@ -74,6 +81,11 @@ export const updateInventoryItem = async (req: Request, res: Response) => {
 
     if (!updatedItem) {
       return res.status(404).json({ message: 'Inventory item not found' });
+    }
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('newMessage', { category: 'inventory', message: `Updated inventory item: ${updatedItem.name}` });
     }
 
     res.json(updatedItem);
