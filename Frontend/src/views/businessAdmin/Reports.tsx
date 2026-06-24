@@ -26,7 +26,10 @@ import { useNavigate } from 'react-router-dom';
 
 export const Reports: React.FC = () => {
   const navigate = useNavigate();
-  const [month, setMonth] = useState('2026-04');
+  const [month, setMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const queryClient = useQueryClient();

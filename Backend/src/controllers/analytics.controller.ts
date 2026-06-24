@@ -291,15 +291,20 @@ export const getBusinessAnalytics = async (req: Request, res: Response): Promise
 export const getBusinessReports = async (req: Request, res: Response): Promise<void> => {
   try {
     const businessId = (req as any).user.businessId;
+    const { month } = req.query;
 
-    // Get current month dates
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
+    let targetDate = new Date();
+    if (month && typeof month === 'string') {
+      const [year, m] = month.split('-');
+      if (year && m) {
+        targetDate = new Date(parseInt(year), parseInt(m) - 1, 1);
+      }
+    }
+
+    const startOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const endOfMonth = new Date();
-    endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-    endOfMonth.setDate(0);
+    const endOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
     endOfMonth.setHours(23, 59, 59, 999);
 
     const monthlyOrders = await Order.find({
