@@ -5,7 +5,7 @@ import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { 
   Clock, ChevronRight, CheckCircle2, ChefHat, AlertTriangle,
-  Flame, Wind, Plus as PlusIcon, RotateCcw, Timer, MonitorOff
+  Flame, Wind, Plus as PlusIcon, RotateCcw, Timer, MonitorOff, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -173,19 +173,38 @@ export const KDS: React.FC = () => {
                     </div>
                     <h4 className="text-white font-semibold text-lg mt-2">Order #{order._id.slice(-4)}</h4>
                   </div>
-                  <div className="text-right">
-                    <div className={`flex items-center justify-end gap-1.5 font-mono font-semibold text-base ${
-                      ['New', 'Pending'].includes(order.status) ? 'text-orange-400' : 'text-slate-400'
-                    }`}>
-                      <Timer size={16} />
-                      {order.estimatedPrepTime ? `${order.estimatedPrepTime} min` : 'Est: --'}
+                  <div className="flex items-start gap-4">
+                    <div className="text-right">
+                      <div className={`flex items-center justify-end gap-1.5 font-mono font-semibold text-base ${
+                        ['New', 'Pending'].includes(order.status) ? 'text-orange-400' : 'text-slate-400'
+                      }`}>
+                        <Timer size={16} />
+                        {order.estimatedPrepTime ? `${order.estimatedPrepTime} min` : 'Est: --'}
+                      </div>
+                      <p className="text-[10px] font-semibold text-slate-500 uppercase mt-0.5 tracking-widest">{order.type}</p>
                     </div>
-                    <p className="text-[10px] font-semibold text-slate-500 uppercase mt-0.5 tracking-widest">{order.type}</p>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this order?')) {
+                          updateOrderStatus(order._id, 'Cancelled');
+                        }
+                      }}
+                      className="text-slate-500 hover:text-red-500 transition-colors mt-0.5"
+                      title="Delete Order"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                 </div>
 
                 {/* Ticket Body */}
                 <div className="flex-1 max-h-[400px] overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                  {order.notes && (
+                    <div className="mb-4 bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4 text-yellow-200">
+                      <p className="text-xs font-bold uppercase tracking-widest text-yellow-500 mb-1">Special Instructions</p>
+                      <p className="text-sm font-semibold whitespace-pre-wrap">{order.notes}</p>
+                    </div>
+                  )}
                   {order.items.map((item: any, itemIdx: number) => {
                     const isCompleted = completedItems.includes(item._id || item.menuItem);
                     return (
@@ -230,15 +249,24 @@ export const KDS: React.FC = () => {
                        MARK AS READY
                      </button>
                    ) : (
-                     <div className="flex-1 flex gap-2">
-                       <button 
-                         onClick={() => updateOrderStatus(order._id, 'Completed')}
-                         className="flex-1 py-4 bg-slate-800 text-white hover:bg-slate-700 rounded-2xl text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-2"
-                       >
-                          <CheckCircle2 size={16} /> PICKED UP
-                       </button>
-                     </div>
-                   )}
+                    <div className="flex-1 flex gap-2">
+                      {(!order.paymentMethod || order.paymentMethod === 'Unpaid') && order.type === 'POS' ? (
+                        <button 
+                          onClick={() => window.open(`/admin/pos?orderId=${order._id}`, '_blank')}
+                          className="flex-1 py-4 bg-brand-primary text-white hover:bg-brand-primary/90 rounded-2xl text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-2"
+                        >
+                           BILL IN POS
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => updateOrderStatus(order._id, 'Completed')}
+                          className="flex-1 py-4 bg-slate-800 text-white hover:bg-slate-700 rounded-2xl text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-2"
+                        >
+                           <CheckCircle2 size={16} /> PICKED UP
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             );

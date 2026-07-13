@@ -46,7 +46,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout, setCredentials } from '../store/slices/authSlice';
 import { RootState } from '../store';
 import api from '../utils/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { io } from 'socket.io-client';
 
 function cn(...inputs: ClassValue[]) {
@@ -118,6 +118,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
     navigate('/login');
   };
 
+  const queryClient = useQueryClient();
+
+  const { data: dbOrders = [] } = useQuery({
+    queryKey: ['sidebar-kds-orders'],
+    queryFn: async () => {
+      if (isSuperAdmin) return [];
+      const res = await api.get('/orders');
+      return res.data.filter((o: any) => o.status !== 'Completed' && o.status !== 'Cancelled' && o.type !== 'Delivery');
+    },
+    refetchInterval: 30000, // Fallback polling
+    enabled: !isSuperAdmin
+  });
+
+  const hasActiveKdsOrders = dbOrders.length > 0;
+
+  useEffect(() => {
+    if (isSuperAdmin) return;
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
+    socket.on('newOrder', () => {
+      queryClient.invalidateQueries({ queryKey: ['sidebar-kds-orders'] });
+    });
+    socket.on('orderUpdated', () => {
+      queryClient.invalidateQueries({ queryKey: ['sidebar-kds-orders'] });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [isSuperAdmin, queryClient]);
+
   return (
     <aside className={cn(
       "w-64 bottom-0 overflow-y-auto bg-brand-sidebar text-white flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0",
@@ -144,21 +173,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPath === item.id || (currentPath === (isSuperAdmin ? 'super-admin' : 'admin') && item.id === 'dashboard');
-          return (
-            <Link
-              key={item.id}
-              to={`${basePath}/${item.id}`}
-              onClick={() => { if (onClose) onClose(); }}
-              className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm",
-                isActive 
-                  ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
-                  : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
-              )}
-            >
-              <Icon className={cn("w-5 h-5", isActive ? "text-white" : "group-hover:text-white")} />
-              <span className={cn("font-semibold", isSuperAdmin && "truncate")}>{item.label}</span>
-              {isActive && (
+            return (
+              <Link
+                key={item.id}
+                to={`${basePath}/${item.id}`}
+                onClick={() => { if (onClose) onClose(); }}
+                className={cn(
+                  "relative w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm",
+                  isActive 
+                    ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
+                    : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                )}
+              >
+                <Icon className={cn("w-5 h-5", isActive ? "text-white" : "group-hover:text-white")} />
+                <span className={cn("font-semibold", isSuperAdmin && "truncate")}>{item.label}</span>
+                {item.id === 'kds' && hasActiveKdsOrders && (
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse absolute right-4 top-1/2 -translate-y-1/2"></span>
+                )}
+                {isActive && (
                 <motion.div 
                   layoutId="active-pill"
                   className="ml-auto w-1 h-4 bg-white rounded-full opacity-50"

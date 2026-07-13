@@ -29,14 +29,17 @@ export const Login: React.FC = () => {
       if (user.role === 'CUSTOMER') {
         const lastBusinessId = localStorage.getItem('lastBusinessId');
         if (lastBusinessId) {
-            navigate(`/customer/order/${lastBusinessId}`, { replace: true });
+          navigate(`/customer/order/${lastBusinessId}`, { replace: true });
         } else {
-            navigate('/customer/dashboard', { replace: true });
+          navigate('/customer/dashboard', { replace: true });
         }
       } else if (user.role === 'SUPER_ADMIN') {
         navigate('/super-admin', { replace: true });
-      } else {
+      } else if (user.role === 'BUSINESS_ADMIN' || user.role === 'STAFF') {
         navigate('/admin/dashboard', { replace: true });
+      } else {
+        // Prevent infinite redirect loop for unknown roles or corrupted state
+        dispatch(setCredentials({ user: null, token: null }));
       }
     }
   }, [isAuthenticated, user, navigate]);
@@ -77,17 +80,18 @@ export const Login: React.FC = () => {
 
       // Role-based routing
       if (data.data.role === 'CUSTOMER') {
-        // Find business ID from localstorage or previous navigation if available
         const lastBusinessId = localStorage.getItem('lastBusinessId');
         if (lastBusinessId) {
-            navigate(`/customer/order/${lastBusinessId}`);
+          navigate(`/customer/order/${lastBusinessId}`);
         } else {
-            navigate('/customer/dashboard'); // default
+          navigate('/customer/dashboard'); // default
         }
       } else if (data.data.role === 'SUPER_ADMIN') {
         navigate('/super-admin');
-      } else {
+      } else if (data.data.role === 'BUSINESS_ADMIN' || data.data.role === 'STAFF') {
         navigate('/admin/dashboard');
+      } else {
+        setError('Unauthorized role detected. Please contact support.');
       }
     } catch (err) {
       if (err instanceof Error) {

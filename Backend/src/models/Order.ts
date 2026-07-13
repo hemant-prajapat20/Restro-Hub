@@ -32,6 +32,7 @@ export interface IOrder extends Document {
     phone: string;
   };
   deliveryOtp?: string;
+  notes?: string;
   estimatedPrepTime?: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -67,6 +68,7 @@ const OrderSchema = new Schema({
     phone: { type: String }
   },
   deliveryOtp: { type: String },
+  notes: { type: String },
   estimatedPrepTime: { type: Number }
 }, { timestamps: true });
 

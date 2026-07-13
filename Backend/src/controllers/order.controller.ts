@@ -22,11 +22,28 @@ export const getOrders = async (req: Request, res: Response) => {
   }
 };
 
+// Get a single order by ID
+export const getOrderById = async (req: Request, res: Response) => {
+  try {
+    const businessId = (req as any).user.businessId;
+    const { id } = req.params;
+    const order = await Order.findOne({ _id: id, businessId }).populate('tableId');
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching order' });
+  }
+};
+
 // Create a new order
 export const createOrder = async (req: Request, res: Response) => {
   try {
     const businessId = (req as any).user.businessId;
-    const { type, tableId, items, subtotal, tax, total, paymentMethod, source, customerDetails } = req.body;
+    const { type, tableId, items, subtotal, tax, total, paymentMethod, source, customerDetails, notes } = req.body;
 
     const newOrder = new Order({
       businessId,
@@ -39,6 +56,7 @@ export const createOrder = async (req: Request, res: Response) => {
       paymentMethod,
       source,
       customerDetails,
+      notes,
       status: type === 'POS' ? 'Completed' : 'Pending' // POS is usually completed immediately, but KDS might need it as pending. Let's default to Pending if not specified, or let frontend decide.
     });
     
@@ -57,8 +75,12 @@ export const createOrder = async (req: Request, res: Response) => {
       io.emit('newOrder', populatedOrder);
     }
 
-    // Insert Message for the Message Center
-    await logMessage(businessId, 'payment', 'New Transaction', `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`, 'success');
+    // Insert Message for the Message Center if payment is completed
+    if (newOrder.status === 'Completed') {
+      await logMessage(businessId, 'payment', 'New Transaction', `Transaction ${savedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${total} completed successfully via ${type}.`, 'success');
+    } else if (newOrder.status === 'In Kitchen') {
+      await logMessage(businessId, 'order', 'KOT Sent', `New KOT ${savedOrder._id.toString().substring(0, 8).toUpperCase()} sent to kitchen.`, 'info');
+    }
 
     res.status(201).json(populatedOrder);
   } catch (error) {
@@ -91,6 +113,8 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 
     if (status === 'Completed' || status === 'Served') {
         await logMessage(businessId, 'order', 'Order Completed', `Order ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} status changed to ${status}.`, 'success');
+    } else if (status === 'Ready') {
+        await logMessage(businessId, 'order', 'Order Ready', `Order ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} is ready for pickup/billing.`, 'success');
     }
 
     if (updatedOrder.customerId) {
@@ -147,6 +171,11 @@ export const updateOrder = async (req: Request, res: Response) => {
     const io = req.app.get('io');
     if (io) {
       io.emit('orderUpdated', updatedOrder);
+    }
+
+    // If the order was just paid for in POS, log the transaction
+    if (req.body.status === 'Completed' && req.body.paymentMethod) {
+      await logMessage(businessId, 'payment', 'New Transaction', `Transaction ${updatedOrder._id.toString().substring(0, 8).toUpperCase()} for ₹${updatedOrder.total} completed successfully via ${updatedOrder.type}.`, 'success');
     }
 
     res.json(updatedOrder);

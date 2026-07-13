@@ -44,9 +44,7 @@ export const Transactions: React.FC = () => {
     return <div className="p-5 flex justify-center items-center h-[calc(100vh-80px)]">Loading Orders...</div>;
   }
 
-  const historyOrders = orders.filter((o: any) => o.status === 'Completed' || o.status === 'Cancelled' || o.status === 'Served');
-  
-  const filteredOrders = historyOrders.filter((inv: any) => {
+  const filteredOrders = orders.filter((inv: any) => {
     const invId = inv._id || inv.id || '';
     return invId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (inv.type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,7 +66,7 @@ export const Transactions: React.FC = () => {
        <div className="bg-white rounded-[32px] border border-stone-200/80 shadow-soft overflow-hidden flex flex-col mb-8 mt-4">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
              <h5 className="font-semibold font-display text-slate-900 text-lg">
-               Past Transactions
+               All Transactions
              </h5>
              <div className="relative w-72">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -99,6 +97,7 @@ export const Transactions: React.FC = () => {
                    ) : filteredOrders.map((order: any) => {
                      const invId = order._id || order.id || '';
                      const shortId = invId ? invId.slice(-8).toUpperCase() : 'N/A';
+                     const isUnpaid = !order.paymentMethod || order.paymentMethod === 'Unpaid';
                      return (
                      <tr key={invId} className="hover:bg-slate-50/50 transition-all group">
                         <td className="px-6 py-4">

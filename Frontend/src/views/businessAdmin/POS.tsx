@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { MenuItem, OrderItem } from '../../types';
@@ -25,9 +26,13 @@ import { FilterBar } from '../../components/FilterBar';
 import { initializeRazorpayPayment } from '../../utils/razorpay';
 
 export const POS: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const editOrderId = searchParams.get('orderId');
+
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [notes, setNotes] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
@@ -42,16 +47,59 @@ export const POS: React.FC = () => {
     }
   });
 
-  const orderMutation = useMutation({
-    mutationFn: async (orderData: any) => {
-      const response = await api.post('/orders', orderData);
+  const { data: orderToEdit } = useQuery({
+    queryKey: ['order', editOrderId],
+    queryFn: async () => {
+      if (!editOrderId) return null;
+      const response = await api.get(`/orders/${editOrderId}`);
       return response.data;
     },
-    onSuccess: (data) => {
-      toast.success('Order completed successfully!');
+    enabled: !!editOrderId
+  });
+
+  React.useEffect(() => {
+    if (orderToEdit) {
+      setCart(orderToEdit.items.map((item: any) => ({
+        itemId: item.menuItem,
+        name: item.name,
+        category: item.category || 'General',
+        price: item.price,
+        quantity: item.quantity
+      })));
+      if (orderToEdit.customerDetails) {
+        setCustomerName(orderToEdit.customerDetails.name || '');
+        setCustomerPhone(orderToEdit.customerDetails.phone || '');
+      }
+      if (orderToEdit.notes) {
+        setNotes(orderToEdit.notes);
+      }
+    }
+  }, [orderToEdit]);
+
+  const orderMutation = useMutation({
+    mutationFn: async (orderData: any) => {
+      if (editOrderId) {
+        const response = await api.put(`/orders/${editOrderId}`, orderData);
+        return response.data;
+      } else {
+        const response = await api.post('/orders', orderData);
+        return response.data;
+      }
+    },
+    onSuccess: (data, variables) => {
+      if (variables.status === 'In Kitchen') {
+        toast.success('KOT sent to kitchen!');
+      } else {
+        toast.success('Order completed successfully!');
+      }
       setOrderState('submitted');
-      if (data && data._id) {
+      
+      // Only generate/open invoice if it is NOT a KOT
+      if (variables.status !== 'In Kitchen' && data && data._id) {
         window.open(`/invoice/${data._id}`, '_blank');
+        if (editOrderId) {
+          setSearchParams({});
+        }
       }
     },
     onError: () => {
@@ -63,22 +111,24 @@ export const POS: React.FC = () => {
   const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
 
   const handleSendToKitchen = () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || !customerName.trim() || !customerPhone.match(/^\d{10}$/)) return;
     setOrderState('sending');
-    orderMutation.mutate({
-      type: 'POS',
-      items: cart.map(c => ({
-        menuItem: c.itemId,
-        name: c.name,
-        category: c.category || 'General',
-        quantity: c.quantity,
-        price: c.price
-      })),
-      subtotal: subTotal,
-      tax: sgst + cgst,
-      total: total,
-      status: 'In Kitchen'
-    });
+      orderMutation.mutate({
+        type: 'POS',
+        items: cart.map(c => ({
+          menuItem: c.itemId,
+          name: c.name,
+          category: c.category || 'General',
+          quantity: c.quantity,
+          price: c.price
+        })),
+        subtotal: subTotal,
+        tax: sgst + cgst,
+        total: total,
+        status: 'In Kitchen',
+        customerDetails: { name: customerName, phone: customerPhone },
+        notes: notes
+      });
   };
 
   const handleResetOrder = () => {
@@ -86,6 +136,12 @@ export const POS: React.FC = () => {
     setOrderState('idle');
     setShowCheckout(false);
     setPaymentMethod(null);
+    setCustomerName('');
+    setCustomerPhone('');
+    setNotes('');
+    if (editOrderId) {
+      setSearchParams({});
+    }
   };
 
   const filteredItems = useMemo(() => {
@@ -97,6 +153,7 @@ export const POS: React.FC = () => {
   }, [activeCategory, searchQuery, menuItems]);
 
   const addToCart = (item: MenuItem) => {
+    if (editOrderId) return;
     setCart(prev => {
       const currentId = item.id || item._id;
       const existing = prev.find(i => i.itemId === currentId);
@@ -108,6 +165,7 @@ export const POS: React.FC = () => {
   };
 
   const removeFromCart = (itemId: string) => {
+    if (editOrderId) return;
     setCart(prev => {
       const item = prev.find(i => i.itemId === itemId);
       if (item && item.quantity > 1) {
@@ -175,12 +233,14 @@ export const POS: React.FC = () => {
             <h4 className="font-semibold text-lg font-display uppercase tracking-tight text-slate-800">Current Order</h4>
             <span className="bg-brand-accent text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">{cart.length}</span>
           </div>
-          <button 
-             onClick={() => setCart([])}
-             className="text-slate-400 hover:text-red-500 transition-colors"
-          >
-            <Trash2 size={20} />
-          </button>
+          {!editOrderId && (
+            <button 
+               onClick={() => setCart([])}
+               className="text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <Trash2 size={20} />
+            </button>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
@@ -205,19 +265,23 @@ export const POS: React.FC = () => {
                   <p className="text-xs text-slate-500 mt-0.5">₹{item.price} each</p>
                 </div>
                 <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-1">
-                  <button 
-                    onClick={() => removeFromCart(item.itemId)}
-                    className="p-1 hover:bg-slate-100 rounded text-slate-500"
-                  >
-                    <Minus size={14} />
-                  </button>
+                  {!editOrderId && (
+                    <button 
+                      onClick={() => removeFromCart(item.itemId)}
+                      className="p-1 hover:bg-slate-100 rounded text-slate-500"
+                    >
+                      <Minus size={14} />
+                    </button>
+                  )}
                   <span className="text-xs font-semibold w-4 text-center">{item.quantity}</span>
-                  <button 
-                    onClick={() => addToCart(menuItems.find(m => m.id === item.itemId || (m as any)._id === item.itemId)!)}
-                    className="p-1 hover:bg-slate-100 rounded text-slate-500"
-                  >
-                    <Plus size={14} />
-                  </button>
+                  {!editOrderId && (
+                    <button 
+                      onClick={() => addToCart(menuItems.find(m => m.id === item.itemId || (m as any)._id === item.itemId)!)}
+                      className="p-1 hover:bg-slate-100 rounded text-slate-500"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  )}
                 </div>
                 <div className="text-right ml-2">
                   <p className="text-sm font-semibold text-slate-900">₹{item.price * item.quantity}</p>
@@ -227,51 +291,89 @@ export const POS: React.FC = () => {
           )}
         </div>
 
-        <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-slate-500 font-medium">
+        <div className="p-3 bg-slate-50 border-t border-slate-200 space-y-2 shrink-0">
+          <div className="space-y-2 mb-1 pb-2 border-b border-slate-200 max-h-[20vh] overflow-y-auto custom-scrollbar pr-2">
+            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Customer Details (Required)</h4>
+            <div className="space-y-1.5">
+              <input 
+                type="text" 
+                placeholder="Customer Name" 
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold focus:border-brand-accent outline-none"
+              />
+              <input 
+                type="text" 
+                placeholder="Mobile Number (10 digits)" 
+                maxLength={10}
+                value={customerPhone}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d+$/.test(val)) {
+                    setCustomerPhone(val);
+                  }
+                }}
+                className={`w-full bg-white border rounded-lg px-3 py-2 text-sm font-semibold outline-none transition-all ${
+                  customerPhone && customerPhone.length !== 10 
+                    ? 'border-red-400 focus:border-red-500 text-red-600 focus:ring-2 focus:ring-red-100' 
+                    : 'border-slate-200 focus:border-brand-accent'
+                }`}
+              />
+              <div className="pt-1">
+                <input
+                  type="text"
+                  placeholder="Kitchen Notes / Special Instructions (e.g. less spicy, extra salt)"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium outline-none focus:border-brand-accent transition-all"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-slate-500 font-medium">
               <span>Subtotal</span>
               <span>₹{subTotal}</span>
             </div>
-            <div className="flex justify-between text-sm text-brand-primary font-semibold">
+            <div className="flex justify-between text-xs text-brand-primary font-semibold">
                <div className="flex items-center gap-1">
-                  <CheckCircle2 size={14} />
+                  <CheckCircle2 size={12} />
                   <span>KDS Sync Fee</span>
                </div>
                <span>Incl.</span>
             </div>
           </div>
-          <div className="flex justify-between items-center py-2 border-t border-slate-200">
-            <span className="text-lg font-semibold text-slate-900">Total Due</span>
-            <span className="text-2xl font-semibold text-brand-primary">₹{total.toFixed(2)}</span>
+          <div className="flex justify-between items-center py-1.5 border-t border-slate-200">
+            <span className="text-base font-semibold text-slate-900">Total Due</span>
+            <span className="text-xl font-semibold text-brand-primary">₹{total.toFixed(2)}</span>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2">
              <button
-               disabled={cart.length === 0 || orderState !== 'idle'}
+               disabled={!!editOrderId || cart.length === 0 || orderState !== 'idle' || !customerName.trim() || !customerPhone.match(/^\d{10}$/)}
                onClick={handleSendToKitchen}
-               className={`flex-1 group py-5 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 border-2 ${
-                  orderState === 'idle' 
+               className={`flex-1 group py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1.5 border-2 ${
+                  !editOrderId && orderState === 'idle' && customerName.trim() && customerPhone.match(/^\d{10}$/)
                     ? 'border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white' 
                     : 'bg-slate-100 border-slate-100 text-slate-400 cursor-not-allowed'
                }`}
              >
                {orderState === 'sending' ? (
-                  <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
                ) : (
                   <>
-                     <ChefHat className="group-hover:scale-110 transition-transform" size={20} />
+                     <ChefHat className="group-hover:scale-110 transition-transform" size={16} />
                      KOT
                   </>
                )}
              </button>
              <button
-               disabled={cart.length === 0}
+               disabled={cart.length === 0 || !customerName.trim() || !customerPhone.match(/^\d{10}$/)}
                onClick={() => setShowCheckout(true)}
-               className="flex-[2] bg-brand-accent hover:bg-brand-accent/90 disabled:bg-slate-300 text-white font-semibold py-5 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-brand-accent/30 transition-all active:scale-95 text-lg"
+               className="flex-[2] bg-brand-accent hover:bg-brand-accent/90 disabled:bg-slate-300 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-xl shadow-brand-accent/30 transition-all active:scale-95 text-base"
              >
                PAY BILL
-               <ChevronRight size={22} strokeWidth={3} />
+               <ChevronRight size={18} strokeWidth={3} />
              </button>
           </div>
         </div>
@@ -294,7 +396,7 @@ export const POS: React.FC = () => {
                    <CheckCircle2 size={48} strokeWidth={3} />
                 </motion.div>
                 <h3 className="text-2xl font-semibold text-slate-900 mb-2 uppercase">Ticket Sent!</h3>
-                <p className="text-slate-500 font-medium mb-8">Order #0912 has been successfully synchronized with the Kitchen KDS.</p>
+                <p className="text-slate-500 font-medium mb-8">The order has been successfully processed and synchronized with the system.</p>
                 <button 
                   onClick={handleResetOrder}
                   className="w-full py-4 bg-slate-900 text-white rounded-2xl font-semibold uppercase tracking-widest hover:bg-slate-800 transition-all"
@@ -326,42 +428,6 @@ export const POS: React.FC = () => {
               <div className="p-5">
                 <h3 className="text-2xl font-semibold font-display mb-6">Complete Payment</h3>
                 
-                
-                <div className="mb-6 space-y-3">
-                  <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Customer Details (Required)</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <input 
-                      type="text" 
-                      placeholder="Customer Name" 
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:border-brand-accent outline-none"
-                    />
-                    <div>
-                      <input 
-                        type="text" 
-                        placeholder="Mobile Number (10 digits)" 
-                        maxLength={10}
-                        value={customerPhone}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === '' || /^\d+$/.test(val)) {
-                            setCustomerPhone(val);
-                          }
-                        }}
-                        className={`w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-semibold outline-none transition-all ${
-                          customerPhone && customerPhone.length !== 10 
-                            ? 'border-red-400 focus:border-red-500 text-red-600 focus:ring-2 focus:ring-red-100' 
-                            : 'border-slate-200 focus:border-brand-accent'
-                        }`}
-                      />
-                      {customerPhone && customerPhone.length !== 10 && (
-                        <p className="text-[10px] text-red-500 font-semibold mt-1 ml-1">Must be exactly 10 digits</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {[
                     { id: 'Cash', icon: Banknote, label: 'Cash' },
@@ -410,16 +476,8 @@ export const POS: React.FC = () => {
                   <button 
                     onClick={() => {
                       const invoiceNum = 'IND-POS-' + Math.floor(100000 + Math.random() * 900000);
-                      const timestampStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + new Date().toLocaleTimeString();
                       
                       const processOrder = () => {
-                        const receiptItems = cart.map(item => ({
-                          itemId: item.itemId,
-                          name: item.name,
-                          price: item.price,
-                          quantity: item.quantity
-                        }));
-
                         orderMutation.mutate({
                           type: 'POS',
                           items: cart.map(c => ({
@@ -427,15 +485,15 @@ export const POS: React.FC = () => {
                             name: c.name,
                             category: c.category || 'General',
                             quantity: c.quantity,
-                            price: c.price,
-                            status: 'Served'
+                            price: c.price
                           })),
                           subtotal: subTotal,
                           tax: sgst + cgst,
                           total: total,
                           paymentMethod: paymentMethod || 'Cash',
                           status: 'Completed',
-                          customerDetails: { name: customerName, phone: customerPhone }
+                          customerDetails: { name: customerName, phone: customerPhone },
+                          notes: notes
                         });
 
                         setCart([]);
@@ -459,7 +517,7 @@ export const POS: React.FC = () => {
                         processOrder();
                       }
                     }}
-                    disabled={!paymentMethod || !customerName.trim() || !customerPhone.match(/^\d{10}$/) || orderMutation.isPending}
+                    disabled={!paymentMethod || orderMutation.isPending}
                     className="flex-[2] bg-brand-success hover:bg-brand-success/90 disabled:bg-slate-300 text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-brand-success/20 transition-all"
                   >
                     COMPLETE PAYMENT

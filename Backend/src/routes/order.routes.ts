@@ -1,6 +1,6 @@
 import { Role } from '../models/User';
 import { Router } from 'express';
-import { getOrders, createOrder, updateOrderStatus, updateOrder, verifyOtp, deleteOrder } from '../controllers/order.controller';
+import { getOrders, getOrderById, createOrder, updateOrderStatus, updateOrder, verifyOtp, deleteOrder } from '../controllers/order.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
@@ -13,6 +13,7 @@ router.route('/')
   .post(createOrder);
 
 router.route('/:id')
+  .get(getOrderById)
   .put(updateOrder)
   .delete(deleteOrder);
 
