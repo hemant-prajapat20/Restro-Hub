@@ -610,18 +610,26 @@ export const CafeBakery: React.FC = () => {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
               {/* Specialty Listing */}
               <div className="xl:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start content-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch content-start">
                   {filteredItems.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/60 transition-all flex flex-col h-fit"
+                      className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/60 transition-all flex flex-col h-full"
                     >
-                      <div className="h-40 relative overflow-hidden">
-                        <img 
-                          src={item.image || 'https://images.unsplash.com/photo-1550461716-ba42010c2cde?w=400&h=400&fit=crop'} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
-                        />
+                      <div className="h-40 relative overflow-hidden shrink-0 bg-slate-100 flex flex-col items-center justify-center">
+                        {item.image ? (
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 absolute inset-0 z-10"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : null}
+                        <div className="text-slate-300 flex flex-col items-center z-0">
+                          <span className="text-[10px] font-bold uppercase tracking-widest mt-2">No Image</span>
+                        </div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                         <span className="absolute top-4 left-4 px-3 py-1 bg-brand-primary text-brand-accent border border-amber-950/20 rounded-xl text-[10px] font-semibold uppercase tracking-widest">
                           {item.category}
@@ -636,7 +644,7 @@ export const CafeBakery: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="p-4 flex-1 flex flex-col space-y-4">
                         <div>
                           <div className="flex justify-between items-start mb-4">
 
@@ -675,7 +683,7 @@ export const CafeBakery: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-stone-100">
+                        <div className="flex items-center justify-between pt-4 border-t border-stone-100 mt-auto">
                           <div>
                             <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">List Price</p>
                             <p className="text-2xl font-semibold text-brand-primary font-display">₹{item.price.toLocaleString()}</p>

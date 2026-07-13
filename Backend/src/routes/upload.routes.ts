@@ -10,6 +10,6 @@ const router = Router();
 router.use(protect);
 
 // Handle single file upload mapped to the "image" field
-router.post('/', upload.single('image'), uploadImage);
+router.post('/image', upload.single('image'), uploadImage);
 
 export default router;

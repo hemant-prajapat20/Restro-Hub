@@ -664,7 +664,7 @@ export const BarLounge: React.FC = () => {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
               {/* Liquor Cards list */}
               <div className="xl:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start content-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch content-start">
                   <AnimatePresence>
                     {filteredItems.map((item) => (
                       <motion.div
@@ -673,22 +673,30 @@ export const BarLounge: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-amber-500/60 transition-all flex flex-col h-fit"
+                        className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-amber-500/60 transition-all flex flex-col h-full"
                       >
-                        <div className="h-40 relative overflow-hidden">
-                          <img 
-                            src={item.image || 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=400&fit=crop'} 
-                            alt={item.name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-                          <span className="absolute top-4 left-4 px-3 py-1 bg-stone-950 text-brand-accent rounded-xl text-[10px] font-semibold uppercase tracking-widest border border-amber-500/20">
+                        <div className="h-40 relative overflow-hidden shrink-0 bg-stone-100 flex flex-col items-center justify-center">
+                          {item.image ? (
+                            <img 
+                              src={item.image} 
+                              alt={item.name} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 absolute inset-0 z-10"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : null}
+                          <div className="text-stone-300 flex flex-col items-center z-0">
+                            <span className="text-[10px] font-bold uppercase tracking-widest mt-2">No Image</span>
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent z-20 pointer-events-none" />
+                          <span className="absolute top-4 left-4 px-3 py-1 bg-stone-950 text-brand-accent rounded-xl text-[10px] font-semibold uppercase tracking-widest border border-amber-500/20 z-30">
                             {item.category}
                           </span>
-                          <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] font-semibold text-white uppercase tracking-widest font-mono">
+                          <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] font-semibold text-white uppercase tracking-widest font-mono z-30">
                             {item.alcoholContent} ABV
                           </span>
-                          <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
+                          <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between z-30">
                             <div>
                               <p className="text-[10px] font-semibold text-amber-400 uppercase tracking-widest mb-1">{item.vintage}</p>
                               <h4 className="text-xl font-semibold text-white tracking-tight leading-tight">{item.name}</h4>
@@ -696,7 +704,7 @@ export const BarLounge: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="p-4 flex-1 flex flex-col justify-between space-y-6">
+                        <div className="p-4 flex-1 flex flex-col space-y-6">
                           <div className="grid grid-cols-3 gap-4">
                             <div className="p-3 bg-stone-50 rounded-2xl text-center border border-stone-100">
                               <p className="text-[8px] font-semibold text-stone-400 uppercase tracking-wider mb-1">State</p>
@@ -712,7 +720,7 @@ export const BarLounge: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between pt-4 border-t border-stone-100">
+                          <div className="flex items-center justify-between pt-4 border-t border-stone-100 mt-auto">
                             <div>
                               <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">Est Glass Pour</p>
                               <p className="text-2xl font-semibold text-stone-950 font-display">₹{item.pricePerGlass.toLocaleString()}</p>

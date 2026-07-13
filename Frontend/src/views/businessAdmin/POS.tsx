@@ -196,29 +196,43 @@ export const POS: React.FC = () => {
         </div>
 
         {/* Menu Grid */}
-        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start content-start custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch content-start custom-scrollbar">
           {filteredItems.map((item) => (
             <motion.div
               layout
               key={item.id || item._id}
               onClick={() => addToCart(item)}
-              className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col h-fit"
+              className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
               whileTap={{ scale: 0.98 }}
             >
-              <div className="relative h-32 rounded-xl overflow-hidden mb-3">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
+              <div className="relative h-32 w-full shrink-0 rounded-xl overflow-hidden mb-3 bg-slate-100 flex flex-col items-center justify-center">
+                {item.image ? (
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 absolute inset-0 z-10" 
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }} 
+                  />
+                ) : null}
+                <div className="text-slate-300 flex flex-col items-center">
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2">No Image</span>
+                </div>
+                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase shadow-sm z-20 ${
                   item.isVeg ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                 }`}>
                   {item.isVeg ? 'Veg' : 'Non-Veg'}
                 </div>
               </div>
-              <h5 className="font-semibold text-slate-900 group-hover:text-brand-accent transition-colors truncate">{item.name}</h5>
-              <p className="text-xs text-slate-500 line-clamp-1 mb-2">{item.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-brand-primary">₹{item.price}</span>
-                <div className="p-1.5 bg-slate-100 rounded-lg text-slate-400 group-hover:bg-brand-accent group-hover:text-white transition-all">
-                  <Plus size={16} strokeWidth={3} />
+              <div className="flex-1 flex flex-col">
+                <h5 className="font-semibold text-slate-900 group-hover:text-brand-accent transition-colors line-clamp-2 mb-1">{item.name}</h5>
+                <p className="text-[10px] text-slate-500 line-clamp-2 min-h-[30px] mb-3">{item.description}</p>
+                <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-100">
+                  <span className="text-lg font-bold text-brand-primary">₹{item.price}</span>
+                  <div className="p-1.5 bg-slate-100 rounded-lg text-slate-400 group-hover:bg-brand-accent group-hover:text-white transition-all shadow-sm">
+                    <Plus size={16} strokeWidth={3} />
+                  </div>
                 </div>
               </div>
             </motion.div>

@@ -277,15 +277,27 @@ export const MenuManagement: React.FC = () => {
       </div>
 
       {/* Grid View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start content-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch content-start">
         {filteredItems.map((item) => (
           <motion.div 
             layout
             key={item.id || (item as any)._id} 
-            className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent transition-all flex flex-col h-fit"
+            className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent transition-all flex flex-col h-full"
           >
-              <div className="relative h-40">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <div className="relative h-40 shrink-0 bg-slate-100 flex flex-col items-center justify-center">
+                {item.image ? (
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 absolute inset-0 z-10" 
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }} 
+                  />
+                ) : null}
+                <div className="text-slate-300 flex flex-col items-center">
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2">No Image</span>
+                </div>
                 <div className="absolute top-4 left-4 flex gap-2">
                    <div className={`px-2 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg ${item.isVeg ? 'bg-brand-success' : 'bg-brand-danger'}`}>
                       {item.isVeg ? 'Veg' : 'Non-Veg'}
@@ -301,8 +313,8 @@ export const MenuManagement: React.FC = () => {
                 </div>
              </div>
 
-             <div className="p-4 space-y-4">
-                <div className="flex items-start justify-between">
+             <div className="p-4 flex-1 flex flex-col">
+                <div className="flex items-start justify-between mb-4">
                    <div className="flex-1">
                       <h4 className="text-xl font-semibold text-brand-primary leading-tight hover:text-brand-accent transition-colors cursor-pointer">{item.name}</h4>
                       <p className="text-xs text-slate-400 font-semibold uppercase tracking-widest mt-1">{item.category}</p>
@@ -315,11 +327,11 @@ export const MenuManagement: React.FC = () => {
                    </div>
                 </div>
 
-                <p className="text-sm text-slate-500 font-medium line-clamp-2 leading-relaxed">
+                <p className="text-sm text-slate-500 font-medium line-clamp-2 leading-relaxed mb-4 min-h-[40px]">
                    {item.description}
                 </p>
 
-                <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
+                <div className="pt-4 border-t border-slate-50 flex items-center justify-between mt-auto">
                    <div className="flex -space-x-2">
                       <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-semibold text-slate-400" title="KDS Tracking Available">K</div>
                       <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-semibold text-slate-400" title="QR Ordering Ready">Q</div>
