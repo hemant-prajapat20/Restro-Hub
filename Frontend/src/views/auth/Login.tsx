@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ArrowRight,
+  ArrowLeft,
   Globe,
   Lock,
   UtensilsCrossed
@@ -114,17 +115,19 @@ export const Login: React.FC = () => {
       <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-brand-success/5 rounded-full blur-3xl pointer-events-none" />
 
+      {/* Back to Home Button */}
+      <Link 
+        to="/" 
+        className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center text-slate-500 hover:text-brand-primary transition-colors font-medium z-50 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-sm hover:shadow-md border border-slate-200"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" />
+        Back to Home
+      </Link>
+
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 h-full max-h-[800px]">
+
         {/* Hero Section */}
         <div className="hidden lg:block space-y-6">
-          <motion.div 
-            whileHover={{ scale: 1.05, rotate: [-1, 1, -1, 0] }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            className="inline-block relative cursor-pointer"
-          >
-            <img src="/logo.png" alt="Dine & Dusk" className="h-28 w-auto object-contain relative z-10 drop-shadow-2xl" />
-          </motion.div>
           <div className="space-y-2">
             <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
               The Operating System for <br /><span className="text-brand-accent">Modern Dining.</span>
@@ -168,18 +171,7 @@ export const Login: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-[420px] mx-auto lg:mx-0 justify-self-center lg:justify-self-center bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
         >
-          <div className="p-6">
-            <div className="lg:hidden flex items-center justify-center mb-10">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-brand-accent/20 blur-lg rounded-full scale-150 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                <img src="/logo.png" alt="Dine & Dusk" className="h-20 w-auto object-contain relative z-10 drop-shadow-xl" />
-              </motion.div>
-            </div>
-
+          <div className="p-5 sm:p-6">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { Login } from './views/auth/Login';
 import { Register } from './views/auth/Register';
 import { SystemOwnerLogin } from './views/auth/SystemOwnerLogin';
+import { LandingPage } from './views/LandingPage';
 import { BusinessAdminLayout } from './layouts/BusinessAdminLayout';
 import { SuperAdminLayout } from './layouts/SuperAdminLayout';
 
@@ -57,7 +58,7 @@ export default function App() {
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/system-owner" element={<SystemOwnerLogin />} />
