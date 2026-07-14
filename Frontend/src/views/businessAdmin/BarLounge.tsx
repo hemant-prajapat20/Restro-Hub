@@ -458,8 +458,8 @@ export const BarLounge: React.FC = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    if (!customerName.trim() && !customerPhone.trim()) {
-      toast.error('Customer Name or Mobile Number is required for billing.');
+    if (!customerName.trim() || !customerPhone.match(/^\d{10}$/)) {
+      toast.error('Customer Name and valid 10-digit Mobile Number are required for billing.');
       return;
     }
 

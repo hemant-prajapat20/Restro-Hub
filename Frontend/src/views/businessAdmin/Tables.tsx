@@ -362,8 +362,8 @@ export const Tables: React.FC = () => {
   };
 
   const handleSettleAndClear = (tableId: string) => {
-    if (!customerName.trim() && !customerPhone.trim()) {
-      toast.error('Customer Name or Mobile Number is required for billing.');
+    if (!customerName.trim() || !customerPhone.match(/^\d{10}$/)) {
+      toast.error('Customer Name and valid 10-digit Mobile Number are required for billing.');
       return;
     }
 
@@ -1130,7 +1130,7 @@ export const Tables: React.FC = () => {
                           handleSettleAndClear(selectedTable.id);
                         }
                       }}
-                      disabled={(getCombinedTableItems(selectedTable.id).length || 0) === 0}
+                      disabled={(getCombinedTableItems(selectedTable.id).length || 0) === 0 || (modalTab === 'checkout' && (!customerName.trim() || !customerPhone.match(/^\d{10}$/)))}
                       className="flex-1 bg-brand-success text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-success/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                        <CheckCircle2 size={18} strokeWidth={3} />
