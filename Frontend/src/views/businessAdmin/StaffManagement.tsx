@@ -147,7 +147,24 @@ export const StaffManagement: React.FC = () => {
   });
 
   const filteredCrew = crew.filter(member => {
-    const matchesCategory = selectedRoleFilter === 'All' || member.role === selectedRoleFilter;
+    let matchesCategory = false;
+    if (selectedRoleFilter === 'All') {
+       matchesCategory = true;
+    } else {
+       const roleLower = member.role.toLowerCase();
+       const filterLower = selectedRoleFilter.toLowerCase();
+       
+       if (filterLower === 'waiter') {
+          matchesCategory = roleLower.includes('waiter') || roleLower.includes('waitress');
+       } else if (filterLower === 'manager') {
+          matchesCategory = roleLower.includes('manager');
+       } else if (filterLower === 'chef') {
+          matchesCategory = roleLower.includes('chef') || roleLower.includes('kitchen') || roleLower.includes('cook');
+       } else {
+          matchesCategory = member.role === selectedRoleFilter;
+       }
+    }
+
     const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           member.role.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
