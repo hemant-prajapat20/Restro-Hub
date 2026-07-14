@@ -7,6 +7,8 @@ export interface IOrderItem {
   quantity: number;
   price: number;
   status: 'Pending' | 'In Kitchen' | 'Ready' | 'Served';
+  variant?: { name: string; price: number };
+  addons?: { name: string; price: number }[];
 }
 
 export interface IOrder extends Document {
@@ -49,7 +51,9 @@ const OrderSchema = new Schema({
     category: { type: String },
     quantity: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true },
-    status: { type: String, enum: ['Pending', 'In Kitchen', 'Ready', 'Served'], default: 'Pending' }
+    status: { type: String, enum: ['Pending', 'In Kitchen', 'Ready', 'Served'], default: 'Pending' },
+    variant: { name: { type: String }, price: { type: Number } },
+    addons: [{ name: { type: String }, price: { type: Number } }]
   }],
   subtotal: { type: Number, required: true },
   tax: { type: Number, required: true },

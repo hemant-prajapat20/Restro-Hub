@@ -121,7 +121,10 @@ export const InvoiceView: React.FC = () => {
                  title: "RESTROHUB TRANSACTION",
                  invoiceNumber: invoiceId,
                  timestamp: new Date(invoice.createdAt || invoice.date).toLocaleString('en-IN'),
-                 items: invoice.items || [],
+                 items: (invoice.items || []).map((item: any) => ({
+                   ...item,
+                   name: `${item.name}${item.variant ? ` (${item.variant.name})` : ''}${item.addons && item.addons.length > 0 ? ` + ${item.addons.map((a:any)=>a.name).join(', ')}` : ''}`
+                 })),
                  subtotal: subtotal,
                  tax: tax,
                  total: grandTotal,
@@ -201,7 +204,15 @@ export const InvoiceView: React.FC = () => {
                 {invoice.items && invoice.items.length > 0 ? invoice.items.map((item: any, idx: number) => (
                   <tr key={idx}>
                     <td className="px-6 py-5 print:py-2">
-                      <p className="font-bold text-slate-900 uppercase print:text-xs">{item.name}</p>
+                      <p className="font-bold text-slate-900 uppercase print:text-xs">
+                        {item.name}
+                        {item.variant && <span className="text-[10px] text-brand-accent ml-2">({item.variant.name})</span>}
+                      </p>
+                      {item.addons && item.addons.length > 0 && (
+                        <p className="text-[10px] font-semibold text-slate-500 mt-0.5 print:text-[8px]">
+                          + {item.addons.map((a:any)=>a.name).join(', ')}
+                        </p>
+                      )}
                       <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1 print:text-[7px]">HSN: 9987 - FOOD & BEVERAGE</p>
                     </td>
                     <td className="px-6 py-5 print:py-2 text-center font-bold text-slate-700 print:text-xs">{(item.quantity || 1).toString().padStart(2, '0')}</td>

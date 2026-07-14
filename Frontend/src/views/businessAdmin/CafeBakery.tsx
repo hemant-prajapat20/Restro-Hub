@@ -16,6 +16,8 @@ interface CafeItem {
   roastOrBakeTime: string;
   scoreOrAward: string;
   image: string;
+  variants?: any[];
+  addons?: any[];
 }
 
 const INITIAL_CAFE_ITEMS: CafeItem[] = [
@@ -71,11 +73,16 @@ interface CartItem {
   milk: 'Whole Milk' | 'Almond' | 'Oat' | 'Soy' | 'None';
   sweetness: 'No Sweet' | 'Mid Sweet' | 'Elegant Sweet';
   notes: string;
+  variant?: any;
+  addons?: any[];
+  customPrice?: number;
 }
 
+import { Clock, Minus, Check, ShoppingBag, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { ItemCustomizationModal } from '../../components/ItemCustomizationModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../utils/api';
-import toast from 'react-hot-toast';
 
 export const CafeBakery: React.FC = () => {
   const queryClient = useQueryClient();
@@ -364,35 +371,64 @@ export const CafeBakery: React.FC = () => {
   };
 
   // Cart operations
-  const addToCart = (product: CafeItem) => {
+  const [customizingItem, setCustomizingItem] = useState<CafeItem | null>(null);
+
+  const handleItemClick = (product: CafeItem) => {
+    if ((product.variants && product.variants.length > 0) || (product.addons && product.addons.length > 0)) {
+      setCustomizingItem(product);
+    } else {
+      addToCart(product);
+    }
+  };
+
+  const addToCart = (product: CafeItem, customizations?: { variant?: any, addons?: any[], quantity?: number, unitPrice?: number }) => {
     const isBeverage = product.category === 'Signature Beverage' || product.category === 'Cold Brew';
     setCart(prev => {
-      const existing = prev.find(item => item.item.id === product.id);
-      if (existing) {
-        return prev.map(item => item.item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      const vKey = customizations?.variant ? customizations.variant.name : '';
+      const aKey = customizations?.addons ? customizations.addons.map((a:any) => a.name).sort().join(',') : '';
+      
+      const existingIndex = prev.findIndex(item => {
+         const iv = item.variant ? item.variant.name : '';
+         const ia = item.addons ? item.addons.map((a:any) => a.name).sort().join(',') : '';
+         return item.item.id === product.id && iv === vKey && ia === aKey;
+      });
+
+      if (existingIndex >= 0) {
+        const newCart = [...prev];
+        newCart[existingIndex].quantity += (customizations?.quantity || 1);
+        return newCart;
       }
       return [...prev, {
         item: product,
-        quantity: 1,
+        quantity: customizations?.quantity || 1,
         milk: isBeverage ? 'Whole Milk' : 'None',
         sweetness: isBeverage ? 'Elegant Sweet' : 'No Sweet',
-        notes: ''
+        notes: '',
+        variant: customizations?.variant,
+        addons: customizations?.addons,
+        customPrice: customizations?.unitPrice
       }];
     });
   };
 
-  const removeOneFromCart = (productId: string) => {
+  const removeOneFromCart = (index: number) => {
     setCart(prev => {
-      const existing = prev.find(item => item.item.id === productId);
-      if (existing && existing.quantity > 1) {
-        return prev.map(item => item.item.id === productId ? { ...item, quantity: item.quantity - 1 } : item);
+      const newCart = [...prev];
+      if (newCart[index].quantity > 1) {
+        newCart[index].quantity -= 1;
+      } else {
+        newCart.splice(index, 1);
       }
-      return prev.filter(item => item.item.id !== productId);
+      return newCart;
     });
   };
 
-  const updateCartModifier = (productId: string, field: 'milk' | 'sweetness' | 'notes', value: any) => {
-    setCart(prev => prev.map(item => item.item.id === productId ? { ...item, [field]: value } : item));
+  const updateCartModifier = (index: number, field: 'milk' | 'sweetness' | 'notes', value: any) => {
+    setCart(prev => {
+      const newCart = [...prev];
+      newCart[index] = { ...newCart[index], [field]: value };
+      return newCart;
+    });
   };
 
   const applyLoyaltyDiscount = () => {
@@ -614,7 +650,8 @@ export const CafeBakery: React.FC = () => {
                   {filteredItems.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/60 transition-all flex flex-col h-full"
+                      onClick={() => handleItemClick(item)}
+                      className="bg-white rounded-2xl border border-stone-200/80 shadow-soft overflow-hidden group hover:border-brand-accent/60 transition-all flex flex-col h-full cursor-pointer"
                     >
                       <div className="h-40 relative overflow-hidden shrink-0 bg-slate-100 flex flex-col items-center justify-center">
                         {item.image ? (
@@ -753,7 +790,7 @@ export const CafeBakery: React.FC = () => {
                 {items.map(item => (
                   <button
                     key={item.id}
-                    onClick={() => addToCart(item)}
+                    onClick={() => handleItemClick(item)}
                     disabled={item.stockCount <= 0}
                     className="p-4 bg-white rounded-2xl border border-stone-200/80 hover:border-brand-accent text-left group flex items-start gap-4 transition-all disabled:opacity-55 cursor-pointer relative"
                   >
@@ -810,26 +847,33 @@ export const CafeBakery: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-6 max-h-[360px] overflow-y-auto custom-scrollbar pr-1">
-                    {cart.map((cartItem) => {
+                    {cart.map((cartItem, idx) => {
                       const isBeverage = cartItem.item.category.includes('Beverage') || cartItem.item.category.includes('Cold Brew');
                       return (
-                        <div key={cartItem.item.id} className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-3">
+                        <div key={idx} className="p-4 bg-stone-50 rounded-2xl border border-stone-150 space-y-3">
                           <div className="flex items-start justify-between gap-4">
                             <div>
                               <p className="text-xs font-semibold text-stone-900">{cartItem.item.name}</p>
-                              <p className="text-[10px] text-stone-400 font-mono">₹{cartItem.item.price} each</p>
+                              {cartItem.variant && <p className="text-[10px] font-semibold text-brand-accent mt-0.5">Size: {cartItem.variant.name}</p>}
+                              {cartItem.addons && cartItem.addons.length > 0 && (
+                                <p className="text-[10px] text-stone-500 mt-0.5">Add-ons: {cartItem.addons.map((a:any) => a.name).join(', ')}</p>
+                              )}
+                              <p className="text-[10px] text-stone-400 font-mono">₹{cartItem.customPrice || cartItem.item.price} each</p>
                             </div>
                             
                             <div className="flex items-center bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
                               <button 
-                                onClick={() => removeOneFromCart(cartItem.item.id)}
+                                onClick={() => removeOneFromCart(idx)}
                                 className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50"
                               >
                                 -
                               </button>
                               <span className="px-3 text-xs font-semibold text-stone-800 font-mono">{cartItem.quantity}</span>
                               <button 
-                                onClick={() => addToCart(cartItem.item)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCart(cartItem.item, { variant: cartItem.variant, addons: cartItem.addons, quantity: 1, unitPrice: cartItem.customPrice });
+                                }}
                                 className="px-2.5 py-1 text-xs font-semibold text-stone-500 hover:bg-stone-50"
                               >
                                 +
@@ -844,7 +888,7 @@ export const CafeBakery: React.FC = () => {
                                 <label className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest block mb-1">Milk Choice</label>
                                 <select
                                   value={cartItem.milk}
-                                  onChange={(e: any) => updateCartModifier(cartItem.item.id, 'milk', e.target.value)}
+                                  onChange={(e: any) => updateCartModifier(idx, 'milk', e.target.value)}
                                   className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-semibold text-stone-700 focus:outline-none"
                                 >
                                   <option value="Whole Milk">Whole Milk</option>
@@ -859,7 +903,7 @@ export const CafeBakery: React.FC = () => {
                                 <label className="text-[8px] font-semibold text-stone-400 uppercase tracking-widest block mb-1">Sweetness</label>
                                 <select
                                   value={cartItem.sweetness}
-                                  onChange={(e: any) => updateCartModifier(cartItem.item.id, 'sweetness', e.target.value)}
+                                  onChange={(e: any) => updateCartModifier(idx, 'sweetness', e.target.value)}
                                   className="w-full px-2 py-1 bg-white border border-stone-200 rounded text-[10px] font-semibold text-stone-700 focus:outline-none"
                                 >
                                   <option value="Elegant Sweet">Maison (Standard)</option>
@@ -872,10 +916,10 @@ export const CafeBakery: React.FC = () => {
 
                           <input 
                             type="text" 
-                            placeholder="Add customized barista remarks..."
+                            placeholder="Add notes (e.g. extra hot)..."
                             value={cartItem.notes}
-                            onChange={(e) => updateCartModifier(cartItem.item.id, 'notes', e.target.value)}
-                            className="w-full px-2.5 py-1.5 bg-white border border-stone-200 rounded-xl text-[9.5px] font-medium text-stone-700 placeholder-stone-300 focus:outline-none focus:ring-1 focus:ring-brand-accent/30"
+                            onChange={(e) => updateCartModifier(idx, 'notes', e.target.value)}
+                            className="w-full px-2 py-1.5 bg-white border border-stone-200 rounded text-[10px] font-medium text-stone-700 focus:outline-none placeholder-stone-300"
                           />
                         </div>
                       );
@@ -1316,6 +1360,17 @@ export const CafeBakery: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      <ItemCustomizationModal 
+        item={customizingItem as any} 
+        isOpen={!!customizingItem} 
+        onClose={() => setCustomizingItem(null)}
+        onConfirm={(data) => {
+          addToCart(customizingItem!, data);
+          setCustomizingItem(null);
+        }}
+      />
+
       {/* Edit Modal */}
       <AnimatePresence>
         {editingItem && (

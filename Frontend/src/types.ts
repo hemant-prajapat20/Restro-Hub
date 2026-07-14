@@ -34,6 +34,8 @@ export interface OrderItem {
   quantity: number;
   price: number;
   notes?: string;
+  variant?: { name: string; price: number };
+  addons?: { name: string; price: number }[];
 }
 
 export interface Order {

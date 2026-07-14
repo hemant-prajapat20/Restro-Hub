@@ -23,6 +23,7 @@ import api from '../../utils/api';
 import { MenuItem, OrderItem } from '../../types';
 import { generateReceiptPDF } from '../../utils/pdfGenerator';
 import { FilterBar } from '../../components/FilterBar';
+import { ItemCustomizationModal } from '../../components/ItemCustomizationModal';
 import { initializeRazorpayPayment } from '../../utils/razorpay';
 
 export const POS: React.FC = () => {
@@ -152,26 +153,55 @@ export const POS: React.FC = () => {
     });
   }, [activeCategory, searchQuery, menuItems]);
 
-  const addToCart = (item: MenuItem) => {
+  const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
+
+  const handleItemClick = (item: MenuItem) => {
     if (editOrderId) return;
+    if ((item.variants && item.variants.length > 0) || (item.addons && item.addons.length > 0)) {
+      setCustomizingItem(item);
+    } else {
+      addToCart({
+        itemId: item.id || (item as any)._id,
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        quantity: 1
+      });
+    }
+  };
+
+  const addToCart = (customizedItem: any) => {
     setCart(prev => {
-      const currentId = item.id || item._id;
-      const existing = prev.find(i => i.itemId === currentId);
-      if (existing) {
-        return prev.map(i => i.itemId === currentId ? { ...i, quantity: i.quantity + 1 } : i);
+      // Create a unique key for the item based on its ID, variant, and addons to group identical customizations
+      const variantKey = customizedItem.variant ? customizedItem.variant.name : '';
+      const addonsKey = customizedItem.addons ? customizedItem.addons.map((a:any) => a.name).sort().join(',') : '';
+      const itemHash = `${customizedItem.itemId}-${variantKey}-${addonsKey}`;
+
+      const existingIndex = prev.findIndex(i => {
+        const iVariantKey = i.variant ? i.variant.name : '';
+        const iAddonsKey = i.addons ? i.addons.map((a:any) => a.name).sort().join(',') : '';
+        return `${i.itemId}-${iVariantKey}-${iAddonsKey}` === itemHash;
+      });
+
+      if (existingIndex >= 0) {
+        const newCart = [...prev];
+        newCart[existingIndex].quantity += customizedItem.quantity;
+        return newCart;
       }
-      return [...prev, { itemId: currentId as string, name: item.name, category: item.category, price: item.price, quantity: 1 }];
+      return [...prev, customizedItem];
     });
   };
 
-  const removeFromCart = (itemId: string) => {
+  const removeFromCart = (index: number) => {
     if (editOrderId) return;
     setCart(prev => {
-      const item = prev.find(i => i.itemId === itemId);
-      if (item && item.quantity > 1) {
-        return prev.map(i => i.itemId === itemId ? { ...i, quantity: i.quantity - 1 } : i);
+      const newCart = [...prev];
+      if (newCart[index].quantity > 1) {
+        newCart[index].quantity -= 1;
+      } else {
+        newCart.splice(index, 1);
       }
-      return prev.filter(i => i.itemId !== itemId);
+      return newCart;
     });
   };
 
@@ -179,9 +209,15 @@ export const POS: React.FC = () => {
   const sgst = subTotal * 0.025;
   const cgst = subTotal * 0.025;
   const total = subTotal + sgst + cgst;
-
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] overflow-y-auto lg:overflow-hidden font-[Inter] font-semibold">
+      <ItemCustomizationModal
+        isOpen={!!customizingItem}
+        onClose={() => setCustomizingItem(null)}
+        item={customizingItem}
+        onConfirm={addToCart}
+      />
+      
       {/* Menu Area */}
       <div className="flex-1 flex flex-col bg-slate-50 min-h-[60vh] lg:min-h-0">
         {/* Top Controls */}
@@ -201,7 +237,7 @@ export const POS: React.FC = () => {
             <motion.div
               layout
               key={item.id || item._id}
-              onClick={() => addToCart(item)}
+              onClick={() => handleItemClick(item)}
               className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
               whileTap={{ scale: 0.98 }}
             >
@@ -267,31 +303,35 @@ export const POS: React.FC = () => {
                <p className="text-xs text-slate-300 mt-1">Start adding items from the menu to create an order.</p>
             </div>
           ) : (
-            cart.map((item) => (
+            cart.map((item, idx) => (
               <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                key={item.itemId} 
+                key={idx} 
                 className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100"
               >
                 <div className="flex-1">
                   <h6 className="font-semibold text-sm text-slate-900 leading-tight">{item.name}</h6>
+                  {item.variant && <p className="text-xs font-semibold text-brand-accent mt-0.5">Size: {item.variant.name}</p>}
+                  {item.addons && item.addons.length > 0 && (
+                    <p className="text-[10px] text-slate-500 mt-0.5">Add-ons: {item.addons.map((a: any) => a.name).join(', ')}</p>
+                  )}
                   <p className="text-xs text-slate-500 mt-0.5">₹{item.price} each</p>
                 </div>
                 <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 p-1">
                   {!editOrderId && (
                     <button 
-                      onClick={() => removeFromCart(item.itemId)}
+                      onClick={() => removeFromCart(idx)}
                       className="p-1 hover:bg-slate-100 rounded text-slate-500"
                     >
                       <Minus size={14} />
                     </button>
                   )}
-                  <span className="text-xs font-semibold w-4 text-center">{item.quantity}</span>
+                  <span className="font-semibold text-sm w-4 text-center">{item.quantity}</span>
                   {!editOrderId && (
                     <button 
-                      onClick={() => addToCart(menuItems.find(m => m.id === item.itemId || (m as any)._id === item.itemId)!)}
-                      className="p-1 hover:bg-slate-100 rounded text-slate-500"
+                      onClick={() => addToCart({ ...item, quantity: 1 })}
+                      className="p-1 hover:bg-slate-100 rounded text-brand-primary"
                     >
                       <Plus size={14} />
                     </button>

@@ -27,6 +27,7 @@ import {
   ChefHat,
   Download
 } from 'lucide-react';
+import { ItemCustomizationModal } from '../../components/ItemCustomizationModal';
 import { initializeRazorpayPayment } from '../../utils/razorpay';
 import { motion, AnimatePresence } from 'motion/react';
 import { Table, TableStatus, MenuItem } from '../../types';
@@ -227,9 +228,24 @@ export const Tables: React.FC = () => {
     }
   });
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
+
+  const handleItemClick = (tableId: string, item: MenuItem) => {
+    if ((item.variants && item.variants.length > 0) || (item.addons && item.addons.length > 0)) {
+      setCustomizingItem(item);
+    } else {
+      addToTableOrder(tableId, {
+        itemId: item.id || (item as any)._id,
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        quantity: 1
+      });
+    }
+  };
 
   // Dynamic table billing state
-  const [tableOrders, setTableOrders] = useState<Record<string, { itemId: string; name: string; price: number; quantity: number }[]>>({
+  const [tableOrders, setTableOrders] = useState<Record<string, { itemId: string; name: string; price: number; quantity: number, variant?: any, addons?: any[] }[]>>({
     'T2': [
       { itemId: '1', name: 'Paneer Tikka Masala', quantity: 1, price: 320 },
       { itemId: '7', name: 'Garlic Naan', quantity: 2, price: 60 }
@@ -265,15 +281,21 @@ export const Tables: React.FC = () => {
       name: i.name,
       price: i.price,
       quantity: i.quantity,
+      variant: i.variant,
+      addons: i.addons,
       isSent: true
     })));
 
     const merged: Record<string, any> = {};
     [...dbItems, ...localItems.map(i => ({...i, isSent: false}))].forEach(item => {
-      if (!merged[item.itemId]) {
-        merged[item.itemId] = { ...item };
+      const variantKey = item.variant ? item.variant.name : '';
+      const addonsKey = item.addons ? item.addons.map((a:any) => a.name).sort().join(',') : '';
+      const hash = `${item.itemId}-${variantKey}-${addonsKey}-${item.isSent}`;
+      
+      if (!merged[hash]) {
+        merged[hash] = { ...item };
       } else {
-        merged[item.itemId].quantity += item.quantity;
+        merged[hash].quantity += item.quantity;
       }
     });
     return Object.values(merged);
@@ -298,7 +320,7 @@ export const Tables: React.FC = () => {
   };
 
   // Adding item to order
-  const addToTableOrder = (tableId: string, menuItem: MenuItem) => {
+  const addToTableOrder = (tableId: string, itemData: any) => {
     const t = tables.find(t => t._id === tableId);
     if (t && (t.status === 'Available' || t.status === 'Reserved' || t.status === 'Cleaning')) {
       updateTableStatusMutation.mutate({ id: tableId, status: 'Occupied' });
@@ -306,40 +328,58 @@ export const Tables: React.FC = () => {
 
     setTableOrders(prev => {
       const items = prev[tableId] || [];
-      const mItemId = (menuItem as any)._id || menuItem.id;
-      const existing = items.find(item => item.itemId === mItemId);
+      const variantKey = itemData.variant ? itemData.variant.name : '';
+      const addonsKey = itemData.addons ? itemData.addons.map((a:any) => a.name).sort().join(',') : '';
+      const itemHash = `${itemData.itemId}-${variantKey}-${addonsKey}`;
+
+      const existingIndex = items.findIndex(item => {
+        const iVariantKey = item.variant ? item.variant.name : '';
+        const iAddonsKey = item.addons ? item.addons.map((a:any) => a.name).sort().join(',') : '';
+        return `${item.itemId}-${iVariantKey}-${iAddonsKey}` === itemHash;
+      });
+
       let updated;
-      if (existing) {
-        updated = items.map(item => item.itemId === mItemId ? { ...item, quantity: item.quantity + 1 } : item);
+      if (existingIndex >= 0) {
+        updated = [...items];
+        updated[existingIndex].quantity += itemData.quantity || 1;
       } else {
-        updated = [...items, { itemId: mItemId, name: menuItem.name, price: menuItem.price, quantity: 1 }];
+        updated = [...items, { ...itemData, quantity: itemData.quantity || 1 }];
       }
       return { ...prev, [tableId]: updated };
     });
   };
 
   // Removing item from order
-  const removeFromTableOrder = (tableId: string, itemId: string) => {
+  const removeFromTableOrder = (tableId: string, itemHash: string) => {
     setTableOrders(prev => {
       const items = prev[tableId] || [];
-      const existing = items.find(item => item.itemId === itemId);
-      if (!existing) return prev;
-      let updated;
-      if (existing.quantity > 1) {
-        updated = items.map(item => item.itemId === itemId ? { ...item, quantity: item.quantity - 1 } : item);
+      const updated = [...items];
+      const index = updated.findIndex(item => {
+          const v = item.variant ? item.variant.name : '';
+          const a = item.addons ? item.addons.map((ad:any) => ad.name).sort().join(',') : '';
+          return `${item.itemId}-${v}-${a}` === itemHash;
+      });
+      
+      if (index === -1) return prev;
+      
+      if (updated[index].quantity > 1) {
+        updated[index].quantity -= 1;
       } else {
-        updated = items.filter(item => item.itemId !== itemId);
+        updated.splice(index, 1);
       }
       return { ...prev, [tableId]: updated };
     });
   };
 
   // Completely clear item line
-  const clearItemFromOrder = (tableId: string, itemId: string) => {
+  const clearItemFromOrder = (tableId: string, itemHash: string) => {
     setTableOrders(prev => {
       const items = prev[tableId] || [];
-      const updated = items.filter(item => item.itemId !== itemId);
-      return { ...prev, [tableId]: updated };
+      return { ...prev, [tableId]: items.filter(item => {
+          const v = item.variant ? item.variant.name : '';
+          const a = item.addons ? item.addons.map((ad:any) => ad.name).sort().join(',') : '';
+          return `${item.itemId}-${v}-${a}` !== itemHash;
+      })};
     });
   };
 
@@ -628,12 +668,12 @@ export const Tables: React.FC = () => {
                     <span className="font-mono text-slate-900 font-extrabold">₹{computeTableTotal(table._id).toLocaleString()}</span>
                  </div>
                  
-                 {getCombinedTableItems(table._id).length > 0 && getCombinedTableItems(table._id).length > 0 && (
+                 {getCombinedTableItems(table._id).length > 0 && (
                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Active Order</p>
                      <div className="space-y-1.5 max-h-24 overflow-y-auto custom-scrollbar">
                        {getCombinedTableItems(table._id).map(item => (
-                         <div key={item.itemId} className="flex justify-between items-start text-xs">
+                         <div key={`${item.itemId}-${item.variant?.name}-${item.addons?.map((a:any)=>a.name).join(',')}`} className="flex justify-between items-start text-xs">
                            <span className="text-slate-700 font-medium truncate pr-2"><span className="text-slate-400">{item.quantity}x</span> {item.name}</span>
                            <span className="text-slate-500 font-mono">₹{item.price * item.quantity}</span>
                          </div>
@@ -863,35 +903,39 @@ export const Tables: React.FC = () => {
 
                            <div className="bg-white border-2 border-slate-100 rounded-[32px] p-6 space-y-4">
                              <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-                               {getCombinedTableItems(selectedTable.id).map(item => (
-                                 <div key={item.itemId} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-xl hover:bg-slate-50/80">
+                               {getCombinedTableItems(selectedTable.id).map(item => {
+                                  const v = item.variant ? item.variant.name : '';
+                                  const a = item.addons ? item.addons.map((ad:any) => ad.name).sort().join(',') : '';
+                                  const hash = `${item.itemId}-${v}-${a}`;
+                                  return (
+                                 <div key={hash} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-xl hover:bg-slate-50/80">
                                    <div className="truncate flex-1">
                                      <p className="text-xs font-semibold text-slate-800 truncate">{item.name}</p>
                                      <p className="text-[10px] text-slate-400 font-mono">₹{item.price} each</p>
                                    </div>
                                    <div className="flex items-center gap-2">
                                      <button 
-                                       onClick={() => removeFromTableOrder(selectedTable.id, item.itemId)}
+                                       onClick={() => removeFromTableOrder(selectedTable.id, hash)}
                                        className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-semibold text-xs"
                                      >
                                        -
                                      </button>
                                      <span className="text-xs font-bold text-slate-950 font-mono min-w-[14px] text-center">{item.quantity}</span>
                                      <button 
-                                       onClick={() => addToTableOrder(selectedTable.id, { id: item.itemId, name: item.name, price: item.price } as MenuItem)}
+                                       onClick={() => addToTableOrder(selectedTable.id, item)}
                                        className="w-6 h-6 bg-white border border-slate-200 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center font-semibold text-xs"
                                      >
                                        +
                                      </button>
                                      <button 
-                                       onClick={() => clearItemFromOrder(selectedTable.id, item.itemId)}
+                                       onClick={() => clearItemFromOrder(selectedTable.id, hash)}
                                        className="text-red-450 hover:text-red-600 pl-1"
                                      >
                                        <Trash2 size={13} />
                                      </button>
                                    </div>
                                  </div>
-                               ))}
+                               );})}
                              </div>
 
                              {/* Pricing & Ledger Details */}
@@ -1044,7 +1088,6 @@ export const Tables: React.FC = () => {
                        <div className="space-y-3 max-h-[365px] overflow-y-auto custom-scrollbar pr-1">
                          {filteredMenuItems.map(dish => {
                            const itemId = dish._id || dish.id;
-                           const quantity = getCombinedTableItems(selectedTable.id).find(i => i.itemId === itemId)?.quantity || 0;
                            return (
                              <div key={itemId} className="p-3 bg-white border border-slate-150 rounded-2xl flex items-center gap-4 hover:border-brand-accent/40 transition-all">
                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 flex-shrink-0">
@@ -1057,32 +1100,12 @@ export const Tables: React.FC = () => {
                                  <h5 className="text-xs font-semibold text-slate-800 truncate mt-1">{dish.name}</h5>
                                  <p className="text-xs font-mono text-slate-500 font-semibold mb-0.5">₹{dish.price}</p>
                                </div>
-                               <div className="flex items-center gap-2">
-                                 {quantity > 0 ? (
-                                   <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
-                                     <button
-                                       onClick={() => removeFromTableOrder(selectedTable.id, itemId)}
-                                       className="px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
-                                     >
-                                       -
-                                     </button>
-                                     <span className="px-2 text-xs font-semibold text-slate-800 font-mono">{quantity}</span>
-                                     <button
-                                       onClick={() => addToTableOrder(selectedTable.id, dish)}
-                                       className="px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
-                                     >
-                                       +
-                                     </button>
-                                   </div>
-                                 ) : (
-                                   <button
-                                     onClick={() => addToTableOrder(selectedTable.id, dish)}
-                                     className="px-3 py-1.5 bg-brand-accent text-white text-[10px] font-semibold uppercase tracking-wider rounded-lg hover:scale-105 active:scale-95 transition-all"
-                                   >
-                                     ADD +
-                                   </button>
-                                 )}
-                               </div>
+                               <button
+                                 onClick={() => handleItemClick(selectedTable.id, dish)}
+                                 className="px-3 py-1.5 bg-brand-accent text-white text-[10px] font-semibold uppercase tracking-wider rounded-lg hover:scale-105 active:scale-95 transition-all"
+                               >
+                                 ADD +
+                               </button>
                              </div>
                            );
                          })}
@@ -1106,6 +1129,8 @@ export const Tables: React.FC = () => {
                             name: i.name,
                             quantity: i.quantity,
                             price: i.price,
+                            variant: i.variant,
+                            addons: i.addons,
                             status: 'Pending'
                           })),
                           subtotal: computeTableSubtotal(selectedTable.id),
@@ -1147,6 +1172,17 @@ export const Tables: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      <ItemCustomizationModal 
+        item={customizingItem} 
+        isOpen={!!customizingItem} 
+        onClose={() => setCustomizingItem(null)}
+        onConfirm={(data) => {
+          if (selectedTableId) {
+             addToTableOrder(selectedTableId, data);
+          }
+        }}
+      />
 
       {/* Add Table Modal */}
       <AnimatePresence>

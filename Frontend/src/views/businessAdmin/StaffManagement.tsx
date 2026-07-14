@@ -580,16 +580,13 @@ export const StaffManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
-                    <select 
+                    <input 
+                      type="text"
+                      placeholder="e.g. Junior Waiter, Executive Chef"
                       value={newRole} 
                       onChange={(e) => setNewRole(e.target.value)}
-                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600"
-                    >
-                      <option value="" disabled>Select a Category...</option>
-                      {staffCategories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
+                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600 focus:outline-none"
+                    />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Assigned Shift</label>

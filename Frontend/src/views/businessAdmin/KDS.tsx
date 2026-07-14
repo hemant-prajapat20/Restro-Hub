@@ -186,7 +186,7 @@ export const KDS: React.FC = () => {
                     <button
                       onClick={() => {
                         if (window.confirm('Are you sure you want to delete this order?')) {
-                          updateOrderStatus(order._id, 'Cancelled');
+                          updateOrderStatus(order._id, 'Cancelled' as any);
                         }
                       }}
                       className="text-slate-500 hover:text-red-500 transition-colors mt-0.5"
