@@ -81,7 +81,7 @@ export default function App() {
 
             {/* Business Admin / Staff Routes */}
             <Route path="/admin" element={<BusinessAdminLayout />}>
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route index element={<Navigate to="/admin/tables" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="pos" element={<POS />} />
               <Route path="restro" element={<RestroSignature />} />

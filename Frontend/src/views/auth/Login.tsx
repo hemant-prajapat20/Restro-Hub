@@ -36,7 +36,7 @@ export const Login: React.FC = () => {
       } else if (user.role === 'SUPER_ADMIN') {
         navigate('/super-admin', { replace: true });
       } else if (user.role === 'BUSINESS_ADMIN' || user.role === 'STAFF') {
-        navigate('/admin/dashboard', { replace: true });
+        navigate('/admin/tables', { replace: true });
       } else {
         // Prevent infinite redirect loop for unknown roles or corrupted state
         dispatch(setCredentials({ user: null, token: null }));
@@ -89,7 +89,7 @@ export const Login: React.FC = () => {
       } else if (data.data.role === 'SUPER_ADMIN') {
         navigate('/super-admin');
       } else if (data.data.role === 'BUSINESS_ADMIN' || data.data.role === 'STAFF') {
-        navigate('/admin/dashboard');
+        navigate('/admin/tables');
       } else {
         setError('Unauthorized role detected. Please contact support.');
       }
@@ -117,9 +117,14 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10 h-full max-h-[800px]">
         {/* Hero Section */}
         <div className="hidden lg:block space-y-6">
-          <div className="w-12 h-12 bg-brand-accent rounded-[16px] flex items-center justify-center shadow-xl shadow-brand-accent/40 rotate-3">
-            <UtensilsCrossed className="text-white w-6 h-6" />
-          </div>
+          <motion.div 
+            whileHover={{ scale: 1.05, rotate: [-1, 1, -1, 0] }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="inline-block relative cursor-pointer"
+          >
+            <img src="/logo.png" alt="Dine & Dusk" className="h-28 w-auto object-contain relative z-10 drop-shadow-2xl" />
+          </motion.div>
           <div className="space-y-2">
             <h1 className="text-4xl font-black text-slate-900 leading-[1.1] tracking-tighter">
               The Operating System for <br /><span className="text-brand-accent">Modern Dining.</span>
@@ -164,11 +169,15 @@ export const Login: React.FC = () => {
           className="w-full max-w-[420px] mx-auto lg:mx-0 justify-self-center lg:justify-self-center bg-white rounded-[20px] shadow-soft border border-slate-200 flex flex-col"
         >
           <div className="p-6">
-            <div className="lg:hidden flex items-center gap-3 mb-10">
-              <div className="w-10 h-10 bg-brand-accent rounded-xl flex items-center justify-center">
-                <UtensilsCrossed className="text-white w-6 h-6" />
-              </div>
-              <h1 className="text-xl font-black font-display tracking-tight"><span className="text-black">Restro</span><span className="text-brand-accent">Hub</span></h1>
+            <div className="lg:hidden flex items-center justify-center mb-10">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-brand-accent/20 blur-lg rounded-full scale-150 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                <img src="/logo.png" alt="Dine & Dusk" className="h-20 w-auto object-contain relative z-10 drop-shadow-xl" />
+              </motion.div>
             </div>
 
             <motion.div
