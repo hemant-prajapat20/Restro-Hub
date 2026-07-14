@@ -16,31 +16,25 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
   item,
   onConfirm
 }) => {
-  const [selectedVariant, setSelectedVariant] = useState<{name: string, price: number} | null>(null);
-  const [selectedAddons, setSelectedAddons] = useState<{name: string, price: number}[]>([]);
+  const [selectedVariant, setSelectedVariant] = useState<{ name: string, price: number } | null>(null);
+  const [selectedAddons, setSelectedAddons] = useState<{ name: string, price: number }[]>([]);
   const [quantity, setQuantity] = useState(1);
-  const [customAddonName, setCustomAddonName] = useState('');
-  const [customAddonPrice, setCustomAddonPrice] = useState('');
+  const [pizzaSlices, setPizzaSlices] = useState<number | null>(null);
 
   // Reset state when a new item is selected
   useEffect(() => {
     if (item && isOpen) {
-      if (item.variants && item.variants.length > 0) {
-        // Automatically select the first variant by default
-        setSelectedVariant(item.variants[0]);
-      } else {
-        setSelectedVariant(null);
-      }
+      // Set default to Regular size
+      setSelectedVariant({ name: 'Regular', price: item.price });
       setSelectedAddons([]);
       setQuantity(1);
-      setCustomAddonName('');
-      setCustomAddonPrice('');
+      setPizzaSlices(4); // Default to 4 slices
     }
   }, [item, isOpen]);
 
   if (!isOpen || !item) return null;
 
-  const toggleAddon = (addon: {name: string, price: number}) => {
+  const toggleAddon = (addon: { name: string, price: number }) => {
     setSelectedAddons(prev => {
       // Find exact match by name AND price so custom ones can coexist
       const existsIndex = prev.findIndex(a => a.name === addon.name && a.price === addon.price);
@@ -52,18 +46,26 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
     });
   };
 
-  const handleAddCustom = () => {
-    if (!customAddonName.trim()) return;
-    const price = Number(customAddonPrice) || 0;
-    setSelectedAddons(prev => [...prev, { name: customAddonName.trim(), price }]);
-    setCustomAddonName('');
-    setCustomAddonPrice('');
-  };
-
   const calculateUnitPrice = () => {
-    const basePrice = selectedVariant ? selectedVariant.price : item.price;
+    const basePrice = item.price;
+    let variantPrice = basePrice;
+
+    // Apply variant multiplier
+    if (selectedVariant?.name === 'Medium') {
+      variantPrice = Math.round(basePrice * 0.6); // 60% of base price
+    }
+
+    // Add addons
     const addonsTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
-    return basePrice + addonsTotal;
+
+    // Add slice extra charge (₹50 per slice, base is 4 slices included)
+    let sliceExtra = 0;
+    if (pizzaSlices && pizzaSlices > 4) {
+      const extraSlices = pizzaSlices - 4;
+      sliceExtra = extraSlices * 50; // ₹50 per extra slice
+    }
+
+    return variantPrice + addonsTotal + sliceExtra;
   };
 
   const unitPrice = calculateUnitPrice();
@@ -77,7 +79,8 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
       price: unitPrice, // Adjusted unit price
       quantity: quantity,
       variant: selectedVariant || undefined,
-      addons: selectedAddons.length > 0 ? selectedAddons : undefined
+      addons: selectedAddons.length > 0 ? selectedAddons : undefined,
+      pizzaSlices: pizzaSlices || undefined
     };
     onConfirm(customizedItem);
     onClose();
@@ -98,10 +101,10 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white rounded-[24px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+          className="bg-white rounded-[24px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]"
         >
           {/* Header */}
-          <div className="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+          <div className="p-5 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <div>
               <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${item.isVeg ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                 {item.category}
@@ -114,35 +117,63 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
             {/* Variants Section */}
-            {hasVariants && (
-              <div className="space-y-4">
-                <div className="flex justify-between items-end">
-                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Select Variant</h3>
-                  <span className="text-[10px] font-bold text-brand-accent uppercase bg-brand-accent/10 px-2 py-1 rounded">Required</span>
-                </div>
-                <div className="space-y-2">
-                  {item.variants!.map((variant, idx) => (
-                    <div 
-                      key={idx}
-                      onClick={() => setSelectedVariant(variant)}
-                      className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                        selectedVariant?.name === variant.name 
-                          ? 'border-brand-accent bg-brand-accent/5' 
-                          : 'border-slate-100 hover:border-slate-200 bg-white'
-                      }`}
+            <div className="space-y-4">
+              <div className="flex justify-between items-end">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Select Size</h3>
+                <span className="text-[10px] font-bold text-brand-accent uppercase bg-brand-accent/10 px-2 py-1 rounded">Required</span>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { name: 'Regular', multiplier: 1 },
+                  { name: 'Medium', multiplier: 0.6 }
+                ].map((variant) => {
+                  const variantPrice = Math.round(item.price * variant.multiplier);
+                  const priceDisplay = variant.multiplier === 1 ? `₹${variantPrice}` : `₹${variantPrice} (60%)`;
+                  return (
+                    <div
+                      key={variant.name}
+                      onClick={() => setSelectedVariant({ name: variant.name, price: variantPrice })}
+                      className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedVariant?.name === variant.name
+                        ? 'border-brand-accent bg-brand-accent/5'
+                        : 'border-slate-100 hover:border-slate-200 bg-white'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                          selectedVariant?.name === variant.name ? 'border-brand-accent' : 'border-slate-300'
-                        }`}>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedVariant?.name === variant.name ? 'border-brand-accent' : 'border-slate-300'
+                          }`}>
                           {selectedVariant?.name === variant.name && <div className="w-2.5 h-2.5 bg-brand-accent rounded-full" />}
                         </div>
                         <span className="font-semibold text-slate-700">{variant.name}</span>
                       </div>
-                      <span className="font-bold text-slate-900 font-mono">₹{variant.price}</span>
+                      <span className="font-bold text-slate-900 font-mono">{priceDisplay}</span>
                     </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Pizza Slices/Pieces Section (for Pizza items) */}
+            {item.category?.toLowerCase().includes('pizza') && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Slices</h3>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">4 Slices Included</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {[4, 6, 8].map(slice => (
+                    <button
+                      key={slice}
+                      onClick={() => setPizzaSlices(slice)}
+                      className={`p-3 rounded-xl border-2 font-bold text-xs transition-all flex flex-col items-center gap-1 ${pizzaSlices === slice
+                        ? 'border-brand-accent bg-brand-accent/10 text-brand-accent'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                        }`}
+                    >
+                      <span>{slice}</span>
+                      <span className="text-[10px]">{slice === 4 ? 'Included' : `+₹${(slice - 4) * 50}`}</span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -159,19 +190,17 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                   {item.addons!.map((addon, idx) => {
                     const isSelected = selectedAddons.some(a => a.name === addon.name);
                     return (
-                      <div 
+                      <div
                         key={idx}
                         onClick={() => toggleAddon(addon)}
-                        className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          isSelected
-                            ? 'border-brand-success bg-brand-success/5' 
-                            : 'border-slate-100 hover:border-slate-200 bg-white'
-                        }`}
+                        className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
+                          ? 'border-brand-success bg-brand-success/5'
+                          : 'border-slate-100 hover:border-slate-200 bg-white'
+                          }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                            isSelected ? 'border-brand-success bg-brand-success' : 'border-slate-300 bg-white'
-                          }`}>
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-brand-success bg-brand-success' : 'border-slate-300 bg-white'
+                            }`}>
                             {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
                           </div>
                           <span className="font-semibold text-slate-700">{addon.name}</span>
@@ -185,59 +214,68 @@ export const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
             )}
 
             {/* Custom Request Section */}
-            <div className="space-y-4 pt-4 border-t border-slate-100">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Custom Modifier</h3>
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  placeholder="e.g. Extra Spicy, Open Charge..." 
-                  value={customAddonName}
-                  onChange={(e) => setCustomAddonName(e.target.value)}
-                  className="flex-[2] p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-accent text-sm" 
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddCustom()}
-                />
-                <input 
-                  type="number" 
-                  placeholder="Price (₹)" 
-                  value={customAddonPrice}
-                  onChange={(e) => setCustomAddonPrice(e.target.value)}
-                  className="flex-1 p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-accent text-sm" 
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddCustom()}
-                />
-                <button 
-                  onClick={handleAddCustom}
-                  className="px-4 py-3 bg-brand-accent text-white rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-brand-primary transition-colors"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
 
             {/* Quantity Selector */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-               <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Quantity</h3>
-               <div className="flex items-center bg-slate-100 rounded-xl p-1">
-                 <button 
-                   onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                   className="w-10 h-10 flex items-center justify-center bg-white rounded-lg text-slate-600 shadow-sm hover:text-slate-900"
-                 >
-                   <Minus size={18} />
-                 </button>
-                 <span className="w-12 text-center font-bold text-slate-800">{quantity}</span>
-                 <button 
-                   onClick={() => setQuantity(q => q + 1)}
-                   className="w-10 h-10 flex items-center justify-center bg-white rounded-lg text-slate-600 shadow-sm hover:text-slate-900"
-                 >
-                   <Plus size={18} />
-                 </button>
-               </div>
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Quantity</h3>
+              <div className="flex items-center bg-slate-100 rounded-xl p-1">
+                <button
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  className="w-10 h-10 flex items-center justify-center bg-white rounded-lg text-slate-600 shadow-sm hover:text-slate-900"
+                >
+                  <Minus size={18} />
+                </button>
+                <span className="w-12 text-center font-bold text-slate-800">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(q => q + 1)}
+                  className="w-10 h-10 flex items-center justify-center bg-white rounded-lg text-slate-600 shadow-sm hover:text-slate-900"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-slate-100 bg-white">
+          <div className="p-5 border-t border-slate-100 bg-white">
+            {/* Price Breakdown */}
+            <div className="mb-4 p-3 bg-slate-50 rounded-xl space-y-1.5 text-xs">
+              <div className="flex justify-between text-slate-600">
+                <span>Base Price:</span>
+                <span>₹{item.price}</span>
+              </div>
+              {selectedVariant && selectedVariant.name === 'Medium' && (
+                <div className="flex justify-between text-slate-600">
+                  <span>Size ({selectedVariant.name} 60%):</span>
+                  <span className="text-red-600">-₹{item.price - selectedVariant.price}</span>
+                </div>
+              )}
+              {selectedAddons.length > 0 && (
+                <div className="flex justify-between text-slate-600">
+                  <span>Add-ons ({selectedAddons.length}):</span>
+                  <span className="text-brand-accent">+₹{selectedAddons.reduce((sum, a) => sum + a.price, 0)}</span>
+                </div>
+              )}
+              {pizzaSlices && pizzaSlices > 4 && (
+                <div className="flex justify-between text-slate-600">
+                  <span>Extra {pizzaSlices - 4} Slices (₹50 each):</span>
+                  <span className="text-brand-accent">+₹{(pizzaSlices - 4) * 50}</span>
+                </div>
+              )}
+              {pizzaSlices && pizzaSlices <= 4 && (
+                <div className="flex justify-between text-slate-600">
+                  <span>Slices:</span>
+                  <span>{pizzaSlices} (Included)</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-slate-800 pt-1.5 border-t border-slate-200">
+                <span>Per Item:</span>
+                <span>₹{unitPrice}</span>
+              </div>
+            </div>
+
             <div className="flex justify-between items-end mb-4">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Item Total</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total ({quantity}x)</span>
               <span className="text-2xl font-bold text-brand-primary font-mono">₹{totalPrice}</span>
             </div>
             <button
