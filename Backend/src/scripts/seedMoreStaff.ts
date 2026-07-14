@@ -11,7 +11,7 @@ const NEW_STAFF = [
     name: 'Emma Roberts',
     role: 'Senior Waitress',
     contact: '9876543210',
-    email: 'emma.r@restrohub.com',
+    email: 'emma.r@dineandusk.com',
     shift: 'Morning (8 AM - 4 PM)',
     salary: 25000,
     score: 4.8,
@@ -22,7 +22,7 @@ const NEW_STAFF = [
     name: 'Michael Chen',
     role: 'Sous Chef',
     contact: '8765432109',
-    email: 'michael.c@restrohub.com',
+    email: 'michael.c@dineandusk.com',
     shift: 'Evening (4 PM - 12 AM)',
     salary: 45000,
     score: 4.9,
@@ -33,7 +33,7 @@ const NEW_STAFF = [
     name: 'Sarah Jenkins',
     role: 'Bartender',
     contact: '7654321098',
-    email: 'sarah.j@restrohub.com',
+    email: 'sarah.j@dineandusk.com',
     shift: 'Evening (4 PM - 12 AM)',
     salary: 30000,
     score: 4.7,
@@ -44,7 +44,7 @@ const NEW_STAFF = [
     name: 'David Wilson',
     role: 'Restaurant Manager',
     contact: '6543210987',
-    email: 'david.w@restrohub.com',
+    email: 'david.w@dineandusk.com',
     shift: 'Full Day (10 AM - 10 PM)',
     salary: 65000,
     score: 5.0,
@@ -55,13 +55,13 @@ const NEW_STAFF = [
 
 const seedAdditionalStaff = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
     const business = await Business.findOne();
     if (!business) {
       console.log('No business found. Run the main seeder first.');
       process.exit(1);
     }
-    
+
     console.log('Seeding additional staff...');
     for (const staffData of NEW_STAFF) {
       const existing = await Staff.findOne({ businessId: business._id, contact: staffData.contact });

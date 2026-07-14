@@ -32,7 +32,7 @@ const toWords = (num: number): string => {
 
   let result = '';
   let wholeNumber = Math.floor(num);
-  
+
   if (wholeNumber >= 1000000) {
     result += convertLessThanOneThousand(Math.floor(wholeNumber / 1000000)) + 'Million ';
     wholeNumber %= 1000000;
@@ -77,67 +77,67 @@ export const InvoiceView: React.FC = () => {
   const grandTotal = invoice.total || invoice.amount;
   const subtotal = invoice.subtotal || (grandTotal - (invoice.tax || 0));
   const tax = invoice.tax || 0;
-  
+
   const invoiceId = invoice.transactionId ? invoice.transactionId : (invoice._id?.slice(-8).toUpperCase() || invoice.id?.slice(-8).toUpperCase());
   const dateFormatted = new Date(invoice.createdAt || invoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-  
+
   return (
     <div className="bg-[#f8f9fc] min-h-screen font-sans text-slate-800 pb-10 print:bg-white print:pb-0 print:h-[297mm] print:overflow-hidden">
-      
+
       {/* Top Action Bar */}
       <div className="px-10 py-6 flex justify-between items-center print:hidden bg-white border-b border-slate-100 shadow-sm sticky top-0 z-50">
-        <button 
+        <button
           onClick={() => {
             if (window.history.length > 1) {
               navigate(-1);
             } else {
               navigate('/business-admin?tab=transactions');
             }
-          }} 
+          }}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold transition-colors"
         >
           <ChevronLeft size={20} /> Back
         </button>
         <div className="flex gap-4">
-          <button 
-             onClick={() => {
-               const phone = invoice.customerDetails?.phone || '';
-               if (phone) {
-                 const cleanPhone = phone.replace(/\D/g, '');
-                 const finalPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-                 window.open(`https://wa.me/${finalPhone}?text=Hello! Here is your invoice link for RestroHub transaction ${invoiceId}`, '_blank');
-               } else {
-                 toast.error('No mobile number available for this customer');
-               }
-             }}
-             className="px-6 py-3 bg-[#25D366] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-[#1ebd57] transition-colors flex items-center justify-center gap-2 shadow-sm"
-           >
-             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-             Send WhatsApp
-           </button>
-           <button 
-             onClick={() => {
-               generateReceiptPDF({
-                 title: "RESTROHUB TRANSACTION",
-                 invoiceNumber: invoiceId,
-                 timestamp: new Date(invoice.createdAt || invoice.date).toLocaleString('en-IN'),
-                 items: (invoice.items || []).map((item: any) => ({
-                   ...item,
-                   name: `${item.name}${item.variant ? ` (${item.variant.name})` : ''}${item.addons && item.addons.length > 0 ? ` + ${item.addons.map((a:any)=>a.name).join(', ')}` : ''}`
-                 })),
-                 subtotal: subtotal,
-                 tax: tax,
-                 total: grandTotal,
-                 customerName: invoice.customerDetails?.name || 'Walk-in',
-                 customerPhone: invoice.customerDetails?.phone || 'N/A',
-                 paymentMethod: invoice.paymentMethod || 'Cash'
-               });
-               toast.success('Invoice downloaded successfully');
-             }}
-             className="px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm"
-           >
-             <Download size={18} /> Download PDF
-           </button>
+          <button
+            onClick={() => {
+              const phone = invoice.customerDetails?.phone || '';
+              if (phone) {
+                const cleanPhone = phone.replace(/\D/g, '');
+                const finalPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+                window.open(`https://wa.me/${finalPhone}?text=Hello! Here is your invoice link for Dine & Dusk transaction ${invoiceId}`, '_blank');
+              } else {
+                toast.error('No mobile number available for this customer');
+              }
+            }}
+            className="px-6 py-3 bg-[#25D366] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-[#1ebd57] transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            Send WhatsApp
+          </button>
+          <button
+            onClick={() => {
+              generateReceiptPDF({
+                title: "DINE & DUSK TRANSACTION",
+                invoiceNumber: invoiceId,
+                timestamp: new Date(invoice.createdAt || invoice.date).toLocaleString('en-IN'),
+                items: (invoice.items || []).map((item: any) => ({
+                  ...item,
+                  name: `${item.name}${item.variant ? ` (${item.variant.name})` : ''}${item.addons && item.addons.length > 0 ? ` + ${item.addons.map((a: any) => a.name).join(', ')}` : ''}`
+                })),
+                subtotal: subtotal,
+                tax: tax,
+                total: grandTotal,
+                customerName: invoice.customerDetails?.name || 'Walk-in',
+                customerPhone: invoice.customerDetails?.phone || 'N/A',
+                paymentMethod: invoice.paymentMethod || 'Cash'
+              });
+              toast.success('Invoice downloaded successfully');
+            }}
+            className="px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm"
+          >
+            <Download size={18} /> Download PDF
+          </button>
           <button onClick={() => window.print()} className="px-6 py-3 bg-[#C5A059] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-[#b58c44] transition-colors flex items-center gap-2 shadow-lg shadow-[#C5A059]/30">
             <Printer size={18} /> Print to Printer
           </button>
@@ -146,15 +146,15 @@ export const InvoiceView: React.FC = () => {
 
       {/* Invoice Container */}
       <div className="max-w-4xl mx-auto my-8 shadow-2xl rounded-2xl overflow-hidden bg-white print:shadow-none print:my-0 print:rounded-none print:w-full print:min-h-0 print:h-full print:scale-[0.95] print:origin-top">
-        
+
         {/* Golden Header */}
         <div className="bg-[#C5A059] text-white px-10 py-12 print:px-6 print:py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 print:gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 backdrop-blur-sm shadow-inner print:w-12 print:h-12">
-               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 print:w-6 print:h-6 text-white"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" strokeLinecap="round" strokeLinejoin="round"/><circle cx="5" cy="19" r="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 print:w-6 print:h-6 text-white"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" strokeLinecap="round" strokeLinejoin="round" /><circle cx="5" cy="19" r="1" /></svg>
             </div>
             <div>
-              <h1 className="text-2xl print:text-xl font-black tracking-wide uppercase">RESTROHUB</h1>
+              <h1 className="text-2xl print:text-xl font-black tracking-wide uppercase">DINE & DUSK</h1>
               <p className="text-[10px] print:text-[8px] font-bold tracking-[0.2em] text-orange-100 uppercase mt-1">Premium Dining Solutions</p>
             </div>
           </div>
@@ -174,17 +174,17 @@ export const InvoiceView: React.FC = () => {
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-200 pb-2">Customer Details</p>
               <h3 className="text-lg font-bold text-slate-900 mb-3">{invoice.customerDetails?.name || 'Walk-in Customer'}</h3>
               <div className="space-y-2 text-xs font-bold text-slate-500">
-                <p className="flex items-center gap-2"><Phone size={14} className="text-[#C5A059]"/> {invoice.customerDetails?.phone || 'N/A'}</p>
-                <p className="flex items-start gap-2"><MapPin size={14} className="text-[#C5A059] shrink-0 mt-0.5"/> <span className="leading-tight">{invoice.customerDetails?.address || 'N/A'}</span></p>
+                <p className="flex items-center gap-2"><Phone size={14} className="text-[#C5A059]" /> {invoice.customerDetails?.phone || 'N/A'}</p>
+                <p className="flex items-start gap-2"><MapPin size={14} className="text-[#C5A059] shrink-0 mt-0.5" /> <span className="leading-tight">{invoice.customerDetails?.address || 'N/A'}</span></p>
               </div>
             </div>
             <div className="bg-[#f8f9fc] rounded-2xl p-6 border border-slate-100">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-200 pb-2">Provider Information</p>
-              <h3 className="text-lg font-bold text-slate-900 mb-3">{businessData?.name || 'RestroHub Center'}</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-3">{businessData?.name || 'Dine & Dusk Center'}</h3>
               <div className="space-y-2 text-xs font-bold text-slate-500">
-                <p className="flex items-center gap-2"><MapPin size={14} className="text-[#C5A059]"/> {businessData ? `${businessData.address}, ${businessData.district}, ${businessData.state}` : 'Mumbai, Maharashtra'}</p>
-                <p className="flex items-center gap-2"><Phone size={14} className="text-[#C5A059]"/> {businessData?.contactPhone || 'N/A'}</p>
-                <p className="flex items-center gap-2"><Mail size={14} className="text-[#C5A059]"/> {businessData?.contactEmail || 'support@restrohub.com'}</p>
+                <p className="flex items-center gap-2"><MapPin size={14} className="text-[#C5A059]" /> {businessData ? `${businessData.address}, ${businessData.district}, ${businessData.state}` : 'Mumbai, Maharashtra'}</p>
+                <p className="flex items-center gap-2"><Phone size={14} className="text-[#C5A059]" /> {businessData?.contactPhone || 'N/A'}</p>
+                <p className="flex items-center gap-2"><Mail size={14} className="text-[#C5A059]" /> {businessData?.contactEmail || 'support@dineandusk.com'}</p>
               </div>
             </div>
           </div>
@@ -210,7 +210,7 @@ export const InvoiceView: React.FC = () => {
                       </p>
                       {item.addons && item.addons.length > 0 && (
                         <p className="text-[10px] font-semibold text-slate-500 mt-0.5 print:text-[8px]">
-                          + {item.addons.map((a:any)=>a.name).join(', ')}
+                          + {item.addons.map((a: any) => a.name).join(', ')}
                         </p>
                       )}
                       <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-1 print:text-[7px]">HSN: 9987 - FOOD & BEVERAGE</p>
@@ -244,7 +244,7 @@ export const InvoiceView: React.FC = () => {
                   <span className="text-xs font-black text-slate-900 uppercase tracking-wider print:text-[10px]">{invoice.paymentMethod || 'CASH'}</span>
                 </div>
               </div>
-              
+
               <div className="bg-[#f8f9fc] rounded-2xl p-5 border border-slate-100 print:p-3">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-2 print:text-[8px] print:mb-1 print:pb-1">Amount In Words</p>
                 <p className="text-[11px] mt-3 font-black italic text-slate-900 uppercase tracking-wider print:mt-1 print:text-[9px]">{toWords(grandTotal)}</p>

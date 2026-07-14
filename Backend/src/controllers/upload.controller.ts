@@ -12,7 +12,7 @@ export const uploadImage = async (req: Request, res: Response) => {
     const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
 
     const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'restrohub_menus',
+      folder: 'dineandusk_menus',
       resource_type: 'auto'
     });
 

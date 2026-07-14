@@ -178,6 +178,6 @@ export const MOCK_USER: User = {
   id: 'U1',
   name: 'Rajesh Kumar',
   role: 'Admin',
-  email: 'rajesh@restrohub.com',
+  email: 'rajesh@dineandusk.com',
   branchId: 'B1'
 };

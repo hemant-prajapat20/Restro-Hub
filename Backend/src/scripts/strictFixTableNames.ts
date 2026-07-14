@@ -8,8 +8,8 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const strictFixTableNames = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
-    
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
+
     const groundTables = await Table.find({ floor: 1 }).sort({ createdAt: 1 });
     const roofTables = await Table.find({ floor: 2 }).sort({ createdAt: 1 });
 

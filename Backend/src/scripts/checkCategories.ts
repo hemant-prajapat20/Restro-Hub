@@ -7,7 +7,7 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const checkCategories = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
     const business = await Business.findOne();
     if (business) {
       console.log('Current staffCategories:', business.staffCategories);

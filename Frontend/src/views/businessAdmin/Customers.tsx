@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Users, 
-  Search, 
+import {
+  Users,
+  Search,
   Star,
-  TrendingUp, 
+  TrendingUp,
   Calendar,
   Phone,
   ChevronRight,
@@ -41,16 +41,16 @@ export const Customers: React.FC = () => {
   });
 
   const filteredTransactions = transactions.filter(t => {
-    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          t.phone.includes(searchQuery) ||
-                          t._id.includes(searchQuery);
+    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.phone.includes(searchQuery) ||
+      t._id.includes(searchQuery);
     let matchesModule = true;
     if (selectedModule === 'Online/Delivery') {
       matchesModule = t.type === 'Online' || t.type === 'Delivery' || t.type === 'Online/Delivery';
     } else if (selectedModule !== '') {
       matchesModule = t.type === selectedModule;
     }
-    
+
     let matchesDate = true;
     if (selectedDate) {
       const tDate = new Date(t.date);
@@ -125,7 +125,7 @@ export const Customers: React.FC = () => {
             onDateChange={setSelectedDate}
           />
         </div>
-        
+
         <div className="overflow-x-auto w-full custom-scrollbar">
           <table className="w-full min-w-[1000px]">
             <thead className="bg-slate-50/50">
@@ -150,10 +150,10 @@ export const Customers: React.FC = () => {
                 </tr>
               ) : (
                 filteredTransactions.map((tx) => (
-                  <motion.tr 
+                  <motion.tr
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    key={tx._id} 
+                    key={tx._id}
                     className="hover:bg-slate-50/80 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -182,12 +182,11 @@ export const Customers: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
-                        tx.type === 'Bar' ? 'bg-purple-100 text-purple-700' :
-                        tx.type === 'Cafe' ? 'bg-amber-100 text-amber-700' :
-                        tx.type === 'Signature' ? 'bg-rose-100 text-rose-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${tx.type === 'Bar' ? 'bg-purple-100 text-purple-700' :
+                          tx.type === 'Cafe' ? 'bg-amber-100 text-amber-700' :
+                            tx.type === 'Signature' ? 'bg-rose-100 text-rose-700' :
+                              'bg-blue-100 text-blue-700'
+                        }`}>
                         {tx.type}
                       </span>
                     </td>
@@ -203,9 +202,9 @@ export const Customers: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
                         {tx.phone !== 'N/A' && (
-                          <a 
-                            href={`https://wa.me/${tx.phone.replace(/\D/g, '')}?text=Hello ${tx.name}, thank you for visiting Restrohub!`}
-                            target="_blank" 
+                          <a
+                            href={`https://wa.me/${tx.phone.replace(/\D/g, '')}?text=Hello ${tx.name}, thank you for visiting Dine & Dusk!`}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                             title="Message on WhatsApp"

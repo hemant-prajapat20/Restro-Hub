@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  IndianRupee, 
-  Building2, 
-  Users, 
+import {
+  IndianRupee,
+  Building2,
+  Users,
   TrendingUp,
   CreditCard,
   AlertCircle,
@@ -105,7 +105,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
             <div class="total-label">Total Paid</div>
             <div class="total-value">₹${txn.amount.toLocaleString('en-IN')}</div>
           </div>
-          <div class="footer">Thank you for choosing RestroHub &bull; support@restrohub.com</div>
+          <div class="footer">Thank you for choosing Dine & Dusk &bull; support@dineandusk.com</div>
         </div>
         </body></html>
       `);
@@ -117,7 +117,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
 
   const handleWhatsApp = () => {
     const msg = encodeURIComponent(
-      `📋 *RestroHub Platform Invoice*\n\n` +
+      `📋 *Dine & Dusk Platform Invoice*\n\n` +
       `Invoice No: ${invoiceNo}\n` +
       `Business: ${txn.businessName}\n` +
       `Owner: ${txn.ownerName}\n` +
@@ -126,7 +126,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
       `Amount Paid: ₹${txn.amount.toLocaleString('en-IN')}\n` +
       `Valid Until: ${expiryStr}\n` +
       `Status: ${txn.status}\n\n` +
-      `Thank you for choosing RestroHub! 🙏`
+      `Thank you for choosing Dine & Dusk! 🙏`
     );
     window.open(`https://wa.me/${txn.ownerPhone?.replace(/\D/g, '')}?text=${msg}`, '_blank');
   };
@@ -157,7 +157,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
                 onClick={onClose}
                 className="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-semibold transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                 Back
               </button>
               <span className="text-slate-400 text-xs font-semibold uppercase tracking-widest">Platform Invoice</span>
@@ -199,9 +199,8 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Business Code</p>
                 <p className="font-mono font-black text-brand-accent text-xl">{txn.businessAdminCode}</p>
                 <p className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest font-semibold">Status</p>
-                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full inline-block mt-1 ${
-                  txn.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
-                }`}>{txn.status}</span>
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full inline-block mt-1 ${txn.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
+                  }`}>{txn.status}</span>
               </div>
             </div>
 
@@ -236,7 +235,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
               <p className="text-2xl font-black text-white">₹{txn.amount.toLocaleString('en-IN')}</p>
             </div>
 
-            <p className="text-center text-[11px] text-slate-400">Thank you for choosing RestroHub • support@restrohub.com</p>
+            <p className="text-center text-[11px] text-slate-400">Thank you for choosing Dine & Dusk • support@dineandusk.com</p>
           </div>
 
           {/* Action Buttons */}
@@ -246,7 +245,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
               onClick={onClose}
               className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors font-semibold text-xs"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
               Back
             </button>
             {/* WhatsApp */}
@@ -255,7 +254,7 @@ const InvoiceModal: React.FC<{ txn: any; onClose: () => void }> = ({ txn, onClos
               className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl bg-[#25D366] hover:bg-[#20bc5a] text-white transition-colors font-semibold text-xs shadow-lg shadow-green-500/20"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
               WhatsApp
             </button>
@@ -349,117 +348,116 @@ export const SuperAdminDashboard: React.FC = () => {
           { title: "Total Users", value: isLoading ? '...' : metrics.totalUsers.toString(), change: "+12%", icon: Users, color: "text-violet-600", bg: "bg-violet-50", gradient: "from-violet-500 to-purple-400" },
           { title: "Active Subscriptions", value: isLoading ? '...' : metrics.activeSubscriptions.toString(), change: "+5", icon: CreditCard, color: "text-rose-600", bg: "bg-rose-50", gradient: "from-rose-500 to-pink-400" }
         ].map((metric, idx) => (
-          <motion.div 
+          <motion.div
             key={idx}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
             className="group relative bg-white p-6 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 border border-slate-100 flex items-center justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1"
           >
-             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br opacity-5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:opacity-10 transition-opacity" />
-             <div className="relative z-10 flex-1 pr-2">
-                <p className="text-sm font-semibold text-slate-500 mb-2 uppercase tracking-wider text-[10px] sm:text-[11px] break-words">{metric.title}</p>
-                <div className="flex items-center gap-3">
-                   <h3 className="text-2xl font-semibold text-slate-900 font-display tracking-tight break-words">{metric.value}</h3>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                   <span className={`inline-flex shrink-0 items-center text-[10px] sm:text-xs font-semibold ${metric.color} ${metric.bg} px-2 py-1 rounded-lg`}>
-                     <TrendingUp className="w-3 h-3 mr-1" />
-                     {metric.change}
-                   </span>
-                   <span className="text-[10px] sm:text-xs text-slate-400 font-medium">vs last month</span>
-                </div>
-             </div>
-             <div className={`relative z-10 shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${metric.gradient} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                <metric.icon className="w-5 h-5 sm:w-6 sm:h-6" />
-             </div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br opacity-5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:opacity-10 transition-opacity" />
+            <div className="relative z-10 flex-1 pr-2">
+              <p className="text-sm font-semibold text-slate-500 mb-2 uppercase tracking-wider text-[10px] sm:text-[11px] break-words">{metric.title}</p>
+              <div className="flex items-center gap-3">
+                <h3 className="text-2xl font-semibold text-slate-900 font-display tracking-tight break-words">{metric.value}</h3>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className={`inline-flex shrink-0 items-center text-[10px] sm:text-xs font-semibold ${metric.color} ${metric.bg} px-2 py-1 rounded-lg`}>
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  {metric.change}
+                </span>
+                <span className="text-[10px] sm:text-xs text-slate-400 font-medium">vs last month</span>
+              </div>
+            </div>
+            <div className={`relative z-10 shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${metric.gradient} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <metric.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
           </motion.div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-         {/* Main Chart Area */}
-         <div className="lg:col-span-2 bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-sm flex flex-col overflow-hidden">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-               <h3 className="text-xl font-semibold text-slate-900 truncate">Revenue Growth</h3>
-               <div className="relative w-full sm:w-auto z-20">
-                 <button 
-                   onClick={() => setShowTimeFilter(!showTimeFilter)}
-                   className="bg-slate-50 border-2 border-slate-50 outline-none font-semibold text-slate-500 rounded-xl px-4 py-2 w-full flex items-center justify-between gap-3 text-sm sm:text-base cursor-pointer hover:border-slate-200 transition-colors"
-                 >
-                   {timeFilter}
-                   <ChevronDown className="w-4 h-4 text-slate-400" />
-                 </button>
-                 {showTimeFilter && (
-                   <div className="absolute top-full right-0 left-0 sm:left-auto sm:min-w-[160px] mt-2 bg-white border border-slate-100 shadow-xl rounded-xl overflow-hidden">
-                     {timeOptions.map(opt => (
-                       <button 
-                         key={opt}
-                         onClick={() => { setTimeFilter(opt); setShowTimeFilter(false); }}
-                         className={`w-full text-left px-4 py-3 text-sm font-semibold hover:bg-slate-50 transition-colors ${timeFilter === opt ? 'text-brand-accent bg-brand-accent/5' : 'text-slate-600'}`}
-                       >
-                         {opt}
-                       </button>
-                     ))}
-                   </div>
-                 )}
-               </div>
+        {/* Main Chart Area */}
+        <div className="lg:col-span-2 bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-sm flex flex-col overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+            <h3 className="text-xl font-semibold text-slate-900 truncate">Revenue Growth</h3>
+            <div className="relative w-full sm:w-auto z-20">
+              <button
+                onClick={() => setShowTimeFilter(!showTimeFilter)}
+                className="bg-slate-50 border-2 border-slate-50 outline-none font-semibold text-slate-500 rounded-xl px-4 py-2 w-full flex items-center justify-between gap-3 text-sm sm:text-base cursor-pointer hover:border-slate-200 transition-colors"
+              >
+                {timeFilter}
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              </button>
+              {showTimeFilter && (
+                <div className="absolute top-full right-0 left-0 sm:left-auto sm:min-w-[160px] mt-2 bg-white border border-slate-100 shadow-xl rounded-xl overflow-hidden">
+                  {timeOptions.map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => { setTimeFilter(opt); setShowTimeFilter(false); }}
+                      className={`w-full text-left px-4 py-3 text-sm font-semibold hover:bg-slate-50 transition-colors ${timeFilter === opt ? 'text-brand-accent bg-brand-accent/5' : 'text-slate-600'}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="w-full h-[300px] sm:h-[350px]">
-               {isLoading ? (
-                 <div className="w-full h-full bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
-                    <p className="font-semibold uppercase tracking-widest text-sm">Loading Chart Data...</p>
-                 </div>
-               ) : (
-                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                   <AreaChart data={metrics.chartData}>
-                     <defs>
-                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                         <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                       </linearGradient>
-                     </defs>
-                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dx={-10} tickFormatter={(value) => `₹${(value/1000)}k`} />
-                     <Tooltip 
-                       contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                       formatter={(value: number) => [formatCurrency(value), 'Revenue']}
-                     />
-                     <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
-                   </AreaChart>
-                 </ResponsiveContainer>
-               )}
-            </div>
-         </div>
+          </div>
+          <div className="w-full h-[300px] sm:h-[350px]">
+            {isLoading ? (
+              <div className="w-full h-full bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-200">
+                <p className="font-semibold uppercase tracking-widest text-sm">Loading Chart Data...</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <AreaChart data={metrics.chartData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} tickFormatter={(value) => `₹${(value / 1000)}k`} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
 
-         {/* Alerts */}
-         <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-sm flex flex-col overflow-hidden">
-            <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2 truncate">
-               <AlertCircle className="w-5 h-5 text-orange-500" />
-               System Alerts
-            </h3>
-            <div className="space-y-4 flex-1">
-               {[
-                 { msg: "Payment failed for 'Spice Symphony'", time: "10 mins ago", type: "error" },
-                 { msg: "New business 'Cafe Mocha' registered", time: "1 hour ago", type: "success" },
-                 { msg: "Server load exceeding 80% threshold", time: "2 hours ago", type: "warning" },
-                 { msg: "Daily backup completed successfully", time: "5 hours ago", type: "info" }
-               ].map((alert, i) => (
-                 <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${
-                      alert.type === 'error' ? 'bg-red-500' : 
-                      alert.type === 'success' ? 'bg-green-500' :
-                      alert.type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
-                    }`} />
-                    <div>
-                       <p className="font-semibold text-slate-700 text-sm break-words">{alert.msg}</p>
-                       <p className="text-xs font-medium text-slate-400 mt-1 break-words">{alert.time}</p>
-                    </div>
-                 </div>
-               ))}
-            </div>
-         </div>
+        {/* Alerts */}
+        <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-sm flex flex-col overflow-hidden">
+          <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2 truncate">
+            <AlertCircle className="w-5 h-5 text-orange-500" />
+            System Alerts
+          </h3>
+          <div className="space-y-4 flex-1">
+            {[
+              { msg: "Payment failed for 'Spice Symphony'", time: "10 mins ago", type: "error" },
+              { msg: "New business 'Cafe Mocha' registered", time: "1 hour ago", type: "success" },
+              { msg: "Server load exceeding 80% threshold", time: "2 hours ago", type: "warning" },
+              { msg: "Daily backup completed successfully", time: "5 hours ago", type: "info" }
+            ].map((alert, i) => (
+              <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${alert.type === 'error' ? 'bg-red-500' :
+                  alert.type === 'success' ? 'bg-green-500' :
+                    alert.type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
+                  }`} />
+                <div>
+                  <p className="font-semibold text-slate-700 text-sm break-words">{alert.msg}</p>
+                  <p className="text-xs font-medium text-slate-400 mt-1 break-words">{alert.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ── Subscription Transaction History ── */}
@@ -557,9 +555,8 @@ export const SuperAdminDashboard: React.FC = () => {
                       {isExpiringSoon && <p className="text-[10px] text-amber-500 font-medium">Expiring soon</p>}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                        txn.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
-                      }`}>{txn.status}</span>
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${txn.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
+                        }`}>{txn.status}</span>
                     </td>
                     <td className="px-6 py-4">
                       <button
@@ -584,9 +581,9 @@ export const SuperAdminDashboard: React.FC = () => {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white border border-slate-200 hover:border-brand-accent hover:text-brand-accent text-slate-600 text-sm font-bold transition-all"
             >
               {showAllTxns ? (
-                <><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg> Show Less</>
+                <><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg> Show Less</>
               ) : (
-                <><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg> View All {filteredTxns.length} Transactions</>
+                <><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg> View All {filteredTxns.length} Transactions</>
               )}
             </button>
           </div>

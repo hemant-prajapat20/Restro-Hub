@@ -36,11 +36,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Basic route for testing
 app.get('/', (req, res) => {
-  res.status(200).json({ status: 'success', message: 'Welcome to RestroHub Backend API' });
+  res.status(200).json({ status: 'success', message: 'Welcome to Dine & Dusk Backend API' });
 });
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'success', message: 'RestroHub API is running smoothly' });
+  res.status(200).json({ status: 'success', message: 'Dine & Dusk API is running smoothly' });
 });
 
 // Mount routes

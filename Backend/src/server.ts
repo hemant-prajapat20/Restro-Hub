@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
 // MongoDB Connection and Server Start
 const startServer = async () => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub';
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk';
     await mongoose.connect(mongoUri);
     console.log('Connected to MongoDB successfully.');
 

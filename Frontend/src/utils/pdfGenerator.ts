@@ -50,12 +50,12 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
 
   // 1. Header 
   y += 10;
-  const brandName = data.title || "RESTROHUB PRIVATE LIMITED";
+  const brandName = data.title || "DINE & DUSK PRIVATE LIMITED";
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(0, 0, 0); // Pure Black
   doc.text(brandName.toUpperCase(), width / 2, y, { align: 'center' });
-  
+
   y += 5;
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(7);
@@ -64,7 +64,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   doc.text("Tel: +91 79 4830112 | GST: 24AAACR1234F1Z5", width / 2, y, { align: 'center' });
 
   // 2. Metadata (Date, Time, Invoice)
-  doc.setTextColor(0, 0, 0); 
+  doc.setTextColor(0, 0, 0);
   y += 10;
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(8);
@@ -119,7 +119,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   y += 5;
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(7);
-  
+
   data.items.forEach((item) => {
     let nameText = item.name;
     if (nameText.length > 20) {
@@ -176,7 +176,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   doc.setFontSize(8);
   doc.text("Payment Status:", width - 30, y, { align: 'right' });
   doc.text("SUCCESS", width - 5, y, { align: 'right' });
-  
+
   // Divider Thick
   doc.setLineWidth(0.5);
   y += 4;
@@ -189,7 +189,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   const sigStartX = width / 2 - 10;
   const sigStartY = y;
   doc.lines([[10, -5], [5, 5], [15, -2], [5, 2]], sigStartX, sigStartY);
-  
+
   y += 4;
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(6);
@@ -209,7 +209,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(6);
   doc.text("RULES & CONDITIONS", 5, y);
-  
+
   y += 3;
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(5);
@@ -223,7 +223,7 @@ export const generateReceiptPDF = (data: PDFReceiptData) => {
   y += 6;
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(6);
-  doc.text("Powered by RestroHub v1.0", width / 2, y, { align: 'center' });
+  doc.text("Powered by Dine & Dusk v1.0", width / 2, y, { align: 'center' });
 
   doc.save(`Invoice_${data.invoiceNumber || 'receipt'}.pdf`);
 };

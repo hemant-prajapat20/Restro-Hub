@@ -14,7 +14,7 @@ const systemSettingsSchema = new Schema<ISystemSettings>(
     platformName: { type: String, default: 'IndiServe Pro', required: true },
     maintenanceMode: { type: Boolean, default: false, required: true },
     jwtExpirationTime: { type: String, default: '30 Days', required: true },
-    masterSecretKey: { type: String, default: 'restrohub_owner_777', required: true },
+    masterSecretKey: { type: String, default: 'dineandusk_owner_777', required: true },
     smartMapping: { type: Boolean, default: false },
     kdsWebhook: { type: Boolean, default: true },
   },

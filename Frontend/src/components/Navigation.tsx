@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  LayoutDashboard, 
-  UtensilsCrossed, 
-  Table2, 
-  ChefHat, 
-  ClipboardList, 
+import {
+  LayoutDashboard,
+  UtensilsCrossed,
+  Table2,
+  ChefHat,
+  ClipboardList,
   Layers,
-  Users, 
-  Settings, 
-  TrendingUp, 
+  Users,
+  Settings,
+  TrendingUp,
   LogOut,
   ShoppingBag,
   Bell,
@@ -89,11 +89,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  
+
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const userPlatforms = user?.businessData?.platforms || [];
   const toggles = user?.businessData?.featureToggles || {};
-  
+
   const filteredBusinessNavItems = businessNavItems.filter(item => {
     // 1. Must have purchased the platform
     if (item.platform && !userPlatforms.includes(item.platform)) {
@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
     // Note: Assuming 'bar' doesn't have a toggle yet, or it's always on if purchased
     if (item.id === 'delivery' && toggles.onlineOrders === false) return false;
     if (item.id === 'tables' && toggles.reservations === false) return false;
-    
+
     return true;
   });
 
@@ -158,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
             <Crown className="text-white w-6 h-6" />
           </div>
           <div className="flex flex-col">
-            <span className={cn("font-semibold text-lg tracking-wider uppercase truncate", isSuperAdmin ? "font-display leading-none" : "font-sans")}><span className="text-white">Restro</span><span className="text-brand-accent">Hub</span></span>
+            <span className={cn("font-semibold text-lg tracking-wider uppercase truncate", isSuperAdmin ? "font-display leading-none" : "font-sans")}><span className="text-white">Dine</span><span className="text-brand-accent"> & Dusk</span></span>
             {isSuperAdmin && <span className="text-[10px] font-semibold text-slate-400 tracking-[0.2em] uppercase mt-1 truncate">Super Admin</span>}
           </div>
         </div>
@@ -173,25 +173,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPath === item.id || (currentPath === (isSuperAdmin ? 'super-admin' : 'admin') && item.id === 'dashboard');
-            return (
-              <Link
-                key={item.id}
-                to={`${basePath}/${item.id}`}
-                onClick={() => { if (onClose) onClose(); }}
-                className={cn(
-                  "relative w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm",
-                  isActive 
-                    ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
-                    : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
-                )}
-              >
-                <Icon className={cn("w-5 h-5", isActive ? "text-white" : "group-hover:text-white")} />
-                <span className={cn("font-semibold", isSuperAdmin && "truncate")}>{item.label}</span>
-                {item.id === 'kds' && hasActiveKdsOrders && (
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse absolute right-4 top-1/2 -translate-y-1/2"></span>
-                )}
-                {isActive && (
-                <motion.div 
+          return (
+            <Link
+              key={item.id}
+              to={`${basePath}/${item.id}`}
+              onClick={() => { if (onClose) onClose(); }}
+              className={cn(
+                "relative w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm",
+                isActive
+                  ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30"
+                  : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+              )}
+            >
+              <Icon className={cn("w-5 h-5", isActive ? "text-white" : "group-hover:text-white")} />
+              <span className={cn("font-semibold", isSuperAdmin && "truncate")}>{item.label}</span>
+              {item.id === 'kds' && hasActiveKdsOrders && (
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse absolute right-4 top-1/2 -translate-y-1/2"></span>
+              )}
+              {isActive && (
+                <motion.div
                   layoutId="active-pill"
                   className="ml-auto w-1 h-4 bg-white rounded-full opacity-50"
                 />
@@ -205,14 +205,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         {!isSuperAdmin && (
           <Link to="/admin/settings" onClick={() => { if (onClose) onClose(); }} className={cn(
             "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group",
-            currentPath === 'settings' 
-              ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30" 
+            currentPath === 'settings'
+              ? "bg-brand-accent text-white shadow-xl shadow-brand-accent/30"
               : "text-slate-400 hover:bg-slate-800 hover:text-white"
           )}>
             <Settings className={cn("w-5 h-5", currentPath === 'settings' ? "text-white" : "group-hover:text-white")} />
             <span className="font-semibold">Settings</span>
             {currentPath === 'settings' && (
-              <motion.div 
+              <motion.div
                 layoutId="active-pill"
                 className="ml-auto w-1 h-4 bg-white rounded-full opacity-50"
               />
@@ -300,7 +300,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
     // Set up Socket.IO connection for real-time notifications
     const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000');
-    
+
     // SuperAdmin only listens to platform-level admin activity events
     // BusinessAdmin listens to their own restaurant message events
     const eventName = isSuperAdmin ? 'newAdminActivity' : 'newMessage';
@@ -311,7 +311,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
       // Add the new notification to the top of the list
       setNotifications(prev => [newNotif, ...prev]);
-      
+
       // Show toast notification
       if (newNotif.type === 'success') {
         toast.success(newNotif.message, { duration: 5000 });
@@ -380,9 +380,9 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 lg:ml-64 sticky top-0 z-40 glass">
-      
+
       <div className="flex items-center gap-4 flex-1">
-        <button 
+        <button
           onClick={onOpenSidebar}
           className="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
         >
@@ -398,12 +398,12 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
           <div className="flex-1 max-w-xl hidden md:block" ref={searchRef}>
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-brand-accent transition-colors" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
                 onFocus={() => setShowSearchDropdown(true)}
-                placeholder="Search orders, menu items, or customers..." 
+                placeholder="Search orders, menu items, or customers..."
                 className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:bg-white transition-all font-medium text-sm text-slate-800 shadow-sm"
               />
 
@@ -423,7 +423,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                       </div>
                     ) : searchResults && (searchResults.orders?.length > 0 || searchResults.menuItems?.length > 0 || searchResults.customers?.length > 0) ? (
                       <div className="overflow-y-auto p-2 scrollbar-thin">
-                        
+
                         {searchResults.orders?.length > 0 && (
                           <div className="mb-3">
                             <h3 className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-widest sticky top-0 bg-white/95 backdrop-blur z-10 flex items-center gap-2">
@@ -431,7 +431,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                             </h3>
                             <div className="space-y-0.5 mt-1">
                               {searchResults.orders.map((o: any) => (
-                                <button 
+                                <button
                                   key={o._id}
                                   onClick={() => { setShowSearchDropdown(false); navigate('/admin/transactions'); }}
                                   className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-xl transition-colors text-left group"
@@ -456,7 +456,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                             </h3>
                             <div className="space-y-0.5 mt-1">
                               {searchResults.menuItems.map((m: any) => (
-                                <button 
+                                <button
                                   key={m._id}
                                   onClick={() => { setShowSearchDropdown(false); navigate('/admin/menu'); }}
                                   className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-xl transition-colors text-left group"
@@ -481,7 +481,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                             </h3>
                             <div className="space-y-0.5 mt-1">
                               {searchResults.customers.map((c: any) => (
-                                <button 
+                                <button
                                   key={c._id}
                                   onClick={() => { setShowSearchDropdown(false); navigate('/admin/customers'); }}
                                   className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 rounded-xl transition-colors text-left group"
@@ -521,9 +521,9 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
           <div className={cn("w-2 h-2 rounded-full animate-pulse", isSuperAdmin ? "bg-brand-accent" : "bg-brand-success")} />
           {isSuperAdmin ? 'Network Status: Optimal' : 'Server Live'}
         </div>
-        
+
         <div className="relative" ref={dropdownRef}>
-          <button 
+          <button
             aria-label="Notifications"
             onClick={() => setShowDropdown(!showDropdown)}
             className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all"
@@ -551,7 +551,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                   notifications.map((notif, i) => {
                     let IconComp = Bell;
                     let iconColor = "text-slate-400";
-                    switch(notif.category) {
+                    switch (notif.category) {
                       case 'order': IconComp = ShoppingBag; iconColor = "text-emerald-500"; break;
                       case 'payment': IconComp = CreditCard; iconColor = "text-blue-500"; break;
                       case 'inventory': IconComp = Package; iconColor = "text-amber-500"; break;
@@ -562,19 +562,20 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
                     }
 
                     return (
-                    <div
-                      key={i}
-                      onClick={() => !notif.isRead && markOneRead(notif._id)}
-                      className={cn("p-3 border-b border-slate-50 transition-colors flex items-start gap-3", notif.isRead ? "hover:bg-slate-50" : "bg-amber-50/40 hover:bg-amber-50 cursor-pointer")}>
-                      <div className="mt-0.5 shrink-0">
-                        <IconComp size={16} className={iconColor} />
+                      <div
+                        key={i}
+                        onClick={() => !notif.isRead && markOneRead(notif._id)}
+                        className={cn("p-3 border-b border-slate-50 transition-colors flex items-start gap-3", notif.isRead ? "hover:bg-slate-50" : "bg-amber-50/40 hover:bg-amber-50 cursor-pointer")}>
+                        <div className="mt-0.5 shrink-0">
+                          <IconComp size={16} className={iconColor} />
+                        </div>
+                        <div>
+                          <p className={cn("text-xs mb-1", notif.isRead ? "font-normal text-slate-600" : "font-bold text-black")}>{notif.message}</p>
+                          <span className={cn("text-[10px]", notif.isRead ? "text-slate-400" : "text-slate-500 font-medium")}>{new Date(notif.createdAt).toLocaleString()}</span>
+                        </div>
                       </div>
-                      <div>
-                        <p className={cn("text-xs mb-1", notif.isRead ? "font-normal text-slate-600" : "font-bold text-black")}>{notif.message}</p>
-                        <span className={cn("text-[10px]", notif.isRead ? "text-slate-400" : "text-slate-500 font-medium")}>{new Date(notif.createdAt).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  )})
+                    )
+                  })
                 )}
               </div>
               <Link to={isSuperAdmin ? "/super-admin/messages" : "/admin/messages"} onClick={() => setShowDropdown(false)} className="block p-3 text-center text-xs text-brand-accent font-semibold hover:bg-slate-50 transition-colors border-t border-slate-100">
@@ -586,7 +587,7 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
 
         <div className="h-10 w-[1px] bg-slate-200 mx-1 md:mx-2" />
 
-        <div 
+        <div
           onClick={() => navigate(isSuperAdmin ? '/super-admin/settings' : '/admin/settings')}
           className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
         >
@@ -604,8 +605,8 @@ export const Header: React.FC<{ onOpenSidebar?: () => void }> = ({ onOpenSidebar
             ) : user ? (
               <span className="font-bold text-brand-accent">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</span>
             ) : (
-              <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rajesh" 
+              <img
+                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rajesh"
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />

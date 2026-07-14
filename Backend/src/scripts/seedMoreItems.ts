@@ -199,13 +199,13 @@ const LIQUOR_ITEMS = [
 
 const seedAdditionalItems = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
     const business = await Business.findOne();
     if (!business) {
       console.log('No business found. Run the main seeder first.');
       process.exit(1);
     }
-    
+
     console.log('Seeding Cafe Items...');
     for (const item of CAFE_ITEMS) {
       await CafeItem.create({ ...item, businessId: business._id });

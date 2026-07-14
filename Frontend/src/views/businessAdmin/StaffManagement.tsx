@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { 
-  Users, 
-  Plus, 
-  Search, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  TrendingUp, 
-  Briefcase, 
-  Clock, 
-  Smile, 
-  DollarSign, 
+import {
+  Users,
+  Plus,
+  Search,
+  Phone,
+  Mail,
+  Calendar,
+  TrendingUp,
+  Briefcase,
+  Clock,
+  Smile,
+  DollarSign,
   CheckCircle,
   X,
   Sparkles,
@@ -68,7 +68,7 @@ export const StaffManagement: React.FC = () => {
 
   // Form states for New Staff
   const [newName, setNewName] = useState('');
-  const [newGender, setNewGender] = useState<'Male'|'Female'>('Male');
+  const [newGender, setNewGender] = useState<'Male' | 'Female'>('Male');
   const [newRole, setNewRole] = useState('');
   const [newShift, setNewShift] = useState<'Morning (6 AM - 2 PM)' | 'Evening (2 PM - 10 PM)' | 'Night (10 PM - 6 AM)' | 'General (10 AM - 7 PM)'>('General (10 AM - 7 PM)');
   const [newSalary, setNewSalary] = useState('');
@@ -78,7 +78,7 @@ export const StaffManagement: React.FC = () => {
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
+
   // Category management
   const [newCategoryName, setNewCategoryName] = useState('');
 
@@ -149,24 +149,24 @@ export const StaffManagement: React.FC = () => {
   const filteredCrew = crew.filter(member => {
     let matchesCategory = false;
     if (selectedRoleFilter === 'All') {
-       matchesCategory = true;
+      matchesCategory = true;
     } else {
-       const roleLower = member.role.toLowerCase();
-       const filterLower = selectedRoleFilter.toLowerCase();
-       
-       if (filterLower === 'waiter') {
-          matchesCategory = roleLower.includes('waiter') || roleLower.includes('waitress');
-       } else if (filterLower === 'manager') {
-          matchesCategory = roleLower.includes('manager');
-       } else if (filterLower === 'chef') {
-          matchesCategory = roleLower.includes('chef') || roleLower.includes('kitchen') || roleLower.includes('cook');
-       } else {
-          matchesCategory = member.role === selectedRoleFilter;
-       }
+      const roleLower = member.role.toLowerCase();
+      const filterLower = selectedRoleFilter.toLowerCase();
+
+      if (filterLower === 'waiter') {
+        matchesCategory = roleLower.includes('waiter') || roleLower.includes('waitress');
+      } else if (filterLower === 'manager') {
+        matchesCategory = roleLower.includes('manager');
+      } else if (filterLower === 'chef') {
+        matchesCategory = roleLower.includes('chef') || roleLower.includes('kitchen') || roleLower.includes('cook');
+      } else {
+        matchesCategory = member.role === selectedRoleFilter;
+      }
     }
 
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          member.role.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -182,9 +182,9 @@ export const StaffManagement: React.FC = () => {
 
     const isFemale = newGender === 'Female';
     const seedName = isFemale ? `Sophia-${newName}` : `Felix-${newName}`;
-    
+
     // Use explicit hair styles to guarantee gender appearance in avataaars
-    const avatarParams = isFemale 
+    const avatarParams = isFemale
       ? `&hair=longHairStraight,longHairCurly,longHairMiaWallace&clothing=blazerAndSweater,collarAndSweater`
       : `&hair=shortHairShortFlat,shortHairShortRound,shortHairFrizzle&facialHairProbability=20&clothing=hoodie,shirtCrewNeck`;
 
@@ -239,8 +239,8 @@ export const StaffManagement: React.FC = () => {
     setUploadedImage(null);
     setImagePreview(null);
     // We cannot reliably guess gender from avatar seed without storing it, but we can default.
-    setNewGender('Male'); 
-    
+    setNewGender('Male');
+
     setShowAddModal(true);
   };
 
@@ -286,29 +286,29 @@ export const StaffManagement: React.FC = () => {
           </div>
           <h3 className="text-2xl font-semibold font-display text-white tracking-tight">Staff & Shift Directory</h3>
           <p className="text-sm text-stone-400 max-w-xl">
-             Supervise active brigade attendance, adjust sommelier allocations, configure clock-ins, and recruit certified hospitality personnel.
+            Supervise active brigade attendance, adjust sommelier allocations, configure clock-ins, and recruit certified hospitality personnel.
           </p>
         </div>
 
         {/* Attendance Summary */}
         <div className="relative z-10 flex flex-wrap gap-4">
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
-             <Clock className="text-amber-500" size={24} />
-             <div>
-                <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Active On-Duty Brigade</p>
-                <p className="text-lg font-semibold text-white font-mono">
-                   {activeStaffCount} / {crew.length} Crew
-                </p>
-             </div>
+            <Clock className="text-amber-500" size={24} />
+            <div>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Active On-Duty Brigade</p>
+              <p className="text-lg font-semibold text-white font-mono">
+                {activeStaffCount} / {crew.length} Crew
+              </p>
+            </div>
           </div>
           <div className="px-6 py-4 bg-stone-900/80 border border-stone-800 rounded-2xl flex items-center gap-3">
-             <TrendingUp className="text-amber-500" size={24} />
-             <div>
-                <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Monthly Payroll projection</p>
-                <p className="text-lg font-semibold text-white font-mono">
-                   ₹{(crew.reduce((acc, current) => acc + current.salary, 0) / 1000).toFixed(0)}K
-                </p>
-             </div>
+            <TrendingUp className="text-amber-500" size={24} />
+            <div>
+              <p className="text-[10px] font-semibold text-stone-500 uppercase tracking-widest font-sans">Monthly Payroll projection</p>
+              <p className="text-lg font-semibold text-white font-mono">
+                ₹{(crew.reduce((acc, current) => acc + current.salary, 0) / 1000).toFixed(0)}K
+              </p>
+            </div>
           </div>
         </div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
@@ -318,8 +318,8 @@ export const StaffManagement: React.FC = () => {
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-stone-200/60 shadow-soft">
         <div className="relative flex-1 w-full xl:w-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-5 h-5" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search staff..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -332,26 +332,25 @@ export const StaffManagement: React.FC = () => {
             <button
               key={role}
               onClick={() => setSelectedRoleFilter(role)}
-              className={`px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${
-                selectedRoleFilter === role 
-                  ? 'bg-brand-primary text-brand-accent shadow-lg shadow-brand-primary/10' 
+              className={`px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest transition-all ${selectedRoleFilter === role
+                  ? 'bg-brand-primary text-brand-accent shadow-lg shadow-brand-primary/10'
                   : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
-              }`}
+                }`}
             >
               {role}
             </button>
           ))}
           <div className="h-6 w-[1px] bg-stone-200 mx-2 hidden xl:block" />
-          
-          <button 
+
+          <button
             onClick={() => setShowCategoryModal(true)}
             className="p-3 bg-stone-100 text-stone-600 rounded-2xl hover:bg-stone-200 transition-all border border-stone-200"
             title="Manage Staff Categories"
           >
             <Settings size={20} />
           </button>
-          
-          <button 
+
+          <button
             onClick={() => setShowAddModal(true)}
             className="px-6 py-3 bg-brand-accent text-stone-950 font-semibold rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-brand-accent/25"
           >
@@ -363,94 +362,93 @@ export const StaffManagement: React.FC = () => {
 
       {/* Staff Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-8">
-         <AnimatePresence>
-            {filteredCrew.map((member) => (
-               <motion.div
-                  key={member.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-[32px] p-5 border border-stone-200/80 shadow-soft hover:border-brand-accent group transition-all flex flex-col justify-between h-full"
-               >
-                  <div>
-                     <div className="flex items-start justify-between mb-6">
-                        <div className="w-16 h-16 rounded-2xl bg-stone-50 border border-stone-100 p-1 overflow-hidden">
-                           <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-                        </div>
-                        <div className="flex flex-col items-end">
-                           <span className={`px-2.5 py-1 rounded-full text-[8px] font-semibold uppercase tracking-wider ${
-                              (member as any).dynamicStatus === 'ACTIVE' ? 'bg-green-50 text-green-700 border border-green-200/40' : 
-                              'bg-stone-100 text-stone-500 border border-stone-200/40'
-                           } border`}>
-                              {(member as any).dynamicStatus}
-                           </span>
-                           <span className="text-[10px] font-mono text-amber-500 font-semibold tracking-tight mt-1 flex items-center gap-1">
-                              <Smile size={10} />
-                              CS {member.score} / 5.0
-                           </span>
-                        </div>
-                     </div>
-
-                     <div className="flex items-center justify-between">
-                        <h5 className="text-lg font-semibold text-stone-900 group-hover:text-brand-accent transition-colors block">{member.name}</h5>
-                        <button 
-                           onClick={(e) => { e.stopPropagation(); handleEditClick(member); }}
-                           className="p-1.5 text-stone-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-lg transition-all"
-                           title="Edit Staff"
-                        >
-                           <Edit2 size={14} />
-                        </button>
-                     </div>
-                     <p className="text-[10.5px] font-semibold text-stone-400 uppercase tracking-widest mt-1 block">ID: MAISON-{member.id}</p>
-                     
-                     <div className="mt-4 py-3 border-y border-stone-50 space-y-2">
-                        <div className="flex items-center gap-2 text-stone-500 font-medium text-xs">
-                           <Briefcase size={12} className="text-amber-500" />
-                           <span>{member.role}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-stone-500 font-medium text-xs">
-                           <Clock size={12} className="text-amber-500" />
-                           <span>{member.shift}</span>
-                        </div>
-                     </div>
-
-                     <div className="mt-4 space-y-1">
-                        <p className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-700 transition-colors">
-                           <Phone size={12} />
-                           {member.contact}
-                        </p>
-                        <p className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-700 transition-colors truncate">
-                           <Mail size={12} />
-                           {member.email}
-                        </p>
-                     </div>
+        <AnimatePresence>
+          {filteredCrew.map((member) => (
+            <motion.div
+              key={member.id}
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-[32px] p-5 border border-stone-200/80 shadow-soft hover:border-brand-accent group transition-all flex flex-col justify-between h-full"
+            >
+              <div>
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-stone-50 border border-stone-100 p-1 overflow-hidden">
+                    <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                   </div>
-
-                  <div className="mt-6 pt-4 border-t border-stone-50 flex items-center justify-end">
-                     <div className="flex gap-1">
-                        <span className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2 py-1 bg-stone-50 rounded-lg">
-                           Auto-Managed by Shift
-                        </span>
-                     </div>
+                  <div className="flex flex-col items-end">
+                    <span className={`px-2.5 py-1 rounded-full text-[8px] font-semibold uppercase tracking-wider ${(member as any).dynamicStatus === 'ACTIVE' ? 'bg-green-50 text-green-700 border border-green-200/40' :
+                        'bg-stone-100 text-stone-500 border border-stone-200/40'
+                      } border`}>
+                      {(member as any).dynamicStatus}
+                    </span>
+                    <span className="text-[10px] font-mono text-amber-500 font-semibold tracking-tight mt-1 flex items-center gap-1">
+                      <Smile size={10} />
+                      CS {member.score} / 5.0
+                    </span>
                   </div>
-               </motion.div>
-            ))}
-         </AnimatePresence>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <h5 className="text-lg font-semibold text-stone-900 group-hover:text-brand-accent transition-colors block">{member.name}</h5>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(member); }}
+                    className="p-1.5 text-stone-400 hover:text-brand-accent hover:bg-brand-accent/10 rounded-lg transition-all"
+                    title="Edit Staff"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                </div>
+                <p className="text-[10.5px] font-semibold text-stone-400 uppercase tracking-widest mt-1 block">ID: MAISON-{member.id}</p>
+
+                <div className="mt-4 py-3 border-y border-stone-50 space-y-2">
+                  <div className="flex items-center gap-2 text-stone-500 font-medium text-xs">
+                    <Briefcase size={12} className="text-amber-500" />
+                    <span>{member.role}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-stone-500 font-medium text-xs">
+                    <Clock size={12} className="text-amber-500" />
+                    <span>{member.shift}</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-1">
+                  <p className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-700 transition-colors">
+                    <Phone size={12} />
+                    {member.contact}
+                  </p>
+                  <p className="flex items-center gap-2 text-xs text-stone-400 hover:text-stone-700 transition-colors truncate">
+                    <Mail size={12} />
+                    {member.email}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-stone-50 flex items-center justify-end">
+                <div className="flex gap-1">
+                  <span className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2 py-1 bg-stone-50 rounded-lg">
+                    Auto-Managed by Shift
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
       {/* Categories Management Modal */}
       <AnimatePresence>
         {showCategoryModal && (
           <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm"
               onClick={() => setShowCategoryModal(false)}
             />
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -476,7 +474,7 @@ export const StaffManagement: React.FC = () => {
                     className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-accent/20"
                     onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
                   />
-                  <button 
+                  <button
                     onClick={handleAddCategory}
                     className="px-4 py-2 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors"
                   >
@@ -488,7 +486,7 @@ export const StaffManagement: React.FC = () => {
                   {staffCategories.map(category => (
                     <div key={category} className="flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl">
                       <span className="font-medium text-slate-700">{category}</span>
-                      <button 
+                      <button
                         onClick={() => handleDeleteCategory(category)}
                         className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -510,14 +508,14 @@ export const StaffManagement: React.FC = () => {
       <AnimatePresence>
         {showAddModal && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-stone-950/80 backdrop-blur-sm"
               onClick={() => setShowAddModal(false)}
             />
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -539,9 +537,9 @@ export const StaffManagement: React.FC = () => {
                     ) : (
                       <Users className="w-6 h-6 text-stone-300" />
                     )}
-                    <input 
-                      type="file" 
-                      accept="image/*" 
+                    <input
+                      type="file"
+                      accept="image/*"
                       onChange={handleImageChange}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
@@ -555,10 +553,10 @@ export const StaffManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Recruit Full Name</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
-                      placeholder="e.g. Master Sommelier Dev" 
+                      placeholder="e.g. Master Sommelier Dev"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
@@ -566,9 +564,9 @@ export const StaffManagement: React.FC = () => {
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Gender</label>
-                    <select 
-                      value={newGender} 
-                      onChange={(e) => setNewGender(e.target.value as 'Male'|'Female')}
+                    <select
+                      value={newGender}
+                      onChange={(e) => setNewGender(e.target.value as 'Male' | 'Female')}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600"
                     >
                       <option value="Male">Male</option>
@@ -580,18 +578,18 @@ export const StaffManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Certified Specialty Role</label>
-                    <input 
+                    <input
                       type="text"
                       placeholder="e.g. Junior Waiter, Executive Chef"
-                      value={newRole} 
+                      value={newRole}
                       onChange={(e) => setNewRole(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600 focus:outline-none"
                     />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Assigned Shift</label>
-                    <select 
-                      value={newShift} 
+                    <select
+                      value={newShift}
                       onChange={(e) => setNewShift(e.target.value as any)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs text-stone-600"
                     >
@@ -606,11 +604,11 @@ export const StaffManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Monthly Base Salary (₹)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       min="0"
                       required
-                      placeholder="e.g. 85000" 
+                      placeholder="e.g. 85000"
                       value={newSalary}
                       onChange={(e) => setNewSalary(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
@@ -618,9 +616,9 @@ export const StaffManagement: React.FC = () => {
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Performance Score</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. 4.9" 
+                    <input
+                      type="text"
+                      placeholder="e.g. 4.9"
                       value={newScore}
                       onChange={(e) => setNewScore(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
@@ -631,9 +629,9 @@ export const StaffManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Secretariat Email</label>
-                    <input 
-                      type="email" 
-                      placeholder="e.g. dev@restrohub.com" 
+                    <input
+                      type="email"
+                      placeholder="e.g. dev@dineandusk.com"
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-semibold text-xs"
@@ -641,10 +639,10 @@ export const StaffManagement: React.FC = () => {
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-semibold text-stone-400 uppercase tracking-widest px-2">Premium Call Contact</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
-                      placeholder="e.g. +91 9999123456" 
+                      placeholder="e.g. +91 9999123456"
                       value={newContact}
                       onChange={(e) => setNewContact(e.target.value)}
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-2xl font-mono text-xs"

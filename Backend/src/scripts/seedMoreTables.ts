@@ -13,7 +13,7 @@ const NEW_TABLES = [
   { number: 'G-13', capacity: 4, floor: 1 },
   { number: 'G-14', capacity: 6, floor: 1 },
   { number: 'G-15', capacity: 8, floor: 1 },
-  
+
   // Rooftop / Terrace (Floor 2)
   { number: 'R-11', capacity: 2, floor: 2 },
   { number: 'R-12', capacity: 2, floor: 2 },
@@ -24,13 +24,13 @@ const NEW_TABLES = [
 
 const seedAdditionalTables = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
     const business = await Business.findOne();
     if (!business) {
       console.log('No business found. Run the main seeder first.');
       process.exit(1);
     }
-    
+
     console.log('Seeding additional tables...');
     for (const tableData of NEW_TABLES) {
       // Check if table already exists to avoid duplicates

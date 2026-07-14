@@ -7,31 +7,31 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const UPDATES = [
   {
-    oldEmail: 'emma.r@restrohub.com',
+    oldEmail: 'emma.r@dineandusk.com',
     newName: 'Priya Sharma',
-    newEmail: 'priya.s@restrohub.com'
+    newEmail: 'priya.s@dineandusk.com'
   },
   {
-    oldEmail: 'michael.c@restrohub.com',
+    oldEmail: 'michael.c@dineandusk.com',
     newName: 'Rahul Desai',
-    newEmail: 'rahul.d@restrohub.com'
+    newEmail: 'rahul.d@dineandusk.com'
   },
   {
-    oldEmail: 'sarah.j@restrohub.com',
+    oldEmail: 'sarah.j@dineandusk.com',
     newName: 'Ananya Patel',
-    newEmail: 'ananya.p@restrohub.com'
+    newEmail: 'ananya.p@dineandusk.com'
   },
   {
-    oldEmail: 'david.w@restrohub.com',
+    oldEmail: 'david.w@dineandusk.com',
     newName: 'Vikram Singh',
-    newEmail: 'vikram.s@restrohub.com'
+    newEmail: 'vikram.s@dineandusk.com'
   }
 ];
 
 const updateStaffNames = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
-    
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
+
     for (const update of UPDATES) {
       const staff = await Staff.findOne({ email: update.oldEmail });
       if (staff) {

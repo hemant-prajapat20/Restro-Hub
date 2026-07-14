@@ -27,10 +27,10 @@ export const registerSuperAdmin = async (req: Request, res: Response): Promise<v
   try {
     const { firstName, lastName, email, password, phone } = req.body;
 
-    const userExists = await User.findOne({ 
-      $or: [{ email }, { phone }] 
+    const userExists = await User.findOne({
+      $or: [{ email }, { phone }]
     });
-    
+
     if (userExists) {
       if (userExists.email === email) {
         res.status(400).json({ status: 'error', message: 'User email already exists' });
@@ -71,10 +71,10 @@ export const registerCustomer = async (req: Request, res: Response): Promise<voi
   try {
     const { firstName, lastName, email, password, phone } = req.body;
 
-    const userExists = await User.findOne({ 
-      $or: [{ email }, { phone }] 
+    const userExists = await User.findOne({
+      $or: [{ email }, { phone }]
     });
-    
+
     if (userExists) {
       if (userExists.email === email) {
         res.status(400).json({ status: 'error', message: 'User email already exists' });
@@ -174,8 +174,8 @@ export const getProfile = async (req: any, res: Response): Promise<void> => {
       businessData = await Business.findById(user.businessId);
     }
 
-    res.json({ 
-      status: 'success', 
+    res.json({
+      status: 'success',
       data: {
         ...user.toObject(),
         businessData
@@ -208,7 +208,7 @@ export const sendOtp = async (req: Request, res: Response): Promise<void> => {
 
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
     // Set OTP expiration to 10 minutes from now
     const otpExpires = new Date(Date.now() + 10 * 60000);
 
@@ -217,11 +217,11 @@ export const sendOtp = async (req: Request, res: Response): Promise<void> => {
     await user.save();
 
     // In a production environment, you would integrate Twilio or another SMS gateway here:
-    // await smsService.send(phone, `Your RestroHub login OTP is: ${otp}`);
+    // await smsService.send(phone, `Your Dine & Dusk login OTP is: ${otp}`);
     console.log(`[MOCK SMS] OTP for ${phone} is: ${otp}`);
 
-    res.json({ 
-      status: 'success', 
+    res.json({
+      status: 'success',
       message: 'OTP sent successfully to your phone number'
     });
   } catch (error: any) {
@@ -233,7 +233,7 @@ export const sendOtp = async (req: Request, res: Response): Promise<void> => {
 export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
   try {
     const { phone, otp } = req.body;
-    
+
     if (!phone || !otp) {
       res.status(400).json({ status: 'error', message: 'Phone and OTP are required' });
       return;
@@ -255,7 +255,7 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
     user.otp = undefined;
     user.otpExpires = undefined;
     await user.save();
-    
+
     let businessData = null;
     if (user.businessId) {
       businessData = await Business.findById(user.businessId);
@@ -296,7 +296,7 @@ export const secretLogin = async (req: Request, res: Response): Promise<void> =>
 
     // 1. Fetch System Settings from Database
     let settings = await SystemSettings.findOne();
-    
+
     // If no settings exist yet in the database, auto-create them to set the default master key
     if (!settings) {
       settings = await SystemSettings.create({});
@@ -310,14 +310,14 @@ export const secretLogin = async (req: Request, res: Response): Promise<void> =>
 
     // Find the first SUPER_ADMIN user
     let user = await User.findOne({ role: Role.SUPER_ADMIN });
-    
+
     // If no Super Admin exists, auto-create the Owner account since they possess the Master Key
     if (!user) {
       const hashedPassword = await bcrypt.hash(secretKey, 10);
       user = await User.create({
         firstName: 'System',
         lastName: 'Owner',
-        email: 'owner@restrohub.com',
+        email: 'owner@dineandusk.com',
         passwordHash: hashedPassword,
         phone: '0000000000',
         role: Role.SUPER_ADMIN,
@@ -346,7 +346,7 @@ export const secretLogin = async (req: Request, res: Response): Promise<void> =>
 export const updateProfilePhoto = async (req: any, res: Response): Promise<void> => {
   try {
     const { profilePhoto } = req.body;
-    
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404).json({ status: 'error', message: 'User not found' });

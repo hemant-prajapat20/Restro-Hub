@@ -12,7 +12,7 @@ interface RazorpayOptions {
 
 export const initializeRazorpayPayment = async (options: RazorpayOptions) => {
   const token = localStorage.getItem('token');
-  
+
   try {
     // 1. Create order on backend
     const orderRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/payment/create-order`, {
@@ -26,9 +26,9 @@ export const initializeRazorpayPayment = async (options: RazorpayOptions) => {
         receipt: options.receiptId
       })
     });
-    
+
     const orderData = await orderRes.json();
-    
+
     if (orderData.status !== 'success') {
       throw new Error(orderData.message || 'Failed to initialize payment');
     }
@@ -40,7 +40,7 @@ export const initializeRazorpayPayment = async (options: RazorpayOptions) => {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_YourKeyIdHere', // Fallback for dev
       amount: amount.toString(),
       currency,
-      name: 'RestroHub POS',
+      name: 'Dine & Dusk POS',
       description: `Payment for Receipt: ${options.receiptId}`,
       image: 'https://cdn-icons-png.flaticon.com/512/3170/3170733.png',
       order_id,
@@ -76,7 +76,7 @@ export const initializeRazorpayPayment = async (options: RazorpayOptions) => {
         contact: options.customerContact || '9999999999'
       },
       notes: {
-        address: 'RestroHub Corporate Office'
+        address: 'Dine & Dusk Corporate Office'
       },
       theme: {
         color: '#d97706' // Amber-600

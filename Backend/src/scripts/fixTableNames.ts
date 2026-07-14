@@ -8,9 +8,9 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const fixTableNames = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restrohub');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/dineandusk');
     const tables = await Table.find().sort({ floor: 1, createdAt: 1 });
-    
+
     console.log(`Found ${tables.length} tables to evaluate for renaming...`);
 
     let gCounter = 1;
@@ -30,7 +30,7 @@ const fixTableNames = async () => {
           // It's on the rooftop
           newNumber = `R-${currentNumber.padStart(2, '0')}`;
         }
-        
+
         // Ensure no collisions
         const exists = await Table.findOne({ businessId: table.businessId, number: newNumber, _id: { $ne: table._id } });
         if (exists) {

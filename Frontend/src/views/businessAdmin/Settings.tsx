@@ -1,4 +1,4 @@
-// Settings component for Restrohub Business Admin
+// Settings component for Dine & Dusk Business Admin
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
@@ -85,7 +85,7 @@ export const Settings: React.FC = () => {
   const [isUploadingProfile, setIsUploadingProfile] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
-  const [viewingImage, setViewingImage] = useState<{url: string, alt: string} | null>(null);
+  const [viewingImage, setViewingImage] = useState<{ url: string, alt: string } | null>(null);
 
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [editPhoneValue, setEditPhoneValue] = useState(user?.phone || user?.businessData?.contactPhone || '');
@@ -264,8 +264,8 @@ export const Settings: React.FC = () => {
           <div className="bg-white border border-stone-200/80 rounded-[32px] p-5 lg:p-4 shadow-soft h-full flex flex-col">
             <div className="flex flex-col items-center text-center pb-6 border-b border-slate-100">
               <div className="relative group mb-4">
-                <div 
-                  onClick={() => user?.profilePhoto && setViewingImage({url: user.profilePhoto, alt: 'Profile Photo'})}
+                <div
+                  onClick={() => user?.profilePhoto && setViewingImage({ url: user.profilePhoto, alt: 'Profile Photo' })}
                   className="w-24 h-24 bg-brand-accent/10 rounded-full flex items-center justify-center text-brand-accent text-3xl font-bold border-4 border-white shadow-lg overflow-hidden cursor-pointer"
                 >
                   {user?.profilePhoto ? (
@@ -275,7 +275,7 @@ export const Settings: React.FC = () => {
                   )}
                 </div>
                 {/* Profile Photo Upload Overlay */}
-                <div 
+                <div
                   onClick={() => profileInputRef.current?.click()}
                   className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center cursor-pointer transition-opacity ${isUploadingProfile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                 >
@@ -305,7 +305,7 @@ export const Settings: React.FC = () => {
                 <Building2 className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div className="flex-1">
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Business Name</p>
-                  <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'RestroHub Prime'}</p>
+                  <p className="font-semibold text-slate-900 mb-2">{user?.businessData?.name || 'Dine & Dusk Prime'}</p>
 
                   {/* Business Hotel Pictures Gallery */}
                   <div className="mt-2 space-y-3">
@@ -315,24 +315,24 @@ export const Settings: React.FC = () => {
                         const isMain = user?.businessData?.mainHotelImage === url;
                         return (
                           <div key={index} className="relative group w-24 h-24 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                            <img 
-                              src={url} 
-                              alt={`Hotel Picture ${index + 1}`} 
+                            <img
+                              src={url}
+                              alt={`Hotel Picture ${index + 1}`}
                               className="w-full h-full object-cover cursor-pointer"
-                              onClick={() => setViewingImage({url, alt: `Hotel Picture ${index + 1}`})}
+                              onClick={() => setViewingImage({ url, alt: `Hotel Picture ${index + 1}` })}
                             />
                             {/* Hover Actions */}
                             <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button 
+                              <button
                                 onClick={(e) => handleSetMainHotelImage(e, url)}
-                                className="p-1 bg-white/90 text-yellow-500 hover:text-yellow-600 rounded-lg shadow-sm" 
+                                className="p-1 bg-white/90 text-yellow-500 hover:text-yellow-600 rounded-lg shadow-sm"
                                 title="Set as Main Photo"
                               >
                                 <Star size={12} className={isMain ? "fill-current" : ""} />
                               </button>
-                              <button 
+                              <button
                                 onClick={(e) => handleDeleteHotelImage(e, url)}
-                                className="p-1 bg-white/90 text-red-500 hover:text-red-600 rounded-lg shadow-sm" 
+                                className="p-1 bg-white/90 text-red-500 hover:text-red-600 rounded-lg shadow-sm"
                                 title="Delete Photo"
                               >
                                 <Trash2 size={12} />
@@ -349,7 +349,7 @@ export const Settings: React.FC = () => {
                       })}
 
                       {/* Add New Picture Button */}
-                      <div 
+                      <div
                         onClick={() => logoInputRef.current?.click()}
                         className="w-24 h-24 bg-slate-50 hover:bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center cursor-pointer transition-colors"
                       >
@@ -372,7 +372,7 @@ export const Settings: React.FC = () => {
                 <Mail className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Owner Email</p>
-                  <p className="font-semibold text-slate-900">{user?.email || 'admin@restrohub.com'}</p>
+                  <p className="font-semibold text-slate-900">{user?.email || 'admin@dineandusk.com'}</p>
                 </div>
               </div>
 
@@ -382,21 +382,21 @@ export const Settings: React.FC = () => {
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Contact Phone</p>
                   {isEditingPhone ? (
                     <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <input 
-                        type="text" 
-                        value={editPhoneValue} 
-                        onChange={(e) => setEditPhoneValue(e.target.value)} 
+                      <input
+                        type="text"
+                        value={editPhoneValue}
+                        onChange={(e) => setEditPhoneValue(e.target.value)}
                         className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm w-36 sm:w-48 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent"
                         placeholder="Enter contact phone"
                       />
-                      <button 
+                      <button
                         onClick={handleUpdatePhone}
                         disabled={isUpdatingPhone}
                         className="px-3 py-1.5 bg-brand-accent text-white rounded-lg text-sm font-medium hover:bg-brand-accent/90 disabled:opacity-50 shrink-0"
                       >
                         {isUpdatingPhone ? 'Saving...' : 'Save'}
                       </button>
-                      <button 
+                      <button
                         onClick={() => {
                           setIsEditingPhone(false);
                           setEditPhoneValue(user?.phone || user?.businessData?.contactPhone || '');
@@ -409,7 +409,7 @@ export const Settings: React.FC = () => {
                   ) : (
                     <div className="flex items-center justify-between">
                       <p className="font-semibold text-slate-900 truncate pr-2">{user?.phone || user?.businessData?.contactPhone || 'N/A'}</p>
-                      <button 
+                      <button
                         onClick={() => setIsEditingPhone(true)}
                         className="text-brand-accent text-xs font-semibold hover:underline shrink-0"
                       >
@@ -438,8 +438,8 @@ export const Settings: React.FC = () => {
                 <div>
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Subscription Paid</p>
                   <p className="font-semibold text-brand-success">
-                    {user?.businessData?.subscriptionAmountPaid 
-                      ? `₹ ${user.businessData.subscriptionAmountPaid.toLocaleString()}` 
+                    {user?.businessData?.subscriptionAmountPaid
+                      ? `₹ ${user.businessData.subscriptionAmountPaid.toLocaleString()}`
                       : 'N/A'}
                   </p>
                 </div>
@@ -450,7 +450,7 @@ export const Settings: React.FC = () => {
                 <div>
                   <p className="text-slate-500 font-medium text-xs uppercase tracking-widest">Plan Expiry</p>
                   <p className="font-semibold text-slate-900">
-                    {user?.businessData?.subscriptionExpiry 
+                    {user?.businessData?.subscriptionExpiry
                       ? new Date(user.businessData.subscriptionExpiry).toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' })
                       : 'N/A'}
                   </p>
@@ -469,73 +469,73 @@ export const Settings: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FeatureToggle 
+              <FeatureToggle
                 icon={Store}
                 title={isStoreOpen ? "Restaurant is Open" : "Restaurant is Closed"}
                 description={isStoreOpen ? "Customers can view menu and place orders" : "Store is closed. Orders are paused"}
                 enabled={isStoreOpen}
                 onToggle={handleStoreToggle}
               />
-              <FeatureToggle 
-                icon={Bell} 
-                title="Push Notifications" 
+              <FeatureToggle
+                icon={Bell}
+                title="Push Notifications"
                 description="Receive instant alerts for new orders and reservations."
                 enabled={features.notifications}
                 onToggle={() => toggleFeature('notifications')}
               />
-              <FeatureToggle 
-                icon={ShoppingBag} 
-                title="Online Orders (Delivery)" 
+              <FeatureToggle
+                icon={ShoppingBag}
+                title="Online Orders (Delivery)"
                 description="Accept delivery and takeaway orders from customers online."
                 enabled={features.onlineOrders}
                 onToggle={() => toggleFeature('onlineOrders')}
               />
-              <FeatureToggle 
-                icon={Crown} 
-                title="VIP Management" 
+              <FeatureToggle
+                icon={Crown}
+                title="VIP Management"
                 description="Track and reward high-value customers with loyalty points."
                 enabled={features.vip}
                 onToggle={() => toggleFeature('vip')}
               />
               {user?.businessData?.platforms?.includes('Restaurant') && (
-                <FeatureToggle 
-                  icon={Utensils} 
-                  title="Restaurant (Restro)" 
-                  description="Full dining experience with KDS and POS billing." 
+                <FeatureToggle
+                  icon={Utensils}
+                  title="Restaurant (Restro)"
+                  description="Full dining experience with KDS and POS billing."
                   enabled={features.restaurant}
                   onToggle={() => toggleFeature('restaurant')}
                 />
               )}
               {user?.businessData?.platforms?.includes('Cafeteria') && (
-                <FeatureToggle 
-                  icon={Coffee} 
-                  title="Cafe & Patisserie" 
-                  description="Quick service mode for cafes, bakeries, and coffee shops." 
+                <FeatureToggle
+                  icon={Coffee}
+                  title="Cafe & Patisserie"
+                  description="Quick service mode for cafes, bakeries, and coffee shops."
                   enabled={features.cafe}
                   onToggle={() => toggleFeature('cafe')}
                 />
               )}
               {user?.businessData?.platforms?.includes('Bar') && (
-                <FeatureToggle 
-                  icon={Wine} 
-                  title="Bar Lounge" 
+                <FeatureToggle
+                  icon={Wine}
+                  title="Bar Lounge"
                   description="Manage bar inventory, drink menus, and tabs."
                   enabled={features.bar}
                   onToggle={() => toggleFeature('bar')}
                 />
               )}
               {user?.businessData?.platforms?.includes('GenericCafeteria') && (
-                <FeatureToggle 
-                  icon={Store} 
-                  title="Cafeteria" 
+                <FeatureToggle
+                  icon={Store}
+                  title="Cafeteria"
                   description="Token-based ordering for corporate cafeterias and canteens."
                   enabled={features.cafeteria}
                   onToggle={() => toggleFeature('cafeteria')}
                 />
               )}
-              <FeatureToggle 
-                icon={CalendarCheck} 
-                title="Table Booking" 
+              <FeatureToggle
+                icon={CalendarCheck}
+                title="Table Booking"
                 description="Allow customers to pre-book tables or event slots."
                 enabled={features.reservations}
                 onToggle={() => toggleFeature('reservations')}
@@ -543,9 +543,9 @@ export const Settings: React.FC = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-slate-100 flex justify-end">
-               <button className="py-3 px-6 bg-brand-accent hover:bg-yellow-500 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-brand-accent/20">
-                 Save Configuration
-               </button>
+              <button className="py-3 px-6 bg-brand-accent hover:bg-yellow-500 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-brand-accent/20">
+                Save Configuration
+              </button>
             </div>
           </div>
         </div>
@@ -553,10 +553,10 @@ export const Settings: React.FC = () => {
       </div>
 
       {viewingImage && (
-        <ImageModal 
-          imageUrl={viewingImage.url} 
-          altText={viewingImage.alt} 
-          onClose={() => setViewingImage(null)} 
+        <ImageModal
+          imageUrl={viewingImage.url}
+          altText={viewingImage.alt}
+          onClose={() => setViewingImage(null)}
         />
       )}
     </div>
