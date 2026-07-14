@@ -57,6 +57,12 @@ export const Tables: React.FC = () => {
   const [newTableCapacity, setNewTableCapacity] = useState(4);
   const [newTableFloor, setNewTableFloor] = useState(1);
 
+  const [showEditTableModal, setShowEditTableModal] = useState(false);
+  const [editingTableId, setEditingTableId] = useState<string | null>(null);
+  const [editTableIdentifier, setEditTableIdentifier] = useState('');
+  const [editTableCapacity, setEditTableCapacity] = useState(4);
+  const [editTableFloor, setEditTableFloor] = useState(1);
+
   
   const [showAddReservationModal, setShowAddReservationModal] = useState(false);
   const [newResName, setNewResName] = useState('');
@@ -146,6 +152,23 @@ export const Tables: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       toast.success('Table Added');
+    }
+  });
+
+  const updateTableDetailsMutation = useMutation({
+    mutationFn: async (data: any) => await api.put(`/tables/${data.id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      toast.success('Table Updated');
+      setShowEditTableModal(false);
+    }
+  });
+
+  const deleteTableMutation = useMutation({
+    mutationFn: async (id: string) => await api.delete(`/tables/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tables'] });
+      toast.success('Table Deleted');
     }
   });
 
@@ -559,7 +582,22 @@ export const Tables: React.FC = () => {
           >
             <div className="flex items-start justify-between mb-8">
               <div>
-                <h3 className="text-3xl font-semibold text-slate-900 group-hover:text-brand-accent transition-colors">#{table.number}</h3>
+                <h3 className="text-3xl font-semibold text-slate-900 group-hover:text-brand-accent transition-colors flex items-center gap-2">
+                  #{table.number}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingTableId(table._id);
+                      setEditTableIdentifier(table.number);
+                      setEditTableCapacity(table.capacity);
+                      setEditTableFloor(table.floor);
+                      setShowEditTableModal(true);
+                    }} 
+                    className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-brand-accent transition-opacity ml-1"
+                  >
+                    <Edit3 size={20} />
+                  </button>
+                </h3>
                 <p className="text-xs font-bold text-slate-400 mt-1 uppercase flex items-center gap-1">
                   <Users size={12} />
                   {table.capacity} Seater
@@ -1110,7 +1148,7 @@ export const Tables: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Add Table Modal Placeholder */}
+      {/* Add Table Modal */}
       <AnimatePresence>
          {showAddTableModal && (
             <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
@@ -1165,9 +1203,103 @@ export const Tables: React.FC = () => {
                            setNewTableIdentifier('');
                         }}
                         disabled={addTableMutation.isPending}
-                        className="flex-[2] py-4 bg-brand-accent text-white font-semibold rounded-2xl shadow-xl shadow-brand-accent/20"
+                        className="flex-1 bg-brand-primary text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-primary/20"
                      >
-                        {addTableMutation.isPending ? 'PROVISIONING...' : 'PROVISION TABLE'}
+                        SAVE TABLE
+                     </button>
+                  </div>
+               </motion.div>
+            </div>
+         )}
+      </AnimatePresence>
+
+      {/* Edit Table Modal */}
+      <AnimatePresence>
+         {showEditTableModal && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+               <motion.div 
+                 initial={{ opacity: 0 }} 
+                 animate={{ opacity: 1 }} 
+                 exit={{ opacity: 0 }}
+                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                 onClick={() => setShowEditTableModal(false)}
+               />
+               <motion.div 
+                 initial={{ scale: 0.9, opacity: 0 }} 
+                 animate={{ scale: 1, opacity: 1 }} 
+                 exit={{ scale: 0.9, opacity: 0 }}
+                 className="relative bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl border border-slate-200"
+               >
+                  <div className="flex justify-between items-start mb-8">
+                     <div>
+                       <h2 className="text-2xl font-bold text-slate-900 tracking-tight leading-tight">Edit Table</h2>
+                       <p className="text-sm font-medium text-slate-500 mt-1">Update table configuration</p>
+                     </div>
+                     <div className="p-3 bg-brand-accent/10 text-brand-accent rounded-2xl">
+                        <Edit3 size={24} />
+                     </div>
+                  </div>
+                  <div className="space-y-6">
+                     <div>
+                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Table Identifier / Number</label>
+                        <input 
+                           type="text" 
+                           value={editTableIdentifier} 
+                           onChange={(e) => setEditTableIdentifier(e.target.value)}
+                           className="w-full bg-slate-50 border-0 text-slate-900 font-semibold px-5 py-4 rounded-2xl focus:ring-2 focus:ring-brand-accent outline-none transition-all"
+                           placeholder="e.g. T-14 or Balcony-2"
+                        />
+                     </div>
+                     <div className="grid grid-cols-2 gap-4">
+                        <div>
+                           <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Seating Capacity</label>
+                           <div className="flex items-center justify-between bg-slate-50 rounded-2xl p-2 border border-slate-100">
+                             <button onClick={() => setEditTableCapacity(Math.max(1, editTableCapacity - 1))} className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all shadow-sm"><Utensils size={16} /></button>
+                             <span className="font-semibold text-lg">{editTableCapacity}</span>
+                             <button onClick={() => setEditTableCapacity(editTableCapacity + 1)} className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all shadow-sm"><Users size={16} /></button>
+                           </div>
+                        </div>
+                        <div>
+                           <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Floor / Zone</label>
+                           <select
+                             value={editTableFloor}
+                             onChange={(e) => setEditTableFloor(Number(e.target.value))}
+                             className="w-full bg-slate-50 border-0 text-slate-900 font-semibold px-5 h-[52px] rounded-2xl focus:ring-2 focus:ring-brand-accent outline-none appearance-none"
+                           >
+                              <option value={1}>Ground Floor</option>
+                              <option value={2}>Rooftop / Terrace</option>
+                           </select>
+                        </div>
+                     </div>
+                  </div>
+                  <div className="flex gap-4 mt-10">
+                     <button 
+                        onClick={() => {
+                          if(window.confirm('Are you sure you want to permanently delete this table?')) {
+                             deleteTableMutation.mutate(editingTableId!);
+                             setShowEditTableModal(false);
+                          }
+                        }} 
+                        className="py-4 px-6 font-semibold text-brand-danger hover:bg-brand-danger/10 rounded-[20px] transition-all flex items-center justify-center"
+                        title="Delete Table"
+                     >
+                        <Trash2 size={20} />
+                     </button>
+                     <button onClick={() => setShowEditTableModal(false)} className="flex-1 py-4 font-semibold text-slate-400 hover:text-slate-600 transition-all">DISCARD</button>
+                     <button 
+                        onClick={() => {
+                           if (!editTableIdentifier) return toast.error('Table Identifier is required');
+                           updateTableDetailsMutation.mutate({
+                               id: editingTableId,
+                               number: editTableIdentifier,
+                               capacity: editTableCapacity,
+                               floor: editTableFloor
+                           });
+                        }}
+                        disabled={updateTableDetailsMutation.isPending}
+                        className="flex-1 bg-brand-primary text-white py-4 rounded-[20px] font-semibold text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-primary/20"
+                     >
+                        UPDATE TABLE
                      </button>
                   </div>
                </motion.div>
